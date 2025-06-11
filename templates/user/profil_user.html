@@ -1,0 +1,352 @@
+{% extends "user/base_user.html" %}
+{% block content %}
+
+    <div class="profil-header">
+        <div class="profil-avatar-wrapper">
+            <div class="editprofil-profile-image-wrapper" style="top:20px">
+                <img src="https://storage.googleapis.com/a1aa/image/10b4ac45-2b8b-450f-888c-bd7182757e8a.jpg" alt="Profile" class="rounded-circle" width="150" height="150" id="editprofil-profileImage">
+            </div>
+        </div>
+    </div>
+
+    <div class="profil-content">
+        <p class="profil-name" id="editprofil-displayName">Memuat Nama...</p>
+        <p class="profil-username" id="editprofil-displayUsername">Memuat Username...</p>
+        <p class="profil-email" id="editprofil-displayEmail">Memuat Email...</p>
+        <div class="profil-button-wrapper">
+            <button class="profil-button" id="editprofil-editBtn" type="button">Ubah Profil</button>
+        </div>
+    </div>
+
+    <div class="modal fade" id="editprofil-editModal" tabindex="-1" role="dialog" aria-labelledby="editprofilModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered" role="document" style="max-width: 400px; width: 90vw; margin: auto;">
+            <div class="modal-content" style="border-radius: 12px; max-height: 100vh; overflow-y: auto;">
+
+                <div class="modal-header" style="background-color: #7da3e0; border-radius: 0.75rem; height: 10rem; width: 352px; margin: 20px 20px 0 20px; position: relative;">
+                    <h5 class="modal-title text-white" id="editprofilModalLabel" style="position: absolute; left: 1rem; top: 1rem;">Ubah Profil</h5>
+                    <button type="button" class="close text-white" data-dismiss="modal" aria-label="Close" style="position: absolute; right: 1rem; top: 1rem; font-size: 1.5rem;">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+
+                <form id="editprofil-editForm">
+                    <div class="modal-body" style="margin: 20px">
+
+                        <div class="text-center mb-4">
+                            <div class="editprofil-profile-image-wrapper" style="position: absolute; top: -8%; left: 50%; transform: translate(-50%, -50%); z-index: 10; text-align: center;">
+                                <img src="https://storage.googleapis.com/a1aa/image/10b4ac45-2b8b-450f-888c-bd7182757e8a.jpg" alt="Profile" class="rounded-circle bg-light p-1.5" width="80" height="80" id="editprofil-editProfileImage">
+                                <label for="editprofil-photoInput" class="editprofil-camera-label" title="Ubah Foto Profil">
+                                    <i class="bi bi-camera editprofil-camera-icon"></i>
+                                </label>
+                                <input type="file" accept="image/*" id="editprofil-photoInput" name="photo" style="display: none;">
+                            </div>
+                        </div>
+
+                        <div class="form-group text-center" style="margin-top: 20px;">
+                            <button type="button" class="btn btn-sm btn-danger" id="editprofil-deletePhotoBtn" style="background-color: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer;">
+                                Hapus Foto Profil
+                            </button>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="editprofil-nameInput" class="editprofil-reponsiflabel">Nama Lengkap</label>
+                            <input type="text" class="form-control form-control-sm editprofil-reponsifinputtext" id="editprofil-nameInput" name="name">
+                        </div>
+                        <div class="form-group">
+                            <label for="editprofil-usernameInput" class="editprofil-reponsiflabel">Username</label>
+                            <input type="text" class="form-control form-control-sm editprofil-reponsifinputtext" id="editprofil-usernameInput" name="username">
+                        </div>
+                        <div class="form-group">
+                            <label for="editprofil-emailInput" class="editprofil-reponsiflabel">Email</label>
+                            <input type="email" class="form-control form-control-sm editprofil-reponsifinputtext" id="editprofil-emailInput" name="email">
+                        </div>
+
+                    </div>
+
+                    <div class="modal-footer" style="padding: 16px; gap: 12px;">
+                        <button type="button" class="editprofil-btneditbatal" data-dismiss="modal" id="editprofil-cancelBtn">Batal</button>
+                        <button type="submit" class="editprofil-btneditsimpan" id="editprofil-saveBtn" disabled>Simpan</button>
+                    </div>
+                </form>
+
+            </div>
+        </div>
+    </div>
+
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.3/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+
+    <script>
+        const DEFAULT_PROFILE_PIC_URL = "https://storage.googleapis.com/a1aa/image/10b4ac45-2b8b-450f-888c-bd7182757e8a.jpg";
+
+        const profilDisplayName = document.getElementById('editprofil-displayName');
+        const profilUsername = document.getElementById('editprofil-displayUsername');
+        const profilEmail = document.getElementById('editprofil-displayEmail');
+        const profilProfileImage = document.getElementById('editprofil-profileImage');
+
+        const editprofil_editBtn = document.getElementById('editprofil-editBtn');
+        const editprofil_editModal = new bootstrap.Modal(document.getElementById('editprofil-editModal'));
+        const editprofil_editForm = document.getElementById('editprofil-editForm');
+
+        const editprofil_editProfileImage = document.getElementById('editprofil-editProfileImage');
+        const editprofil_photoInput = document.getElementById('editprofil-photoInput');
+        const editprofil_deletePhotoBtn = document.getElementById('editprofil-deletePhotoBtn');
+        const editprofil_saveBtn = document.getElementById('editprofil-saveBtn'); // Ambil tombol simpan
+
+        let initialName = '';
+        let initialUsername = '';
+        let initialEmail = '';
+        let initialPhotoUrl = ''; // Untuk melacak URL foto profil awal
+
+        // Fungsi untuk memeriksa perubahan dan mengaktifkan/menonaktifkan tombol simpan
+        function checkChanges() {
+            const currentName = editprofil_editForm.name.value.trim();
+            const currentUsername = editprofil_editForm.username.value.trim();
+            const currentEmail = editprofil_editForm.email.value.trim();
+            const currentPhotoFile = editprofil_photoInput.files[0];
+            const currentPhotoSrc = editprofil_editProfileImage.src;
+
+
+            const isNameChanged = currentName !== initialName;
+            const isUsernameChanged = currentUsername !== initialUsername;
+            const isEmailChanged = currentEmail !== initialEmail;
+            const isPhotoChanged = currentPhotoFile !== undefined || currentPhotoSrc !== initialPhotoUrl; // Periksa apakah ada file baru atau URL gambar berubah
+
+            if (isNameChanged || isUsernameChanged || isEmailChanged || isPhotoChanged) {
+                editprofil_saveBtn.disabled = false;
+            } else {
+                editprofil_saveBtn.disabled = true;
+            }
+        }
+
+        async function loadUserProfile() {
+            try {
+                const response = await fetch('/api/profil');
+                const data = await response.json();
+
+                console.log("DEBUG JS: Data diterima dari /api/profil:", data);
+
+                if (response.ok && data.success) {
+                    profilDisplayName.textContent = data.full_name;
+                    profilUsername.textContent = data.username;
+                    profilEmail.textContent = data.email;
+                    profilProfileImage.src = data.profile_picture_url || DEFAULT_PROFILE_PIC_URL;
+
+                    // Simpan nilai awal saat memuat profil
+                    initialName = data.full_name;
+                    initialUsername = data.username;
+                    initialEmail = data.email;
+                    initialPhotoUrl = data.profile_picture_url || DEFAULT_PROFILE_PIC_URL;
+
+                    console.log("DEBUG JS: Mengatur gambar profil utama ke:", profilProfileImage.src);
+                    checkChanges(); // Panggil saat memuat profil untuk menonaktifkan tombol jika tidak ada perubahan
+                } else {
+                    console.error("Gagal memuat profil:", data.message || "Terjadi kesalahan.");
+                    if (data.message && data.message.includes("Anda harus login")) {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Sesi Habis',
+                            text: 'Anda harus login untuk melihat profil.',
+                            confirmButtonText: 'Login Sekarang'
+                        }).then(() => {
+                            window.location.href = '/masuk';
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Gagal Memuat',
+                            text: 'Gagal memuat data profil: ' + (data.message || 'Terjadi kesalahan.'),
+                        });
+                    }
+                }
+            } catch (error) {
+                console.error("Terjadi kesalahan jaringan atau server:", error);
+                Swal.fire({
+                    icon: 'error',
+                    title: 'Kesalahan Jaringan',
+                    text: 'Tidak dapat terhubung ke server. Silakan coba lagi nanti.',
+                });
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', loadUserProfile);
+
+        editprofil_editBtn.addEventListener('click', () => {
+            editprofil_editForm.name.value = profilDisplayName.textContent;
+            editprofil_editForm.username.value = profilUsername.textContent;
+            editprofil_editForm.email.value = profilEmail.textContent;
+            editprofil_editProfileImage.src = profilProfileImage.src;
+
+            // Perbarui nilai awal saat modal dibuka
+            initialName = profilDisplayName.textContent;
+            initialUsername = profilUsername.textContent;
+            initialEmail = profilEmail.textContent;
+            initialPhotoUrl = profilProfileImage.src;
+            editprofil_photoInput.value = ''; // Reset input file agar tidak dianggap "berubah" jika file yang sama dipilih lagi
+            
+            checkChanges(); // Panggil saat modal dibuka untuk memastikan tombol simpan sesuai
+            editprofil_editModal.show();
+        });
+
+        document.getElementById('editprofil-cancelBtn').addEventListener('click', () => {
+            editprofil_photoInput.value = '';
+            editprofil_editProfileImage.src = profilProfileImage.src; // Kembalikan ke foto profil awal
+            // Reset nilai input ke nilai awal saat dibatalkan
+            editprofil_editForm.name.value = initialName;
+            editprofil_editForm.username.value = initialUsername;
+            editprofil_editForm.email.value = initialEmail;
+            checkChanges(); // Panggil untuk menonaktifkan tombol setelah batal
+        });
+
+        editprofil_photoInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function (event) {
+                    editprofil_editProfileImage.src = event.target.result;
+                    checkChanges(); // Panggil setelah perubahan foto
+                };
+                reader.readAsDataURL(file);
+            } else {
+                // Jika input file dikosongkan (misalnya, pengguna memilih file lalu membatalkannya di dialog file)
+                // Kembalikan gambar ke URL awal dan panggil checkChanges
+                editprofil_editProfileImage.src = initialPhotoUrl;
+                checkChanges();
+            }
+        });
+
+        // Event listener untuk input teks
+        editprofil_editForm.name.addEventListener('input', checkChanges);
+        editprofil_editForm.username.addEventListener('input', checkChanges);
+        editprofil_editForm.email.addEventListener('input', checkChanges);
+
+
+        editprofil_deletePhotoBtn.addEventListener('click', async () => {
+            const result = await Swal.fire({
+                title: 'Apakah Anda yakin?',
+                text: "Anda tidak akan dapat mengembalikan ini!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, hapus!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (result.isConfirmed) {
+                try {
+                    const response = await fetch('/api/profil/delete_photo', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json'
+                        }
+                    });
+
+                    const resultData = await response.json();
+                    console.log("DEBUG JS: Respon dari /api/profil/delete_photo:", resultData);
+
+                    if (response.ok && resultData.success) {
+                        Swal.fire(
+                            'Dihapus!',
+                            resultData.message,
+                            'success'
+                        );
+                        await loadUserProfile();
+                        editprofil_editModal.hide();
+                    } else {
+                        Swal.fire(
+                            'Gagal!',
+                            'Gagal menghapus foto profil: ' + (resultData.message || 'Terjadi kesalahan.'),
+                            'error'
+                        );
+                        console.error("Error menghapus foto profil:", resultData.message);
+                    }
+                } catch (error) {
+                    console.error("Terjadi kesalahan saat mengirim permintaan penghapusan:", error);
+                    Swal.fire(
+                        'Kesalahan!',
+                        'Terjadi kesalahan saat menghapus foto profil. Silakan coba lagi.',
+                        'error'
+                    );
+                }
+            }
+        });
+
+
+        editprofil_editForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            // Konfirmasi sebelum menyimpan
+            const confirmResult = await Swal.fire({
+                title: 'Konfirmasi Perubahan',
+                text: "Apakah Anda yakin ingin menyimpan perubahan profil?",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#3085d6',
+                cancelButtonColor: '#d33',
+                confirmButtonText: 'Ya, Simpan!',
+                cancelButtonText: 'Batal'
+            });
+
+            if (confirmResult.isConfirmed) {
+                const formData = new FormData();
+                formData.append('name', editprofil_editForm.name.value.trim());
+                formData.append('username', editprofil_editForm.username.value.trim());
+                formData.append('email', editprofil_editForm.email.value.trim());
+
+                if (editprofil_photoInput.files[0]) {
+                    formData.append('photo', editprofil_photoInput.files[0]);
+                    console.log("DEBUG JS: File foto ditambahkan ke FormData.");
+                } else {
+                    console.log("DEBUG JS: Tidak ada file foto yang dipilih.");
+                    // Jika foto tidak diubah, kita perlu memastikan server tidak menghapus foto yang ada
+                    // Anda mungkin perlu menambahkan logic di backend untuk membedakan ini
+                    // Atau, Anda bisa menambahkan flag di FormData:
+                    // if (initialPhotoUrl !== editprofil_editProfileImage.src && editprofil_photoInput.files.length === 0) {
+                    //     formData.append('clear_photo', 'true'); // Kirim sinyal ke backend untuk menghapus foto
+                    // }
+                }
+
+                try {
+                    const response = await fetch('/api/profil/update', {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+                    console.log("DEBUG JS: Respon dari /api/profil/update:", result);
+
+                    if (response.ok && result.success) {
+                        Swal.fire(
+                            'Berhasil!',
+                            result.message,
+                            'success'
+                        );
+                        await loadUserProfile();
+                        editprofil_editModal.hide();
+                        editprofil_photoInput.value = ''; // Reset input file setelah berhasil disimpan
+                    } else {
+                        Swal.fire(
+                            'Gagal!',
+                            'Gagal memperbarui profil: ' + (result.message || 'Terjadi kesalahan.'),
+                            'error'
+                        );
+                        console.error("Error memperbarui profil:", result.message);
+                    }
+                } catch (error) {
+                    console.error("Terjadi kesalahan saat mengirim data:", error);
+                    Swal.fire(
+                        'Kesalahan!',
+                        'Terjadi kesalahan saat memperbarui profil. Silakan coba lagi.',
+                        'error'
+                    );
+                }
+            }
+        });
+    </script>
+
+{% endblock %}

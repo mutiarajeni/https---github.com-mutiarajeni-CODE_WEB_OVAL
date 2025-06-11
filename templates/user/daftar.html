@@ -1,0 +1,211 @@
+{% extends "user/base_user.html" %} {% block title %} Login | Oval Photo
+{%endblock %} {% block content %}
+
+<div class="container-login" style=" min-height: 150vh;">
+  <div class="login-logo">
+    <img src="static/img/logo.png" alt="Logo" />
+    <h2 class="mb-0">Oval Photo</h2>
+  </div>
+
+  <div class="login-card">
+    <form id="daftarForm">
+      <h2 class="login-title">Daftar</h2>
+      <p class="login-subtitle">
+        Halo! Ayo daftar sekarang untuk memesan sesi foto kamu hari ini
+      </p>
+
+      <div class="mb-3">
+        <label for="namalengkap" class="form-label">Nama Lengkap</label>
+        <input
+          type="text"
+          class="form-control"
+          id="namalengkap"
+          placeholder="Masukkan nama lengkap kamu"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="username" class="form-label">Nama Pengguna</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          placeholder="Masukkan nama pengguna kamu"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="alamatemail" class="form-label">Alamat Email</label>
+        <input
+          type="email"
+          class="form-control"
+          id="alamatemail"
+          placeholder="Masukkan alamat email kamu"
+          required
+        />
+      </div>
+
+      <div class="mb-3">
+        <label for="password" class="form-label">Kata Sandi</label>
+        <div class="password-wrapper">
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Masukkan kata sandi kamu"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            aria-label="Toggle password visibility"
+          >
+            <i class="bi bi-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="mb-3">
+        <label for="konfirpassword" class="form-label"
+          >Konfirmasi Kata Sandi</label
+        >
+        <div class="password-wrapper">
+          <input
+            type="password"
+            class="form-control"
+            id="konfirpassword"
+            placeholder="Masukkan kata sandi kamu lagi"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-konfirpassword"
+            aria-label="Toggle password visibility"
+          >
+            <i class="bi bi-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <button type="submit" class="btn-masuk" id="daftarButton" disabled>
+        Daftar
+      </button>
+      <p class="signup-text">
+        Sudah mempunyai akun? <a href="/masuk">Masuk</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+<script>
+  const namalengkapInput = document.getElementById("namalengkap");
+  const alamatemailInput = document.getElementById("alamatemail");
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const konfirpasswordInput = document.getElementById("konfirpassword");
+  const daftarButton = document.getElementById("daftarButton"); // Changed ID
+  const daftarForm = document.getElementById("daftarForm"); // Changed ID
+
+  const togglePassword = document.querySelector(".toggle-password i");
+  const toggleKonfirPassword = document.querySelector(".toggle-konfirpassword i");
+
+  // Fungsi untuk validasi semua field
+  function validateForm() {
+    const isFormValid =
+      namalengkapInput.value.trim() &&
+      alamatemailInput.value.trim() &&
+      usernameInput.value.trim() &&
+      passwordInput.value.trim() &&
+      konfirpasswordInput.value.trim();
+
+    daftarButton.disabled = !isFormValid;
+    daftarButton.style.cursor = isFormValid ? "pointer" : "not-allowed";
+    daftarButton.style.backgroundColor = isFormValid ? "#2563eb" : "#d1d5db";
+  }
+
+  // Tambahkan event listener ke semua input
+  [
+    namalengkapInput,
+    alamatemailInput,
+    usernameInput,
+    passwordInput,
+    konfirpasswordInput,
+  ].forEach((input) => input.addEventListener("input", validateForm));
+
+  // Toggle untuk password
+  document.querySelector(".toggle-password").addEventListener("click", function () {
+    const type = passwordInput.type === "password" ? "text" : "password";
+    passwordInput.type = type;
+    togglePassword.classList.toggle("bi-eye");
+    togglePassword.classList.toggle("bi-eye-slash");
+  });
+
+  // Toggle untuk konfirmasi password
+  document
+    .querySelector(".toggle-konfirpassword")
+    .addEventListener("click", function () {
+      const type =
+        konfirpasswordInput.type === "password" ? "text" : "password";
+      konfirpasswordInput.type = type;
+      toggleKonfirPassword.classList.toggle("bi-eye");
+      toggleKonfirPassword.classList.toggle("bi-eye-slash");
+    });
+
+  // Handle daftar form submission
+  daftarForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const namalengkap = namalengkapInput.value.trim();
+    const username = usernameInput.value.trim();
+    const alamatemail = alamatemailInput.value.trim();
+    const password = passwordInput.value.trim();
+    const konfirpassword = konfirpasswordInput.value.trim();
+
+    try {
+      const response = await fetch("/api/daftar", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          namalengkap,
+          username,
+          alamatemail,
+          password,
+          konfirpassword,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: data.message,
+          showConfirmButton: false,
+          timer: 2000,
+        }).then(() => {
+          window.location.href = "/masuk"; // Redirect to login page
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: data.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Terjadi kesalahan koneksi. Silakan coba lagi.",
+      });
+    }
+  });
+</script>
+
+{% endblock %}

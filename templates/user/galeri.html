@@ -1,0 +1,603 @@
+{% extends "user/base_user.html" %}
+
+{% block content %}
+<header class="header">
+    <div class="header-content text-center">
+        <h1>Galeri Oval Photo</h1>
+        <p>Abadikan momen istimewa kamu dan lihatlah karya foto kami di Galeri Oval!</p>
+    </div>
+</header>
+
+<section class="filters" aria-label="Filter selection">
+    <div>
+        <label for="kategori">Kategori</label>
+        <select id="kategori" name="kategori" aria-describedby="kategoriGaleri">
+            <option value="all">Semua Kategori</option>
+            </select>
+    </div>
+    <div>
+        <label for="pilihan-kategori">Pilihan Kategori</label>
+        <select id="pilihan-kategori" name="pilihan-kategori" disabled aria-describedby="pilihanKategoriGaleri">
+            <option value="all">Pilih Kategori Dahulu</option>
+            </select>
+    </div>
+</section>
+
+<div class="subutama-container" role="main">
+    <div class="gallery" id="full-gallery-view" style="display: none;">
+        <div class="gallery-grid" id="gallery-grid">
+            <img src="static/img/G1.jpg" alt="Couple posing in front of a flower wall" />
+            <img src="static/img/G3.jpg" alt="Two children wearing white headscarves and smiling" />
+            <img src="static/img/G5.jpg" alt="Bride and groom in traditional red attire" />
+            <img src="static/img/G7.jpg" alt="Woman posing in front of decorative flowers" />
+            <img src="static/img/G2.jpg" alt="Couple posing in front of a flower wall side view" />
+            <img src="static/img/G4.jpg" alt="Couple posing under tree branches" />
+            <img src="static/img/G6.jpg" alt="Group posing in traditional attire with decorations" />
+            <img src="static/img/G8.jpg" alt="Couple posing in front of decorative flowers" />
+            <img src="static/img/G9.jpg" alt="Group posing indomaret" />
+            <img src="static/img/G10.jpg" alt="Couple wedding" />
+        </div>
+    </div>
+
+    <div id="preview-sections">
+        </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const kategoriSelect = document.getElementById('kategori');
+        const pilihanKategoriSelect = document.getElementById('pilihan-kategori');
+        const galleryGrid = document.getElementById('gallery-grid');
+        const fullGalleryView = document.getElementById('full-gallery-view');
+        const previewSectionsContainer = document.getElementById('preview-sections');
+
+        let kategoriOptions = [];
+        let pilihanKategoriOptions = {};
+
+        let triggeredBySelengkapnyaButton = false; 
+
+        // Helper function for logging with timestamp
+        function log(message) {
+            console.log(`[${new Date().toLocaleTimeString('id-ID')}] ${message}`);
+        }
+
+        async function initializeGallery() {
+            log('Initializing gallery...');
+            try {
+                const response = await fetch('/api/kategori_options');
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error fetching options! status: ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                log('Filter options fetched successfully.');
+                
+                kategoriOptions = data.kategori;
+                pilihanKategoriOptions = data.pilihan_kategori;
+
+                // Populate Kategori dropdown
+                kategoriSelect.innerHTML = ''; 
+                kategoriOptions.forEach(option => {
+                    const opt = document.createElement('option');
+                    opt.value = option.value;
+                    opt.textContent = option.text;
+                    kategoriSelect.appendChild(opt);
+                });
+
+                // Set initial state for Pilihan Kategori dropdown
+                pilihanKategoriSelect.disabled = true;
+                pilihanKategoriSelect.innerHTML = '<option value="all">Pilih Kategori Dahulu</option>';
+
+                // Load initial gallery content (usually 'all' previews)
+                fetchGalleryContent(); 
+
+            } catch (error) {
+                console.error('Error initializing gallery:', error);
+                previewSectionsContainer.innerHTML = '<p>Gagal memuat opsi filter. Silakan coba refresh halaman. Detail: ' + error.message + '</p>';
+                previewSectionsContainer.style.display = 'block';
+            }
+        }
+
+        function populatePilihanKategori() {
+            log('Populating Pilihan Kategori dropdown...');
+            const selectedKategori = kategoriSelect.value;
+            pilihanKategoriSelect.innerHTML = ''; // Clear existing options
+
+            if (selectedKategori === 'all') {
+                pilihanKategoriSelect.disabled = true;
+                pilihanKategoriSelect.innerHTML = '<option value="all">Pilih Kategori Dahulu</option>';
+            } else {
+                pilihanKategoriSelect.disabled = false;
+                const options = pilihanKategoriOptions[selectedKategori];
+                if (options) {
+                    options.forEach(option => {
+                        const opt = document.createElement('option');
+                        opt.value = option.value;
+                        opt.textContent = option.text;
+                        pilihanKategoriSelect.appendChild(opt);
+                    });
+                } else {
+                    pilihanKategoriSelect.innerHTML = '<option value="all">Tidak ada pilihan</option>'; 
+                }
+            }
+            log('Pilihan Kategori dropdown populated.');
+            
+            if (!triggeredBySelengkapnyaButton) {
+                log('populatePilihanKategori: Triggering fetchGalleryContent as not from Selengkapnya button.');
+                fetchGalleryContent();
+            } else {
+                log('populatePilihanKategori: Skipping fetchGalleryContent as it will be triggered by Selengkapnya button logic.');
+                triggeredBySelengkapnyaButton = false; 
+            }
+        }
+
+        async function fetchGalleryContent() {
+            const selectedKategori = kategoriSelect.value;
+            const selectedPilihanKategori = pilihanKategoriSelect.value;
+            log(`Fetching gallery content for Kategori: ${selectedKategori}, Pilihan Kategori: ${selectedPilihanKategori}`);
+
+            // Clear and hide all content containers first to ensure a clean slate
+            galleryGrid.innerHTML = ''; 
+            fullGalleryView.style.display = 'none';
+            previewSectionsContainer.innerHTML = ''; 
+            previewSectionsContainer.style.display = 'none';
+
+            if (selectedKategori === 'all') {
+                previewSectionsContainer.style.display = 'block'; 
+                await generatePreviewSections();
+            } else if (selectedPilihanKategori === 'all') { 
+                previewSectionsContainer.style.display = 'block'; 
+                await generateSubCategoryPreviewSections(selectedKategori);
+            } else {
+                fullGalleryView.style.display = 'block'; 
+                await fetchFullGalleryPhotos(selectedKategori, selectedPilihanKategori); 
+            }
+            log('Finished processing fetchGalleryContent.');
+        }
+
+        async function fetchFullGalleryPhotos(kategori, pilihanKategori) {
+            log(`Starting fetchFullGalleryPhotos for Kategori: ${kategori}, Pilihan Kategori: ${pilihanKategori}`);
+            let url = `/api/galeri_data?kategori=${kategori}`;
+            if (kategori !== 'all' && pilihanKategori !== 'all') {
+                url += `&pilihan_kategori=${pilihanKategori}`;
+            }
+
+            log(`API URL for full gallery: ${url}`);
+
+            try {
+                const fetchStartTime = Date.now();
+                const response = await fetch(url);
+                const fetchEndTime = Date.now();
+                log(`API response received in ${fetchEndTime - fetchStartTime} ms.`);
+
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                log('Full gallery data parsed successfully.');
+                
+                const renderStartTime = Date.now();
+                if (data.gallery_items && data.gallery_items.length > 0) {
+                    galleryGrid.innerHTML = ''; // Clear default images ONLY if API returns data
+                    data.gallery_items.forEach(item => {
+                        if (item.gambar && item.gambar.length > 0) {
+                            item.gambar.forEach(imageFilename => {
+                                if (imageFilename && typeof imageFilename === 'string' && imageFilename.trim() !== '') {
+                                    const img = document.createElement('img');
+                                    img.src = `/static/images/imgGaleri/${imageFilename}`; 
+                                    img.alt = `Foto galeri ${item.kategori || ''}`; 
+                                    galleryGrid.appendChild(img);
+                                } else {
+                                    console.warn('Skipping image due to empty or invalid filename:', imageFilename, 'for item:', item);
+                                }
+                            });
+                        }
+                    });
+                    log(`Rendered ${data.gallery_items.length} full gallery items in ${Date.now() - renderStartTime} ms.`);
+                } else {
+                    const selectedOptionText = pilihanKategoriSelect.options[pilihanKategoriSelect.selectedIndex] ? pilihanKategoriSelect.options[pilihanKategoriSelect.selectedIndex].text : pilihanKategori;
+                    galleryGrid.innerHTML = `<p>Tidak ada foto yang tersedia untuk ${selectedOptionText}.</p>`;
+                    log('No full gallery items found.');
+                }
+
+            } catch (error) {
+                console.error('Error fetching full gallery photos:', error);
+                galleryGrid.innerHTML = '<p>Terjadi kesalahan saat memuat foto galeri. Detail: ' + error.message + '</p>';
+            }
+        }
+
+        async function generatePreviewSections() {
+            log('Generating top-level preview sections (Layanan, Lokasi)...');
+            previewSectionsContainer.innerHTML = ''; 
+
+            // Section Layanan Preview
+            const layananSection = document.createElement('section');
+            layananSection.classList.add('preview-section');
+            // Menggunakan kelas preview-horizontal-scroll
+            layananSection.innerHTML = `<h2>Galeri Layanan</h2><div class="preview-horizontal-scroll"></div><button class="btn-selengkapnya" data-kategori="layanan" data-pilihan-kategori="all">Selengkapnya</button>`;
+            const layananGrid = layananSection.querySelector('.preview-horizontal-scroll'); 
+            
+            try {
+                const fetchStartTime = Date.now();
+                const response = await fetch('/api/galeri_data?kategori=layanan&limit=4');
+                const fetchEndTime = Date.now();
+                log(`Layanan preview API response in ${fetchEndTime - fetchStartTime} ms.`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                
+                if (data.gallery_items && data.gallery_items.length > 0) {
+                    data.gallery_items.forEach(item => {
+                        if (item.gambar && item.gambar.length > 0) {
+                            const img = document.createElement('img');
+                            img.src = `/static/images/imgGaleri/${item.gambar[0]}`; 
+                            img.alt = `Preview Layanan ${item.kategori}`;
+                            layananGrid.appendChild(img);
+                        }
+                    });
+                } else {
+                    layananGrid.innerHTML = '<p>Tidak ada foto layanan.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching layanan preview:', error);
+                layananGrid.innerHTML = '<p>Gagal memuat preview layanan.</p>';
+            }
+            previewSectionsContainer.appendChild(layananSection);
+
+            // Section Lokasi Preview
+            const lokasiSection = document.createElement('section');
+            lokasiSection.classList.add('preview-section');
+            // Menggunakan kelas preview-horizontal-scroll
+            lokasiSection.innerHTML = `<h2>Galeri Lokasi</h2><div class="preview-horizontal-scroll"></div><button class="btn-selengkapnya" data-kategori="lokasi" data-pilihan-kategori="all">Selengkapnya</button>`;
+            const lokasiGrid = lokasiSection.querySelector('.preview-horizontal-scroll'); 
+            
+            try {
+                const fetchStartTime = Date.now();
+                const response = await fetch('/api/galeri_data?kategori=lokasi&limit=4');
+                const fetchEndTime = Date.now();
+                log(`Lokasi preview API response in ${fetchEndTime - fetchStartTime} ms.`);
+                if (!response.ok) {
+                    const errorText = await response.text();
+                    throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                }
+                const data = await response.json();
+                
+                if (data.gallery_items && data.gallery_items.length > 0) {
+                    data.gallery_items.forEach(item => {
+                        if (item.gambar && item.gambar.length > 0) {
+                            const img = document.createElement('img');
+                            img.src = `/static/images/imgGaleri/${item.gambar[0]}`; 
+                            img.alt = `Preview Lokasi ${item.kategori}`;
+                            lokasiGrid.appendChild(img);
+                        }
+                    });
+                } else {
+                    lokasiGrid.innerHTML = '<p>Tidak ada foto lokasi.</p>';
+                }
+            } catch (error) {
+                console.error('Error fetching lokasi preview:', error);
+                lokasiGrid.innerHTML = '<p>Gagal memuat preview lokasi.</p>';
+            }
+            previewSectionsContainer.appendChild(lokasiSection);
+
+            addSelengkapnyaListeners(); // Re-attach listeners for new buttons
+            log('Finished generating top-level preview sections.');
+        }
+
+        async function generateSubCategoryPreviewSections(mainKategori) {
+            log(`Generating sub-category preview sections for ${mainKategori}...`);
+            previewSectionsContainer.innerHTML = ''; 
+
+            const subCategories = pilihanKategoriOptions[mainKategori];
+            const filteredSubCategories = subCategories.filter(option => option.value !== 'all');
+
+            if (filteredSubCategories.length === 0) { 
+                fullGalleryView.style.display = 'block'; 
+                previewSectionsContainer.style.display = 'none'; 
+                galleryGrid.innerHTML = `<p>Tidak ada sub-kategori yang tersedia untuk ${kategoriSelect.options[kategoriSelect.selectedIndex].text} ini.</p>`;
+                log('No sub-categories found, displaying fallback message in full gallery view.');
+                return;
+            }
+
+            for (const subCat of filteredSubCategories) {
+                const section = document.createElement('section');
+                section.classList.add('preview-section');
+                // Menggunakan kelas preview-horizontal-scroll
+                section.innerHTML = `<h2>Galeri ${subCat.text}</h2><div class="preview-horizontal-scroll"></div><button class="btn-selengkapnya" data-kategori="${mainKategori}" data-pilihan-kategori="${subCat.value}">Selengkapnya</button>`;
+                const grid = section.querySelector('.preview-horizontal-scroll'); // Menggunakan kelas baru
+                
+                try {
+                    const fetchStartTime = Date.now();
+                    const response = await fetch(`/api/galeri_data?kategori=${mainKategori}&pilihan_kategori=${subCat.value}&limit=4`);
+                    const fetchEndTime = Date.now();
+                    log(`${subCat.text} preview API response in ${fetchEndTime - fetchStartTime} ms.`);
+                    if (!response.ok) {
+                        const errorText = await response.text();
+                        throw new Error(`HTTP error! status: ${response.status} - ${errorText}`);
+                    }
+                    const data = await response.json();
+                    
+                    if (data.gallery_items && data.gallery_items.length > 0) {
+                        data.gallery_items.forEach(item => {
+                            if (item.gambar && item.gambar.length > 0) {
+                                const img = document.createElement('img');
+                                img.src = `/static/images/imgGaleri/${item.gambar[0]}`; 
+                                img.alt = `Preview ${subCat.text}`;
+                                grid.appendChild(img);
+                            }
+                        });
+                    } else {
+                        grid.innerHTML = `<p>Tidak ada foto untuk ${subCat.text}.</p>`;
+                    }
+                } catch (error) {
+                    console.error(`Error fetching ${subCat.text} preview:`, error);
+                    grid.innerHTML = `<p>Gagal memuat preview ${subCat.text}.</p>`;
+                }
+                previewSectionsContainer.appendChild(section);
+            }
+            addSelengkapnyaListeners();
+            log('Finished generating sub-category preview sections.');
+        }
+
+        // Fungsi untuk menambahkan/menghapus event listener ke tombol "Selengkapnya"
+        function addSelengkapnyaListeners() {
+            document.querySelectorAll('.btn-selengkapnya').forEach(button => {
+                button.removeEventListener('click', handleSelengkapnyaClick); // Remove existing to prevent duplicates
+                button.addEventListener('click', handleSelengkapnyaClick);
+            });
+            log('Selengkapnya button listeners re-attached.');
+        }
+
+        // Handler terpisah untuk event click tombol "Selengkapnya"
+        function handleSelengkapnyaClick(event) {
+            log('Selengkapnya button clicked. Triggering filter change.');
+            const button = event.currentTarget; 
+            const kategori = button.dataset.kategori;
+            const pilihanKategori = button.dataset.pilihanKategori;
+
+            // === Set flag sebelum manipulasi dropdown ===
+            triggeredBySelengkapnyaButton = true;
+
+            // Set dropdown values
+            kategoriSelect.value = kategori;
+            // Temporarily remove change listener from pilihanKategoriSelect
+            pilihanKategoriSelect.removeEventListener('change', fetchGalleryContent);
+            
+            // Populate Pilihan Kategori dropdown (this runs synchronously to populate options)
+            populatePilihanKategori(); // Ini akan memeriksa flag dan TIDAK akan memanggil fetchGalleryContent di dalamnya
+            
+            // Use a short delay to ensure dropdown options are updated
+            setTimeout(() => {
+                pilihanKategoriSelect.value = pilihanKategori;
+                // Re-add change listener
+                pilihanKategoriSelect.addEventListener('change', fetchGalleryContent);
+                // Sekarang, panggil fetchGalleryContent secara eksplisit.
+                // Ini adalah panggilan yang TERAKHIR dan TEPAT dari tombol "Selengkapnya".
+                fetchGalleryContent(); 
+            }, 0); 
+            log('Dropdown values updated and fetchGalleryContent triggered from Selengkapnya button.');
+        }
+
+        // Event Listeners for filter dropdowns
+        // When Kategori changes, populate Pilihan Kategori. populatePilihanKategori will then check the flag.
+        kategoriSelect.addEventListener('change', populatePilihanKategori); 
+        // When Pilihan Kategori changes, fetch new gallery content (this is for manual selection).
+        pilihanKategoriSelect.addEventListener('change', fetchGalleryContent);
+
+        // Initial call to set up the gallery when the page loads
+        initializeGallery(); 
+    });
+</script>
+
+<style>
+    /* Styling from your provided CSS, with minimal necessary additions/modifications */
+
+    /* Filters Section */
+    .filters {
+        max-width: 1000px;
+        margin: 40px auto 0;
+        padding: 0 16px;
+        display: grid; /* Mengikuti grid Anda */
+        grid-template-columns: 1fr;
+        gap: 24px;
+    }
+    @media (min-width: 640px) {
+        .filters {
+            grid-template-columns: repeat(2, 1fr);
+        }
+    }
+    .filters label {
+        display: block;
+        font-size: clamp(14px, 4vw, 16px);
+        color: #4b5563;
+        margin-bottom: 8px;
+        font-weight: 400;
+        margin-left: auto; /* Mempertahankan margin-left: auto Anda */
+    }
+    .filters select {
+        width: 100%;
+        height: 45px;
+        font-size: 16px;
+        color: #374151;
+        padding: 6px 12px;
+        border: 1px solid #d1d5db;
+        border-radius: 6px;
+        outline-offset: 2px;
+        outline-color: transparent;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        background-color: white;
+        cursor: pointer;
+        /* Tambahan untuk panah custom agar tidak ada panah ganda */
+        appearance: none;
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        background-image: url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%23666%22%20d%3D%22M287%2069.9a17%2017%200%200%200-24.1%200L146.2%20186.7%2029.5%2069.9c-6.8-6.8-17.8-6.8-24.6%200a17.2%2017.2%200%200%200%200%2024.1L134.1%20216.7c6.8%206.8%2017.8%206.8%2024.6%200L287%2094c6.9-6.8%206.9-17.8.1-24.1z%22%2F%3E%3C%2Fsvg%3E');
+        background-repeat: no-repeat;
+        background-position: right 10px center;
+        background-size: 10px;
+    }
+    .filters select:focus {
+        border-color: #3b82f6;
+        box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+    }
+    .filters select[disabled] {
+        background-color: #f3f4f6;
+        border-color: #e5e7eb;
+        color: #9ca3af;
+        cursor: not-allowed;
+    }
+
+    
+
+    /* Preview Sections Specific Styles */
+    #preview-sections {
+        margin-top: 30px;
+    }
+    .preview-section {
+        margin-bottom: 40px;
+        padding: 24px;
+        background-color: #ffffff;
+        border-radius: 8px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+    }
+    .preview-section h2 {
+        font-weight: 700;
+        font-size: 18px;
+        margin-bottom: 16px;
+        text-align: left;
+        color: #374151;
+        position: relative;
+        padding-bottom: 10px;
+    }
+    
+    
+    /* NEW: Horizontal scroll container for previews */
+    .preview-horizontal-scroll { /* Mengganti .gallery-grid di dalam preview-section */
+        display: flex; /* Use flexbox for horizontal layout */
+        overflow-x: auto; /* Enable horizontal scrolling */
+        gap: 15px; /* Gap between images */
+        padding-bottom: 10px; /* Space for scrollbar */
+        margin-bottom: 20px; /* Space before button */
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        justify-content: flex-start; /* Align items to the start, allows space if less than 4 */
+    }
+
+    .preview-horizontal-scroll img {
+        flex-shrink: 0; /* Prevent images from shrinking */
+        width: 200px; /* Fixed width for each preview image */
+        height: 200px; /* Fixed height for consistent look */
+        object-fit: cover; /* Crop to fill the space */
+        border-radius: 8px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        transition: transform 0.2s ease-in-out;
+    }
+    
+    /* Adjust for full width when 4 images fit without scrolling */
+    @media (min-width: 860px) { /* Adjust this breakpoint based on your container width (1000px - padding - scrollbar) */
+        .preview-horizontal-scroll {
+            justify-content: space-between; /* Distribute items with space between them */
+            overflow-x: hidden; /* Hide scrollbar if content fits */
+        }
+        .preview-horizontal-scroll img {
+            width: calc(25% - 11.25px); /* (100% - 3*gap) / 4 */
+            /* If gap is 15px (3 gaps), then 100% - 45px / 4 = 25% - 11.25px */
+            /* Adjust gap here if needed to make it perfect */
+            height: auto; /* Allow height to adjust to maintain aspect ratio */
+            max-height: 200px; /* Keep max-height for very tall images */
+            object-fit: cover;
+        }
+    }
+
+
+    /* Hide scrollbar for aesthetic, but still allow scrolling */
+    .preview-horizontal-scroll::-webkit-scrollbar {
+        height: 5px;
+    }
+    .preview-horizontal-scroll::-webkit-scrollbar-thumb {
+        background-color: #ccc;
+        border-radius: 5px;
+    }
+    .preview-horizontal-scroll::-webkit-scrollbar-track {
+        background-color: #f0f0f0;
+    }
+
+
+    /* "Selengkapnya" Button */
+    .btn-selengkapnya {
+        display: block;
+        width: fit-content;
+        margin: 0 auto;
+        padding: 10px 20px;
+        background-color: #86ade8;
+        color: white;
+        border: none;
+        border-radius: 100px;
+        cursor: pointer;
+        font-size: 12px;
+        font-weight: 600;
+        transition: background-color 0.2s ease, transform 0.2s ease;
+    }
+    .btn-selengkapnya:hover {
+        background-color: #5b90e5;
+        transform: translateY(-2px);
+    }
+
+    /* Responsive adjustments */
+    @media (max-width: 1266px) {
+        .filters {
+            padding: 0 16px;
+        }
+    }
+    @media (max-width: 992px) {
+        .filters {
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+        .filters label {
+            margin-left: 0;
+        }
+        /* galeri full view, menyesuaikan kolom */
+        .gallery-grid {
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        /* Preview sections remains horizontal even on smaller screens */
+        .preview-horizontal-scroll img {
+            width: 150px; /* Smaller fixed width for tablets */
+            height: 150px;
+        }
+        /* Adjust for smaller screens where 4 images might not fit at 860px */
+        @media (min-width: 680px) and (max-width: 992px) { /* Adjust this breakpoint */
+            .preview-horizontal-scroll {
+                justify-content: space-between;
+                overflow-x: hidden;
+            }
+            .preview-horizontal-scroll img {
+                width: calc(25% - 11.25px); /* Recalculate for potential full width */
+                height: auto;
+                max-height: 150px; /* Keep max-height consistent */
+            }
+        }
+    }
+    @media (max-width: 420px) {
+        .filters {
+            gap: 12px;
+        }
+        .gallery-grid { /* Full gallery switches to single column */
+            grid-template-columns: 1fr;
+        }
+        .preview-horizontal-scroll img {
+            width: 120px; /* Even smaller fixed width for mobile */
+            height: 120px;
+        }
+        /* Always allow scroll on very small screens, disable justify-content */
+        .preview-horizontal-scroll {
+            justify-content: flex-start;
+            overflow-x: auto;
+        }
+    }
+</style>
+{% endblock %}

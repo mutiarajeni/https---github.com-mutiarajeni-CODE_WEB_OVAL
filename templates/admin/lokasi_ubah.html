@@ -1,0 +1,229 @@
+{% extends "admin/base_admin.html" %} {% block title %}Ubah Lokasi{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Ubah Lokasi</h6>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <div class="container mt-5">
+            <form
+              id="ubahLokasiForm"
+              method="POST"
+              action="{{ url_for('admin_lokasi_ubah', id=lokasi._id) }}"
+              enctype="multipart/form-data"
+            >
+              <table class="table table-no-border">
+                <tbody>
+                  <tr>
+                    <td><label for="nama">Nama Lokasi</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <label class="form-label active"></label> {# Add active
+                        for pre-filled inputs #}
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="nama"
+                          name="nama"
+                          value="{{ lokasi.nama }}"
+                          required
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="nameError"
+                        style="display: {% if name_exists_error %}block{% else %}none{% endif %}"
+                        >Nama lokasi sudah ada</small
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="alamat">Alamat</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <label class="form-label active"></label>
+                        <textarea
+                          class="form-control"
+                          id="alamat"
+                          name="alamat"
+                          rows="5"
+                          required
+                        >
+{{ lokasi.alamat }}</textarea
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="link_maps">Link Maps</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <label class="form-label active"></label>
+                        <textarea
+                          class="form-control"
+                          id="link_maps"
+                          name="link_maps"
+                          rows="5"
+                          required
+                        >
+{{ lokasi.link_maps }}</textarea
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <a
+                  href="{{ url_for('admin_lokasi') }}"
+                  class="btn btn-outline-dark me-2 fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  >Kembali</a
+                >
+                <button
+                  type="submit"
+                  class="btn btn-dark fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  id="submitButton"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+  let initialNama = document.getElementById("nama").value.trim();
+  let initialAlamat = document.getElementById("alamat").value.trim();
+  let initialLinkMaps = document.getElementById("link_maps").value.trim();
+  let isNameDuplicate = false;
+
+  function isFormChanged() {
+    const nama = document.getElementById("nama").value.trim();
+    const alamat = document.getElementById("alamat").value.trim();
+    const linkMaps = document.getElementById("link_maps").value.trim();
+
+    return (
+      nama !== initialNama ||
+      alamat !== initialAlamat ||
+      linkMaps !== initialLinkMaps
+    );
+  }
+
+  function checkFormFilled() {
+    const nama = document.getElementById("nama").value.trim();
+    const alamat = document.getElementById("alamat").value.trim();
+    const linkMaps = document.getElementById("link_maps").value.trim();
+    const submitButton = document.getElementById("submitButton");
+
+    const isFilled = nama && alamat && linkMaps;
+
+    // Aktifkan tombol jika form terisi, tidak ada duplikasi nama, dan ada perubahan
+    submitButton.disabled = !(
+      isFilled &&
+      (!isNameDuplicate || nama === initialNama) &&
+      isFormChanged()
+    );
+  }
+
+  function checkNameAvailability() {
+    const namaInput = document.getElementById("nama");
+    const nameError = document.getElementById("nameError");
+    const nama = namaInput.value.trim();
+
+    if (nama === initialNama) {
+      nameError.style.display = "none";
+      isNameDuplicate = false;
+      checkFormFilled();
+      return;
+    }
+
+    if (nama === "") {
+      nameError.style.display = "none";
+      isNameDuplicate = false;
+      checkFormFilled();
+      return;
+    }
+
+    fetch("/check_nama_lokasi", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ nama: nama }),
+    })
+      .then((res) => res.json())
+      .then((data) => {
+        if (data.exists) {
+          nameError.style.display = "block";
+          isNameDuplicate = true;
+        } else {
+          nameError.style.display = "none";
+          isNameDuplicate = false;
+        }
+        checkFormFilled();
+      });
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    const inputs = ["nama", "alamat", "link_maps"];
+
+    inputs.forEach((id) => {
+      const el = document.getElementById(id);
+      if (el) {
+        el.addEventListener("input", () => {
+          if (id === "nama") {
+            checkNameAvailability();
+          } else {
+            checkFormFilled();
+          }
+        });
+      }
+    });
+
+    checkFormFilled(); // Cek saat pertama kali halaman dibuka
+  });
+
+  document
+    .getElementById("ubahLokasiForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = this;
+
+      Swal.fire({
+        title: "Apakah kamu yakin?",
+        text: "Lokasi akan diubah.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, simpan!",
+        cancelButtonText: "Batal",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Lokasi berhasil diubah.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            didClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+</script>
+{% endblock %}

@@ -1,0 +1,185 @@
+{% extends "admin/base_admin.html" %} {% block title %} Photo {% endblock %} {%
+block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <div class="row">
+            <div class="col-6 d-flex align-items-center">
+              <h5 class="text-white text-capitalize ps-3">Pesanan</h5>
+            </div>
+            <div class="col-6 text-end">
+              <a
+                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                href="/admin_pesanan_tambah"
+                ><i class="material-icons text-dark me-1 fs-4">add</i
+                >&nbsp;&nbsp;Tambah Pesanan</a
+              >
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <table id="dataTable" class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th
+                  class="text-center text-dark fs-7 fw-bold"
+                  style="width: 50px"
+                ></th>
+                <th class="text-center text-dark fs-7 fw-bold">Nama Klien</th>
+                <th class="text-center text-dark fs-7 fw-bold">Layanan</th>
+                <th class="text-center text-dark fs-7 fw-bold">Waktu Acara</th>
+                <th class="text-center text-dark fs-7 fw-bold">Status</th>
+                <th class="text-center text-dark fs-7 fw-bold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pesanan in pesanan %}
+              <tr>
+                <td class="text-center align-middle">{{ loop.index }}.</td>
+
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.nama_klien }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.layanan }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.jam_acara }} WIB,
+                    {{pesanan.tanggal_mulai_acara_formatted}}-{{pesanan.tanggal_selesai_acara_formatted}}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.status_pesanan }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <div class="d-flex justify-content-center gap-4">
+                    <!-- Tombol Detail -->
+                    <a
+                      href="/admin_pesanan_detail?pesanan_id={{ pesanan._id }}"
+                      class="text-decoration-none d-flex align-items-center"
+                      style="color: #1a73e8"
+                    >
+                      <i class="material-icons me-1">visibility</i>
+                      <span style="font-weight: normal">Detail</span>
+                    </a>
+                    <!-- Tombol Kirim Pengingat -->
+
+                    {% set allowed_statuses = ['Sudah Kirim File & Album',
+                    'Belum Pemotretan', 'Sudah Pemotretan'] %}
+                    <a
+                      href="#"
+                      class="btn-kirim-pengingat text-decoration-none d-flex align-items-center {% if pesanan.status_pesanan not in allowed_statuses %}disabled{% endif %}"
+                      style="color: #f4b400; {% if pesanan.status_pesanan not in allowed_statuses %}pointer-events: none; opacity: 0.5;{% endif %}"
+                      data-id="{{ pesanan._id }}"
+                      data-nama="{{ pesanan.nama_klien }}"
+                      data-email="{{ pesanan.email_klien }}"
+                      data-status="{{ pesanan.status_pesanan }}"
+                    >
+                      <i class="material-icons me-1">notifications</i>
+                      <span style="font-weight: normal">Kirim Pengingat</span>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    document.querySelectorAll(".btn-kirim-pengingat").forEach((button) => {
+      button.addEventListener("click", function (event) {
+        // Mencegah tindakan default hanya jika tombol tidak dinonaktifkan
+        if (!this.classList.contains("disabled")) {
+          event.preventDefault();
+
+          const pesananId = this.dataset.id;
+          const namaKlien = this.dataset.nama;
+          const emailKlien = this.dataset.email;
+          const statusPesanan = this.dataset.status;
+
+          let confirmationText = "";
+          if (statusPesanan === "Belum Pemotretan") {
+            confirmationText = `Apakah Anda yakin ingin mengirim pengingat jadwal pemotretan kepada ${namaKlien}?`;
+          } else if (statusPesanan === "Sudah Pemotretan") {
+            confirmationText = `Apakah Anda yakin ingin mengirim pengingat pelunasan pembayaran kepada ${namaKlien}?`;
+          } else if (statusPesanan === "Sudah Kirim File & Album") {
+            confirmationText = `Apakah Anda yakin ingin meminta ulasan dari ${namaKlien}?`;
+          } else {
+            // Ini seharusnya tidak tercapai jika tombol dinonaktifkan dengan benar
+            return;
+          }
+
+          Swal.fire({
+            title: "Konfirmasi Pengiriman Pengingat",
+            text: confirmationText,
+            icon: "question",
+            showCancelButton: true,
+            confirmButtonColor: "#3085d6",
+            cancelButtonColor: "#d33",
+            confirmButtonText: "Ya, Kirim!",
+            cancelButtonText: "Batal",
+          }).then((result) => {
+            if (result.isConfirmed) {
+              // Buat form dinamis dan submit
+              const form = document.createElement("form");
+              form.method = "POST";
+              form.action = "/admin_kirim_pengingat";
+
+              const inputId = document.createElement("input");
+              inputId.type = "hidden";
+              inputId.name = "pesanan_id_for_redirect";
+              inputId.value = pesananId;
+              form.appendChild(inputId);
+
+              const inputEmail = document.createElement("input");
+              inputEmail.type = "hidden";
+              inputEmail.name = "email_klien";
+              inputEmail.value = emailKlien;
+              form.appendChild(inputEmail);
+
+              const inputStatus = document.createElement("input");
+              inputStatus.type = "hidden";
+              inputStatus.name = "status_pesanan";
+              inputStatus.value = statusPesanan;
+              form.appendChild(inputStatus);
+
+              const inputNama = document.createElement("input");
+              inputNama.type = "hidden";
+              inputNama.name = "nama_klien";
+              inputNama.value = namaKlien;
+              form.appendChild(inputNama);
+
+              document.body.appendChild(form);
+              form.submit();
+
+              Swal.fire({
+                title: "Pengingat Dikirim!",
+                text: "Pengingat telah berhasil dikirim.",
+                icon: "success",
+                timer: 2000,
+                showConfirmButton: false,
+              });
+            }
+          });
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

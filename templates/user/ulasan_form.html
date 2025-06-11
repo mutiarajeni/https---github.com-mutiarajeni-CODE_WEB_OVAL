@@ -1,0 +1,173 @@
+{% extends "user/base_user.html" %}{% block content %}
+<!-- Header -->
+<header class="header">
+  <div class="header-content text-center">
+    <h1>Penilaian dan Ulasan</h1>
+    <p>Bagikan pengalaman kamu untuk membantu kami meningkatkan layanan fotografi</p>
+  </div>
+</header>
+
+<main class="subutama-container">
+  <!--Keterangan-->
+  <p style="text-align: center;  font-size: 14px;  line-height: 20px; margin-bottom: 60px; margin-top: 40px; font-weight: 400">
+      Kami akan sangat menghargai jika kamu dapat memberikan penilaian dan ulasan tentang pengalaman kamu bersama Oval Photo. Ulasan kamu akan membantu kami untuk terus memberikan pelayanan terbaik!   
+  </p>
+
+  <!--Isi-->
+  <div class="formulasan-flex">
+  <section class="formulasan-left" aria-label="Formulasan Penilaian dan Ulasan">
+    <div>
+      <div class="formulasan-review-header">
+        <div class="formulasan-reviewer">
+          <img src="https://storage.googleapis.com/a1aa/image/109cacdc-e7a8-4e87-b952-90d5cbb1f2e3.jpg" alt="Foto profil Rina Wijaya" width="40" height="40" />
+          <span class="formulasan-reviewer-name">Rina Wijaya</span>
+        </div>
+        <span class="formulasan-review-date">12/02/2025</span>
+      </div>
+
+      <p class="formulasan-review-package formulasan-indent-text">Layanan Prewedding - Paket Indoor (Studio)</p>
+
+      <br/>
+      <br/>
+      <h2 class="formulasan-indent-text">Penilaian</h2>
+      <p class="formulasan-penilaian-desc formulasan-indent-text">Berikan rating kamu untuk layanan Oval Photo! Kami ingin tahu seberapa puas kamu dengan layanan yang kami berikan.</p>
+
+      <div class="formulasan-rating-block formulasan-indent-block">
+        <div class="formulasan-stars" role="radiogroup" aria-label="Rating bintang">
+          <i class="bi bi-star formulasan-star" role="radio" aria-checked="false" tabindex="0" data-value="1" aria-label="1 bintang"></i>
+          <i class="bi bi-star formulasan-star" role="radio" aria-checked="false" tabindex="-1" data-value="2" aria-label="2 bintang"></i>
+          <i class="bi bi-star formulasan-star" role="radio" aria-checked="false" tabindex="-1" data-value="3" aria-label="3 bintang"></i>
+          <i class="bi bi-star formulasan-star" role="radio" aria-checked="false" tabindex="-1" data-value="4" aria-label="4 bintang"></i>
+          <i class="bi bi-star formulasan-star" role="radio" aria-checked="false" tabindex="-1" data-value="5" aria-label="5 bintang"></i>
+        </div>
+        <div class="formulasan-star-labels">
+          <span>Buruk</span>
+          <span>Sangat Terbaik</span>
+        </div>
+      </div>
+    </div>
+
+    <br/>
+    <div>
+      <h3 class="formulasan-indent-text">Ulasan</h3>
+      <p class="formulasan-indent-text">Ceritakan pengalaman dan kesan kamu selama menggunakan layanan kamu.</p>
+      <textarea class="formulasan-textarea formulasan-indent-text" placeholder="Ceritakan pengalaman kamu di sini!" rows="12" aria-label="Tulis ulasan"></textarea>
+    </div>
+    <div class="formulasan-buttons formulasan-indent-text">
+      <button type="button" class="formulasan-btn-back" onclick="window.location.href='/ripe_selesai'">Kembali</button>
+      <button type="button" class="formulasan-btn-send" disabled>Kirim</button>
+    </div>
+  </section>
+</div>
+    
+
+ 
+
+</main>
+
+<script>
+  (() => {
+    const starsContainer = document.querySelector('.formulasan-stars');
+    const stars = starsContainer.querySelectorAll('.formulasan-star');
+    const textarea = document.querySelector('.formulasan-textarea');
+    const sendBtn = document.querySelector('.formulasan-btn-send');
+
+    let currentRating = 0;
+
+    // Perbarui tampilan bintang berdasarkan peringkat
+    function updateStars(rating) {
+      stars.forEach((star, index) => {
+        if (index < rating) {
+          star.classList.add('filled');
+          star.setAttribute('aria-checked', 'true');
+          star.tabIndex = 0;
+          star.classList.remove('bi-star');
+          star.classList.add('bi-star-fill');
+        } else {
+          star.classList.remove('filled');
+          star.setAttribute('aria-checked', 'false');
+          star.tabIndex = -1;
+          star.classList.remove('bi-star-fill');
+          star.classList.add('bi-star');
+        }
+      });
+    }
+
+    // Mengaktifkan atau menonaktifkan tombol kirim berdasarkan peringkat dan konten textarea
+    function updateSendButton() {
+      if (currentRating > 0 && textarea.value.trim().length > 0) {
+        sendBtn.disabled = false;
+        sendBtn.classList.add('enabled');
+      } else {
+        sendBtn.disabled = true;
+        sendBtn.classList.remove('enabled');
+      }
+    }
+
+    // Handle klik bintang
+    stars.forEach(star => {
+      star.addEventListener('click', () => {
+        currentRating = parseInt(star.dataset.value);
+        updateStars(currentRating);
+        updateSendButton();
+      });
+
+      star.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          currentRating = parseInt(star.dataset.value);
+          updateStars(currentRating);
+          updateSendButton();
+        }
+        // Navigasi keyboard dgn arrow keys
+        if (e.key === 'ArrowRight' || e.key === 'ArrowUp') {
+          e.preventDefault();
+          let nextIndex = (Array.from(stars).indexOf(star) + 1) % stars.length;
+          stars[nextIndex].focus();
+        }
+        if (e.key === 'ArrowLeft' || e.key === 'ArrowDown') {
+          e.preventDefault();
+          let prevIndex = (Array.from(stars).indexOf(star) - 1 + stars.length) % stars.length;
+          stars[prevIndex].focus();
+        }
+      });
+
+      star.addEventListener('mouseenter', () => {
+        const hoverValue = parseInt(star.dataset.value);
+        stars.forEach((s, i) => {
+          if (i < hoverValue) {
+            s.classList.add('filled');
+            s.classList.remove('bi-star');
+            s.classList.add('bi-star-fill');
+          } else {
+            s.classList.remove('filled');
+            s.classList.remove('bi-star-fill');
+            s.classList.add('bi-star');
+          }
+        });
+      });
+
+      star.addEventListener('mouseleave', () => {
+        updateStars(currentRating);
+      });
+    });
+
+    // Reset bintang saat mouse meninggalkan container
+    starsContainer.addEventListener('mouseleave', () => {
+      updateStars(currentRating);
+    });
+
+    // Enable button kirim jika textarea dan bintang peringkat sudah dipilih
+    textarea.addEventListener('input', () => {
+      updateSendButton();
+    });
+
+    // Initialize bintang dan button
+    updateStars(currentRating);
+    updateSendButton();
+  })();
+</script>
+
+
+
+{% endblock %}

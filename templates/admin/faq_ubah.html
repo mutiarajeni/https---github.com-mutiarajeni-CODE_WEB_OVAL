@@ -1,0 +1,197 @@
+{% extends "admin/base_admin.html" %} {% block title %}Ubah FAQ Admin{% endblock
+%} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Ubah FAQ</h6>
+        </div>
+      </div>
+      <div class="card-body px-4 pb-4">
+        <div class="table-responsive p-0">
+          <!-- Menampilkan pesan error dari backend jika ada -->
+          {% if error_message %}
+          <div
+            class="alert alert-danger alert-dismissible text-white"
+            role="alert"
+          >
+            {{ error_message }}
+            <button
+              type="button"
+              class="btn-close text-lg py-3 opacity-10"
+              data-bs-dismiss="alert"
+              aria-label="Close"
+            >
+              <span aria-hidden="true">×</span>
+            </button>
+          </div>
+          {% endif %}
+
+          <form
+            id="updateFaqForm"
+            method="POST"
+            action="/admin_faq_ubah/{{ faq._id }}"
+          >
+            <table class="table table-no-border">
+              <tbody>
+                <tr>
+                  <td><label for="nama_pengaju">Nama Pengirim</label></td>
+                  <td>
+                    <div class="input-group input-group-outline">
+                      <input
+                        type="text"
+                        class="form-control"
+                        id="nama_pengaju"
+                        name="nama_pengaju"
+                        value="{{ faq.nama_pengaju if faq.nama_pengaju else '-' }}"
+                        disabled
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="email_pengaju">Email Pengirim</label></td>
+                  <td>
+                    <div class="input-group input-group-outline">
+                      <input
+                        type="email"
+                        class="form-control"
+                        id="email_pengaju"
+                        name="email_pengaju"
+                        value="{{ faq.email_pengaju if faq.email_pengaju else '-' }}"
+                        disabled
+                      />
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="pertanyaan">Pertanyaan</label></td>
+                  <td>
+                    <div class="input-group input-group-outline">
+                      <textarea
+                        class="form-control"
+                        id="pertanyaan"
+                        name="pertanyaan"
+                        rows="5"
+                        required
+                      >
+{{ faq.pertanyaan }}</textarea
+                      >
+                    </div>
+                  </td>
+                </tr>
+                <tr>
+                  <td><label for="jawaban">Jawaban</label></td>
+                  <td>
+                    <div class="input-group input-group-outline">
+                      <textarea
+                        class="form-control"
+                        id="jawaban"
+                        name="jawaban"
+                        rows="5"
+                        required
+                      >
+{{ faq.jawaban }}</textarea
+                      >
+                    </div>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+            <div class="text-end mt-3">
+              <a
+                href="/admin_faq"
+                class="btn btn-outline-dark me-2 fw-normal"
+                style="text-transform: none; font-size: 1rem"
+              >
+                Kembali
+              </a>
+              <button
+                type="submit"
+                class="btn btn-dark fw-normal"
+                style="text-transform: none; font-size: 1rem"
+                id="submitButton"
+                disabled
+                {#
+                Tetap
+                disabled
+                secara
+                default
+                #}
+              >
+                Simpan
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let initialPertanyaan = ""; // Variabel untuk menyimpan nilai awal pertanyaan
+  let initialJawaban = ""; // Variabel untuk menyimpan nilai awal jawaban
+
+  document.addEventListener("DOMContentLoaded", function () {
+    // Ambil nilai awal saat DOM sudah dimuat
+    initialPertanyaan = document.getElementById("pertanyaan").value.trim();
+    initialJawaban = document.getElementById("jawaban").value.trim();
+    checkFormChanges(); // Panggil pertama kali untuk mengatur status tombol
+  });
+
+  function checkFormChanges() {
+    const currentPertanyaan = document
+      .getElementById("pertanyaan")
+      .value.trim();
+    const currentJawaban = document.getElementById("jawaban").value.trim();
+    const submitButton = document.getElementById("submitButton");
+
+    // Tombol aktif jika:
+    // 1. Pertanyaan dan jawaban tidak kosong
+    // 2. Ada perubahan pada pertanyaan ATAU ada perubahan pada jawaban
+    const isFormFilled = currentPertanyaan !== "" && currentJawaban !== "";
+    const hasChanges =
+      currentPertanyaan !== initialPertanyaan ||
+      currentJawaban !== initialJawaban;
+
+    submitButton.disabled = !(isFormFilled && hasChanges);
+  }
+
+  document.querySelectorAll("#pertanyaan, #jawaban").forEach((input) => {
+    input.addEventListener("input", checkFormChanges);
+  });
+
+  document
+    .getElementById("updateFaqForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = this;
+
+      Swal.fire({
+        title: "Apakah Anda yakin?",
+        text: "FAQ akan diperbarui.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya",
+        cancelButtonText: "Tidak",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "FAQ berhasil diperbarui.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            didClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+</script>
+{% endblock %}

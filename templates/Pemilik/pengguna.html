@@ -1,0 +1,188 @@
+{% extends "pemilik/base_pemilik.html" %}
+{% block title %}Pengguna{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <div class="row">
+            <div class="col-6 d-flex align-items-center">
+              <h5 class="text-white text-capitalize ps-3">Pengguna</h5>
+            </div>
+            <div class="col-6 text-end">
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
+              >
+                <div class="position-relative w-100 w-sm-auto mb-2 mb-sm-0">
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 py-4"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white; font-size: 12px"
+                  />
+                </div>
+
+                <a
+                  class="btn btn-light text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  href="{{ url_for('pemilik_tambah_pengguna_page') }}"
+                >
+                  <i class="material-icons me-1 fs-4">add</i>
+                  &nbsp;&nbsp;Tambah Pengguna
+                </a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <table id="dataTable" class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th
+                  class="text-center text-dark fs-7 fw-bold"
+                  style="width: 50px"
+                ></th>
+                <th class="text-center fs-7 fw-bold">Nama</th>
+                <th class="text-center fs-7 fw-bold">
+                  Nama Pengguna
+                </th>
+                <th class="text-center fs-7 fw-bold">Peran</th>
+                <th class="text-center fs-7 fw-bold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for user in users %}
+              <tr>
+                <td class="align-middle text-center">
+                  <p class="text-base mb-0">{{ loop.index }}.</p>
+                </td>
+                <td class="align-middle user-name-cell">
+                  <i class="bi bi-person-fill fs-4 ms-2"></i> <span class="text-base mb-0 ms-2">{{ user.full_name }}</span>
+                </td>
+                <td class="align-middle text-center">
+                  <p class="text-base fw-normal mb-0">{{ user.username }}</p>
+                </td>
+                <td class="align-middle text-center">
+                  <p class="text-base fw-normal mb-0 text-capitalize">{{ user.role }}</p>
+                </td>
+                <td class="align-middle text-center text-base">
+                  <a href="{{ url_for('pemilik_ubah_pengguna', user_id=user._id) }}" class="text-base" data-toggle="tooltip" data-original-title="Edit user">
+                    <i class="material-icons me-1">edit</i>Ubah
+                  </a>
+                  {% if user.username != 'pemilik_riyan' %}
+                  <a href="#" class="ms-3 delete-user-btn" data-user-id="{{ user._id }}" data-username="{{ user.username }}" data-toggle="tooltip" data-original-title="Delete user" style="color: #dc3545 !important;">
+                    <i class="material-icons me-1" style="color: #dc3545 !important;">delete</i>Hapus
+                  </a>
+                  {% endif %}
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fungsi helper untuk menampilkan SweetAlert
+  function showAlert(icon, title, text, redirectUrl = null) {
+    Swal.fire({
+      icon: icon, // 'success', 'error', 'warning', 'info', 'question'
+      title: title,
+      text: text,
+      showConfirmButton: true,
+      confirmButtonText: 'Oke'
+    }).then((result) => {
+      if (result.isConfirmed && redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const deleteButtons = document.querySelectorAll('.delete-user-btn');
+    const searchInput = document.getElementById('searchInput');
+    const dataTable = document.getElementById('dataTable');
+    const tableRows = dataTable.querySelectorAll('tbody tr');
+
+    // Fungsionalitas Pencarian
+    searchInput.addEventListener('keyup', function() {
+      const searchTerm = searchInput.value.toLowerCase();
+      tableRows.forEach(row => {
+        let found = false;
+        // Cari di kolom Nama (indeks 1) dan Nama Pengguna (indeks 2)
+        const nameCell = row.children[1];
+        const usernameCell = row.children[2];
+
+        if (nameCell && usernameCell) {
+          const nameText = nameCell.textContent.toLowerCase();
+          const usernameText = usernameCell.textContent.toLowerCase();
+
+          if (nameText.includes(searchTerm) || usernameText.includes(searchTerm)) {
+            found = true;
+          }
+        }
+        row.style.display = found ? '' : 'none';
+      });
+    });
+
+    // Fungsionalitas Hapus Pengguna (sudah ada, tidak diubah)
+    deleteButtons.forEach(button => {
+      button.addEventListener('click', function(event) {
+        event.preventDefault();
+        const userId = this.dataset.userId;
+        const username = this.dataset.username;
+
+        Swal.fire({
+          title: 'Apakah Anda yakin?',
+          text: `Anda tidak akan dapat mengembalikan pengguna ${username} ini!`,
+          icon: 'warning',
+          showCancelButton: true,
+          confirmButtonColor: '#d33',
+          cancelButtonColor: '#6c757d',
+          confirmButtonText: 'Ya, hapus!',
+          cancelButtonText: 'Batal'
+        }).then(async (result) => {
+          if (result.isConfirmed) {
+            try {
+              const response = await fetch(`/api/pemilik_hapus_pengguna/${userId}`, {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json'
+                }
+              });
+
+              const apiResult = await response.json();
+
+              if (response.ok && apiResult.success) {
+                showAlert('success', 'Berhasil!', apiResult.message, '{{ url_for("pemilik_pengguna") }}');
+              } else {
+                showAlert('error', 'Gagal!', apiResult.message || 'Terjadi kesalahan saat menghapus pengguna.');
+              }
+            } catch (error) {
+              console.error('Error:', error);
+              showAlert('error', 'Error!', 'Terjadi kesalahan jaringan atau server saat menghapus pengguna.');
+            }
+          }
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

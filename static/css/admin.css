@@ -1,0 +1,262 @@
+:root {
+  --color: #86ade8;
+  --bg: #010101;
+}
+
+* {
+  font-family: "Poppins", sans-serif;
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+  outline: none;
+  border: none;
+  text-decoration: none;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  background-color: var(--bg);
+  color: #fff;
+  /* min-height: 2000px; */
+}
+
+/* Media Queries */
+/* Laptop */
+@media (max-width: 1366px) {
+  html {
+    font-size: 75%;
+  }
+}
+
+/* custom */
+@media (max-width: 992px) {
+  html {
+    font-size: 62.5%;
+  }
+
+  #hamburger-menu {
+    display: inline-block;
+  }
+
+  .navbar .navbar-nav {
+    position: absolute;
+    top: 100%;
+    right: -100%;
+    background-color: #fff;
+    width: 30rem;
+    height: 100vh;
+    transition: 0.3s;
+    justify-content: start;
+  }
+
+  .navbar .navbar-nav.active {
+    right: 0;
+  }
+
+  .navbar .navbar-nav a {
+    color: var(--bg);
+    display: block;
+    font-size: 1.6rem;
+    margin: 1.5rem;
+    padding: 0.5rem;
+  }
+
+  .navbar .navbar-nav a::after,
+  .navbar .navbar-nav .active::after {
+    transform-origin: 0 0;
+  }
+
+  .navbar .navbar-nav a:hover::after,
+  .navbar .navbar-nav .active::after {
+    transform: scaleX(0.3);
+  }
+
+  .navbar-dropdown {
+    right: -43px;
+  }
+}
+
+/* Mobile */
+@media (max-width: 450px) {
+  html {
+    font-size: 55%;
+  }
+}
+
+.bg-admin {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.7) 0%,
+    rgba(0, 0, 0, 0.7) 100%
+  );
+}
+
+/* Button styles */
+.btn.bg-admin {
+  color: #fff; /* Ensure text color is white */
+  transition: background 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effect */
+}
+
+.btn.bg-gradient-custom:hover {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.9) 0%,
+    rgba(0, 0, 0, 0.9) 100%
+  );
+  box-shadow: 0 12px 24px rgba(0, 0, 0, 0.3), 0 6px 12px rgba(0, 0, 0, 0.2);
+  color: #fff; /* Text color remains white on hover */
+}
+
+/* Upload foto */
+#drop-area {
+  height: 150px;
+  width: 150px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+#drop-area.highlight {
+  border-color: #000000;
+}
+#drop-area .content {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+}
+#drop-area img {
+  max-height: 150px;
+  margin: 10px;
+  display: inline-block;
+}
+
+/* untuk deskripsi detail */
+.text-justify {
+  text-align: justify;
+}
+
+/* hover tulisan di produk Admin */
+.tooltip {
+  position: relative;
+  display: inline-block;
+}
+
+.tooltip .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: black;
+  color: #fff;
+  text-align: center;
+  border-radius: 6px;
+  padding: 5px 0;
+  position: absolute;
+  z-index: 1;
+  bottom: 125%;
+  left: 50%;
+  margin-left: -60px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.tooltip:hover .tooltiptext {
+  visibility: visible;
+  opacity: 1;
+}
+
+/* tulisan dashboard */
+.card-body,
+.card-body h2,
+.card-body h4,
+.card-body h5,
+.card-body h6,
+.card-body p,
+.card-body a,
+.card-body i {
+  color: black !important;
+}
+
+/* Tulisan seluruh item menu di sidebar */
+#sidenav-main .nav-link-text {
+  font-size: 1rem;
+}
+
+/* Ikon material-icons di sidebar */
+#sidenav-main .material-icons {
+  font-size: 1.5rem;
+}
+
+/* Tulisan di header (Oval Photo) */
+#sidenav-main .sidenav-header .text-white {
+  font-size: 1.4rem;
+  font-style: italic;
+}
+
+/* Tulisan di footer tombol Keluar */
+#sidenav-main .sidenav-footer .btn {
+  font-size: 1rem;
+}
+
+/* Semua label, input, textarea, dan teks lainnya berwarna hitam*/
+label,
+.form-control,
+.card-body,
+.btn,
+.alert span,
+table td,
+table th {
+  color: #000 !important;
+}
+
+/* Hapus garis tabel */
+.table-no-border,
+.table-no-border td,
+.table-no-border th {
+  border: none !important;
+}
+
+/* Agar label tidak terlalu jauh */
+.table-no-border td:first-child {
+  width: 280px;
+}
+
+/* Agar label tidak terlalu jauh (pesanan) */
+.table-borderless td:first-child {
+  width: 200px;
+}
+
+/* Placeholder */
+::placeholder {
+  color: #979292 !important;
+  opacity: 0.6;
+}
+
+/* Button Kembali */
+.btn-outline-dark {
+  text-transform: none;
+  color: #000;
+}
+
+/* Button Simpan */
+#submitButton {
+  text-transform: none;
+  font-size: 1.05rem;
+  color: #fff !important;
+  background-color: #000 !important;
+  border-color: #000 !important;
+}
+
+#submitButton:disabled {
+  background-color: #ccc !important;
+  border-color: #ccc !important;
+  color: #fff !important;
+  cursor: not-allowed;
+}
+
+select.form-control:disabled {
+  background-color: #f9f9f9 !important;
+  color: #b0b0b0 !important;
+  border-color: #e0e0e0 !important;
+  opacity: 0.85 !important;
+  cursor: not-allowed;
+}

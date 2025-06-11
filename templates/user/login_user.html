@@ -1,0 +1,145 @@
+{% extends "user/base_user.html" %} {% block title %} Login | Oval Photo
+{%endblock %} {% block content %}
+
+
+<div class="container-login">
+  <div class="login-logo">
+    <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
+    <h2 class="mb-0">Oval Photo</h2>
+  </div>
+
+  <div class="login-card">
+    <form id="loginForm">
+      <h2 class="login-title">Masuk</h2>
+      <p class="login-subtitle">
+        Selamat datang! Masuk untuk mulai merencanakan sesi foto kamu
+      </p>
+
+      <div class="mb-4">
+        <label for="username" class="form-label">Nama Pengguna</label>
+        <input
+          type="text"
+          class="form-control"
+          id="username"
+          placeholder="Masukkan nama pengguna kamu"
+          required
+        />
+      </div>
+
+      <div class="mb-2">
+        <label for="password" class="form-label">Kata Sandi</label>
+        <div class="password-wrapper">
+          <input
+            type="password"
+            class="form-control"
+            id="password"
+            placeholder="Masukkan kata sandi kamu"
+            required
+          />
+          <button
+            type="button"
+            class="toggle-password"
+            aria-label="Toggle password visibility"
+          >
+            <i class="bi bi-eye-slash"></i>
+          </button>
+        </div>
+      </div>
+
+      <div class="text-end mb-4 text-right">
+        <a href="/lupa_kataSandi" class="forgot-link">Lupa Kata Sandi?</a>
+      </div>
+
+      <button type="submit" class="btn-masuk" id="masukButton" disabled>
+        Masuk
+      </button>
+
+      <p class="signup-text">
+        Belum mempunyai akun? <a href="/daftar">Daftar</a>
+      </p>
+    </form>
+  </div>
+</div>
+
+
+<script>
+  const usernameInput = document.getElementById("username");
+  const passwordInput = document.getElementById("password");
+  const masukButton = document.getElementById("masukButton");
+  const loginForm = document.getElementById("loginForm");
+  const togglePassword = document.querySelector(".toggle-password i");
+
+  function validateForm() {
+    masukButton.disabled = !(
+      usernameInput.value.trim() && passwordInput.value.trim()
+    );
+    masukButton.style.cursor = masukButton.disabled ? "not-allowed" : "pointer";
+    masukButton.style.backgroundColor = masukButton.disabled
+      ? "#d1d5db"
+      : "#2563eb";
+  }
+
+  usernameInput.addEventListener("input", validateForm);
+  passwordInput.addEventListener("input", validateForm);
+
+  document
+    .querySelector(".toggle-password")
+    .addEventListener("click", function () {
+      const type = passwordInput.type === "password" ? "text" : "password";
+      passwordInput.type = type;
+      togglePassword.classList.toggle("bi-eye");
+      togglePassword.classList.toggle("bi-eye-slash");
+    });
+
+  // Handle login form submission
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+
+    const username = usernameInput.value.trim();
+    const password = passwordInput.value.trim();
+
+    try {
+      const response = await fetch("/api/masuk", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ username, password }),
+      });
+
+      const data = await response.json();
+
+      if (data.success) {
+        // --- PERUBAHAN UTAMA DI SINI ---
+        localStorage.setItem('isLoggedIn', 'true'); // Simpan status login di localStorage
+        localStorage.setItem('username', username); // Simpan username juga
+        // --- AKHIR PERUBAHAN ---
+
+        Swal.fire({
+          icon: "success",
+          title: "Berhasil!",
+          text: data.message,
+          showConfirmButton: false,
+          timer: 1500,
+        }).then(() => {
+          window.location.href = "/"; // Redirect ke halaman utama
+        });
+      } else {
+        Swal.fire({
+          icon: "error",
+          title: "Gagal!",
+          text: data.message,
+        });
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+      Swal.fire({
+        icon: "error",
+        title: "Error!",
+        text: "Terjadi kesalahan koneksi. Silakan coba lagi.",
+      });
+    }
+  });
+</script>
+
+{% endblock %}

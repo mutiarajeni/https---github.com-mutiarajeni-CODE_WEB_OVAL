@@ -1,0 +1,409 @@
+{% extends "admin/base_admin.html" %} {% block title %} Ubah Tim Fotografi {%
+endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Ubah Tim Fotografi</h6>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        {% if tim %}
+        <div class="table-responsive p-0">
+          <div class="container mt-5">
+            <form
+              id="ubahTimForm"
+              method="POST"
+              action="{{ url_for('admin_timFotografi_ubah', tim_id=tim._id) }}"
+              enctype="multipart/form-data"
+            >
+              <table class="table table-no-border">
+                <tbody>
+                  <tr>
+                    <td><label for="nama">Nama</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <label class="form-label"></label>
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="nama"
+                          name="nama"
+                          value="{{ tim.nama }}"
+                          required
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="nameError"
+                        style="display: none"
+                      >
+                        Nama tim sudah ada
+                      </small>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="email">Alamat Email</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="email"
+                          class="form-control"
+                          id="email"
+                          name="email"
+                          value="{{ tim.email }}"
+                          required
+                        />
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="telepon">No. Telepon</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="telepon"
+                          name="telepon"
+                          value="{{ tim.telepon }}"
+                          required
+                        />
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="gambar">Foto</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <div class="card">
+                          <div class="card-body">
+                            <div
+                              id="drop-area"
+                              class="border rounded d-flex justify-content-center align-items-center"
+                            >
+                              <div class="content">
+                                <i
+                                  class="bi bi-cloud-arrow-up-fill text-primary"
+                                  style="font-size: 48px"
+                                ></i>
+                                <img
+                                  id="gambar-preview"
+                                  src="{{ url_for('static', filename='images/imgTim/' + tim.gambar) }}"
+                                />
+                              </div>
+                            </div>
+                            <input
+                              type="file"
+                              id="gambar"
+                              name="gambar"
+                              multiple
+                              accept="image/*"
+                              class="d-none"
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="peran">Peran</label></td>
+                    <td>
+                      <div
+                        style="
+                          display: grid;
+                          grid-template-columns: repeat(2, 1fr);
+                          gap: 10px;
+                          max-width: 500px;
+                        "
+                      >
+                        {% set existing_peran = tim.peran | default([]) %} {%
+                        for role in ['Fotografer', 'Videografer', 'Editor',
+                        'Sinematografer'] %}
+                        <label
+                          style="
+                            display: flex;
+                            justify-content: space-between;
+                            align-items: center;
+                            border: 1px solid #ddd;
+                            border-radius: 10px;
+                            padding: 8px 12px;
+                            cursor: pointer;
+                          "
+                        >
+                          {{ role }}
+                          <input
+                            type="checkbox"
+                            name="peran[]"
+                            value="{{ role }}"
+                            {%
+                            if
+                            role
+                            in
+                            existing_peran
+                            %}checked{%
+                            endif
+                            %}
+                          />
+                        </label>
+                        {% endfor %}
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <a
+                  href="/admin_timFotografi"
+                  class="btn btn-outline-dark me-2 fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  >Kembali</a
+                >
+                <button
+                  type="submit"
+                  class="btn btn-dark fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  id="submitButton"
+                  disabled
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+        {% else %}
+        <div class="p-3 text-center">
+          <p>Tim fotografi tidak ditemukan.</p>
+          <a
+            href="{{ url_for('admin_timFotografi') }}"
+            class="btn btn-secondary"
+            >Kembali ke Daftar Tim</a
+          >
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  let typingTimer;
+  const doneTypingInterval = 500; // milliseconds
+
+  // Get elements
+  const namaInput = document.getElementById("nama");
+  const emailInput = document.getElementById("email");
+  const teleponInput = document.getElementById("telepon");
+  const gambarInput = document.getElementById("gambar");
+  const peranCheckboxes = document.querySelectorAll('input[name="peran[]"]');
+  const nameError = document.getElementById("nameError");
+  const submitButton = document.getElementById("submitButton");
+  const gambarPreview = document.getElementById("gambar-preview");
+  const dropArea = document.getElementById("drop-area");
+
+  // Store original values
+  const originalValues = {
+    nama: namaInput.value.trim(),
+    email: emailInput.value.trim(),
+    telepon: teleponInput.value.trim(),
+    peran: Array.from(peranCheckboxes)
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.value),
+    gambar: "{{ tim.gambar }}", // Store original image filename
+  };
+
+  let isNameDuplicate = false;
+
+  // Function to check if there are any changes
+  function checkForChanges() {
+    const currentPeran = Array.from(peranCheckboxes)
+      .filter((cb) => cb.checked)
+      .map((cb) => cb.value);
+
+    const hasNameChanged = namaInput.value.trim() !== originalValues.nama;
+    const hasEmailChanged = emailInput.value.trim() !== originalValues.email;
+    const hasTeleponChanged =
+      teleponInput.value.trim() !== originalValues.telepon;
+    const hasPeranChanged =
+      JSON.stringify(currentPeran.sort()) !==
+      JSON.stringify(originalValues.peran.sort());
+    const hasGambarChanged = gambarInput.files.length > 0;
+
+    return (
+      hasNameChanged ||
+      hasEmailChanged ||
+      hasTeleponChanged ||
+      hasPeranChanged ||
+      hasGambarChanged
+    );
+  }
+
+  // Function to check if all required fields are filled
+  function checkRequiredFields() {
+    return (
+      namaInput.value.trim() !== "" &&
+      emailInput.value.trim() !== "" &&
+      teleponInput.value.trim() !== "" &&
+      Array.from(peranCheckboxes).some((cb) => cb.checked)
+    );
+  }
+
+  // Function to toggle submit button
+  function toggleSubmitButton() {
+    submitButton.disabled = !(
+      checkRequiredFields() &&
+      checkForChanges() &&
+      !isNameDuplicate
+    );
+  }
+
+  // Function to check name availability
+  function checkNameAvailability(currentTimId) {
+    clearTimeout(typingTimer);
+    const nama = namaInput.value.trim();
+
+    if (nama === "" || nama === originalValues.nama) {
+      nameError.style.display = "none";
+      isNameDuplicate = false;
+      toggleSubmitButton();
+      return;
+    }
+
+    typingTimer = setTimeout(() => {
+      fetch("/check_nama_tim", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ nama: nama }),
+      })
+        .then((res) => res.json())
+        .then((data) => {
+          // If a team with this name exists AND its ID is different from the current team being edited
+          if (data.exists && data.tim_id !== currentTimId) {
+            nameError.style.display = "block";
+            isNameDuplicate = true;
+          } else {
+            nameError.style.display = "none";
+            isNameDuplicate = false;
+          }
+          toggleSubmitButton();
+        })
+        .catch((error) => {
+          console.error("Error checking name availability:", error);
+          isNameDuplicate = false; // Assume no duplicate on error
+          toggleSubmitButton();
+        });
+    }, doneTypingInterval);
+  }
+
+  // Image preview function
+  function previewImage(event) {
+    const reader = new FileReader();
+    reader.onload = function () {
+      gambarPreview.src = reader.result;
+      gambarPreview.style.display = "block";
+      // Remove any previous text/icon if a new image is selected
+      const contentDiv = dropArea.querySelector(".content");
+      const icon = contentDiv.querySelector("i");
+      const p = contentDiv.querySelector("p");
+      if (icon) icon.style.display = "none";
+      if (p) p.style.display = "none";
+    };
+    if (event.target.files[0]) {
+      reader.readAsDataURL(event.target.files[0]);
+    } else {
+      // If no file selected (e.g., user cancels), revert to original image or hide preview
+      if (originalValues.gambar) {
+        gambarPreview.src =
+          "{{ url_for('static', filename='images/imgTim/' + tim.gambar) }}";
+        gambarPreview.style.display = "block";
+      } else {
+        gambarPreview.style.display = "none";
+        const contentDiv = dropArea.querySelector(".content");
+        const icon = contentDiv.querySelector("i");
+        const p = contentDiv.querySelector("p");
+        if (icon) icon.style.display = "block";
+        if (p) p.style.display = "block";
+      }
+    }
+    toggleSubmitButton();
+  }
+
+  // Event listeners
+  document.addEventListener("DOMContentLoaded", function () {
+    // Initial check for submit button state
+    toggleSubmitButton();
+
+    // Attach input listeners
+    namaInput.addEventListener("input", () =>
+      checkNameAvailability("{{ tim._id }}")
+    );
+    emailInput.addEventListener("input", toggleSubmitButton);
+    teleponInput.addEventListener("input", toggleSubmitButton);
+    peranCheckboxes.forEach((checkbox) =>
+      checkbox.addEventListener("change", toggleSubmitButton)
+    );
+    gambarInput.addEventListener("change", previewImage); // This will call toggleSubmitButton inside previewImage
+
+    // Handle click on drop area to trigger file input
+    dropArea.addEventListener("click", () => gambarInput.click());
+
+    // Drag and drop functionality
+    dropArea.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      dropArea.classList.add("drag-over");
+    });
+    dropArea.addEventListener("dragleave", () => {
+      dropArea.classList.remove("drag-over");
+    });
+    dropArea.addEventListener("drop", (e) => {
+      e.preventDefault();
+      dropArea.classList.remove("drag-over");
+      const files = e.dataTransfer.files;
+      if (files.length > 0) {
+        gambarInput.files = files;
+        previewImage({ target: gambarInput });
+      }
+    });
+  });
+
+  // Handle form submission with SweetAlert
+  document
+    .getElementById("ubahTimForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = this;
+
+      Swal.fire({
+        title: "Apakah kamu yakin?",
+        text: "Perubahan Tim Fotografi akan disimpan.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, simpan!",
+        cancelButtonText: "Batal",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Tim Fotografi berhasil diubah.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            willClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+</script>
+{% endblock %}

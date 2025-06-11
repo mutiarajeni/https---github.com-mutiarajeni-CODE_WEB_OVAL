@@ -1,0 +1,420 @@
+{% extends "admin/base_admin.html" %} {% block title %} Dashboard Admin | Oval
+Photo {% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Detail Pesanan</h6>
+        </div>
+      </div>
+
+      {% for p in pesanan %}
+      <section class="bg-white rounded mt-4 p-3 px-md-5 d-flex flex-column gap-3">
+        <div
+          class="d-flex flex-column flex-md-row justify-content-md-end gap-3 gap-md-6 fw-bold text-dark me-4"
+        >
+          <div>
+            <span>Tanggal Pemesanan</span>
+            <p class="mt-1 fw-normal text-black" style="font-size: 12px">
+              {{ p.tanggal_pemesanan_formatted }}
+            </p>
+          </div>
+          <div>
+            <span>Status</span>
+            <form
+              method="POST"
+              action="{{ url_for('admin_pesanan_update', pesanan_id=p._id) }}"
+              class="d-flex align-items-center gap-2"
+              id="updateOrderForm-{{ p._id }}"
+            >
+              <select
+                name="status_pesanan"
+                class="form-select form-select-sm w-auto text-muted"
+                style="font-size: 12px; min-width: 200px"
+              >
+                {% set status_list = [ 'Menunggu Konfirmasi', 'Telah Dikonfirmasi', 'Belum Pemotretan', 'Sudah
+                Pemotretan', 'Belum Kirim File & Album', 'Sudah Kirim File &
+                Album', 'Gagal Dikonfirmasi',  'Pending Pembayaran', 'Pembayaran Kadaluarsa', 'Pembayaran Dibatalkan', 'Pembayaran Ditolak', 'Pesanan
+                Dibatalkan', 'Selesai'
+                ] %} {% for status in status_list %}
+                <option
+                  value="{{ status }}"
+                  {% if p.status_pesanan == status %}selected{% endif %}
+                >
+                  {{ status }}
+                </option>
+                {% endfor %}
+              </select>
+            </form>
+          </div>
+        </div>
+
+        <div class="row small">
+          <div class="col-md-6 col-lg-4 mb-4" style="color: black">
+            <h5 class="text-black text-capitalize ps-1 mb-3 mt-4">
+              Informasi Klien
+            </h5>
+
+            <div class="row row-cols-1 gy-4">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-person-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Nama Klien</p>
+                  <p class="fw-bold fs-6 mb-0">{{ p.nama_klien }}</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-people-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Nama Orang Tua</p>
+                  <p class="fw-bold fs-6 mb-0">{{ p.nama_orang_tua }}</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-envelope-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">
+                    Alamat Email Klien
+                  </p>
+                  <p class="fw-bold fs-6 mb-0">{{ p.email_klien }}</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-telephone-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">
+                    No. Telepon/WhatsApp Klien
+                  </p>
+                  <p class="fw-bold fs-6 mb-0">{{ p.telepon_klien }}</p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-instagram" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Instagram Klien</p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {{ p.instagram_klien if p.instagram_klien else '-' }}
+                  </p>
+                </div>
+              </div>
+
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-facebook" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Facebook Klien</p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {{ p.facebook_klien if p.facebook_klien else '-' }}
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-4" style="color: black">
+            <h5 class="text-black text-capitalize ps-1 mb-3 mt-4">
+              Informasi Pesanan
+            </h5>
+
+            <div class="mb-4">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-camera-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Layanan</p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {{ p.layanan }} ({{ p.paket }})
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex align-items-start gap-2">
+                <i
+                  class="bi bi-calendar-event-fill"
+                  style="font-size: 14px"
+                ></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Waktu Acara</p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {{ p.jam_acara }} WIB, {{p.tanggal_mulai_acara_formatted}}
+                    - {{p.tanggal_selesai_acara_formatted}}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-geo-alt-fill" style="font-size: 16px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">
+                    Lokasi Acara berada di luar <br> Kab. Labuhanbatu Selatan
+                  </p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {% if p.lokasi_luar_labuhanbatu %}Ya{% else %}Tidak{%
+                    endif %}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-geo-alt-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Lokasi Acara</p>
+                  <p class="fw-bold fs-6 mb-0">{{ p.lokasi }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="mb-4">
+              <div class="d-flex align-items-start gap-2">
+                <i class="bi bi-geo-alt-fill" style="font-size: 14px"></i>
+                <div>
+                  <p class="text-black mb-1 fs-6 fw-normal">Alamat Lokasi</p>
+                  <p class="fw-bold fs-6 mb-0">
+                    {{ p.alamat_lokasi_acara }} ({% if p.link_maps_acara %}
+                    <a
+                      href="{{ p.link_maps_acara }}"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      style="color: black; text-decoration: underline"
+                    >
+                      Link Maps
+                    </a>
+                    {% else %} - {% endif %})
+                  </p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-md-6 col-lg-4 mb-4">
+            <h5 class="text-black text-capitalize ps-1 mb-3 mt-4">
+              Informasi Lainnya
+            </h5>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i
+                  class="bi bi-envelope-paper-fill me-2"
+                  style="font-size: 14px"
+                ></i
+                >Surat Izin Lokasi
+              </label>
+              {% if p.surat_izin_lokasi %}
+              <div class="d-flex align-items-center bg-light p-2 rounded">
+                <i
+                  class="bi bi-file-earmark-pdf-fill text-danger me-2 fs-5"
+                ></i>
+                <a
+                  href="{{ url_for('static', filename='suratIzin/' ~ p.surat_izin_lokasi) }}"
+                  target="_blank"
+                  class="text-decoration-underline"
+                  >{{ p.surat_izin_lokasi }}</a
+                >
+              </div>
+              {% else %}
+              <p class="text-muted">Tidak ada file</p>
+              {% endif %}
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i class="bi bi-cash me-2" style="font-size: 14px"></i>Biaya
+                Tambah Hari
+              </label>
+              <input
+                id="biaya_tambah_hari"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                oninput="formatNumberInput(event)"
+                class="form-control form-control-sm"
+                style="
+                  border-radius: 5px;
+                  border: 1px solid #ced4da;
+                  font-size: 12px;
+                "
+                name="biaya_tambah_hari"
+                value="{{ '{:,.0f}'.format(p.biaya_tambah_hari) if p.biaya_tambah_hari is not none else '0' }}"
+                form="updateOrderForm-{{ p._id }}"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i class="bi bi-cash me-2" style="font-size: 14px"></i>Biaya
+                Lokasi
+              </label>
+              <input
+                id="biaya_lokasi"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                oninput="formatNumberInput(event)"
+                class="form-control form-control-sm"
+                style="
+                  border-radius: 5px;
+                  border: 1px solid #ced4da;
+                  font-size: 12px;
+                "
+                name="biaya_lokasi"
+                value="{{ '{:,.0f}'.format(p.biaya_lokasi) if p.biaya_lokasi is not none else '0' }}"
+                form="updateOrderForm-{{ p._id }}"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i class="bi bi-cash me-2" style="font-size: 14px"></i>Biaya
+                Transportasi & Akomodasi
+              </label>
+              <input
+                id="biaya-transportasi"
+                type="text"
+                inputmode="numeric"
+                pattern="[0-9]*"
+                oninput="formatNumberInput(event)"
+                class="form-control form-control-sm"
+                style="
+                  border-radius: 5px;
+                  border: 1px solid #ced4da;
+                  font-size: 12px;
+                "
+                name="biaya_transportasi"
+                value="{{ '{:,.0f}'.format(p.biaya_transportasi_akomodasi) if p.biaya_transportasi_akomodasi is not none else '0' }}"
+                form="updateOrderForm-{{ p._id }}"
+              />
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i class="bi bi-sticky-fill me-2" style="font-size: 14px"></i
+                >Catatan
+              </label>
+              <textarea
+                class="form-control form-control-sm"
+                rows="3"
+                style="
+                  border-radius: 5px;
+                  border: 1px solid #ced4da;
+                  font-size: 12px;
+                  height: 100px;
+                "
+                name="catatan"
+                form="updateOrderForm-{{ p._id }}"
+              >
+{{ p.catatan | default('') }}</textarea
+              >
+            </div>
+
+            <div class="mb-4">
+              <label class="form-label fs-6">
+                <i class="bi bi-link-45deg me-2" style="font-size: 14px"></i
+                >Link Google Drive
+              </label>
+              <textarea
+                class="form-control form-control-sm"
+                rows="3"
+                style="
+                  border-radius: 5px;
+                  border: 1px solid #ced4da;
+                  font-size: 12px;
+                  height: 100px;
+                "
+                name="link_google_drive"
+                form="updateOrderForm-{{ p._id }}"
+              >
+{{ p.link_google_drive | default('') }}</textarea
+              >
+            </div>
+          </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+        <div
+          class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mt-3"
+        >
+          <a
+            href="/admin_pesanan"
+            class="btn btn-outline-dark me-2 fw-normal mb-3 mb-md-0"
+            style="text-transform: none; font-size: 1rem"
+            >Kembali</a
+          >
+          <div class="text-end">
+            <button
+              type="button"
+              id="saveButton-{{ p._id }}"
+              class="btn btn-outline-dark fw-normal"
+              style="text-transform: none; font-size: 1rem"
+            >
+              Simpan
+            </button>
+          </div>
+        </div>
+      </section>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+
+<script>
+  function formatNumberInput(e) {
+    const input = e.target;
+    let value = input.value.replace(/\D/g, "");
+    if (value === "") {
+      input.value = "";
+      return;
+    }
+    value = parseInt(value, 10).toLocaleString("id-ID");
+    input.value = value;
+  }
+
+  document.querySelectorAll('[id^="saveButton-"]').forEach((button) => {
+    button.addEventListener("click", function () {
+      const pesananId = this.id.replace("saveButton-", "");
+      const form = document.getElementById(`updateOrderForm-${pesananId}`);
+
+      Swal.fire({
+        title: "Konfirmasi Simpan?",
+        text: "Apakah Anda yakin ingin menyimpan perubahan pada pesanan ini?",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, Simpan!",
+        cancelButtonText: "Batal",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Perubahan pesanan berhasil disimpan.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            willClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+  });
+</script>
+
+{% endblock %}

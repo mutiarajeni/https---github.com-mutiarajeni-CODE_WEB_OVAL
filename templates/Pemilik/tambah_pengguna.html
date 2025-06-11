@@ -1,0 +1,285 @@
+{% extends "pemilik/base_pemilik.html" %}
+{% block title %}Tambah Pengguna{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Tambah Pengguna</h6>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <div class="container mt-5">
+            <form id="tambahPenggunaForm">
+              <table class="table table-no-border">
+                <tbody>
+                  <tr>
+                    <td><label for="namaLengkap">Nama Lengkap</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="namaLengkap"
+                          name="namaLengkap"
+                          required
+                        />
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="namaPengguna">Nama Pengguna</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="namaPengguna"
+                          name="namaPengguna"
+                          required
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="usernameError"
+                        style="display: none"
+                        >Nama pengguna sudah ada</small
+                      >
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="kataSandi">Kata Sandi</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="password"
+                          class="form-control"
+                          id="kataSandi"
+                          name="kataSandi"
+                          placeholder="Masukkan kata sandi"
+                          required
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="passwordError"
+                        style="display: none"
+                        >Kata sandi minimal 8 karakter</small
+                      >
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="peranSelect">Peran</label></td>
+                    <td>
+                      <div class="input-group input-group-outline" style="position: relative;">
+                        <select
+                          class="form-control"
+                          id="peranSelect"
+                          name="peran"
+                          style="
+                            -webkit-appearance: none;
+                            -moz-appearance: none;
+                            appearance: none;
+                            padding-right: 30px; /* Beri ruang untuk ikon panah */
+                            background-image: none; /* Pastikan tidak ada panah bawaan browser */
+                          "
+                        >
+                          <option value="admin">Admin</option>
+                          <option value="pemilik">Pemilik</option>
+                        </select>
+                        <i class="bi bi-chevron-down"
+                           style="
+                             position: absolute;
+                             right: 8px; /* Sesuaikan posisi horizontal */
+                             top: 50%;
+                             transform: translateY(-50%);
+                             pointer-events: none;
+                             color: #6c757d; /* Warna abu-abu standar */
+                             font-size: 12px; /* Ukuran ikon, sesuaikan agar sesuai */
+                             z-index: 2;
+                           "></i>
+                      </div>
+                      </td>
+                  </tr>
+                  <tr id="emailRow" style="display: none;">
+                    <td><label for="email">Email</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="email"
+                          class="form-control"
+                          id="email"
+                          name="email"
+                          placeholder="Masukkan email"
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="emailError"
+                        style="display: none"
+                        >Format email tidak valid atau email sudah terdaftar</small
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <a
+                  href="/pemilik_pengguna"
+                  class="btn btn-outline-dark me-2 fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  >Kembali</a
+                >
+                <button
+                  type="submit"
+                  class="btn btn-dark fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  id="submitButton"
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fungsi helper untuk menampilkan SweetAlert (ditempatkan di sini atau di file JS terpisah)
+  function showAlert(icon, title, text, redirectUrl = null) {
+    Swal.fire({
+      icon: icon, // 'success', 'error', 'warning', 'info', 'question'
+      title: title,
+      text: text,
+      showConfirmButton: true,
+      confirmButtonText: 'Oke'
+      // customClass dan buttonsStyling dihilangkan untuk menggunakan gaya bawaan
+    }).then((result) => {
+      if (result.isConfirmed && redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    });
+  }
+
+  const peranSelect = document.getElementById('peranSelect');
+  const emailRow = document.getElementById('emailRow');
+  const emailInput = document.getElementById('email');
+  const emailError = document.getElementById('emailError');
+  const namaLengkapInput = document.getElementById('namaLengkap');
+  const namaPenggunaInput = document.getElementById('namaPengguna');
+  const usernameError = document.getElementById('usernameError');
+  const kataSandiInput = document.getElementById('kataSandi');
+  const passwordError = document.getElementById('passwordError');
+  const tambahPenggunaForm = document.getElementById('tambahPenggunaForm');
+
+  function toggleEmailField() {
+    if (peranSelect.value === 'pemilik') {
+      emailRow.style.display = '';
+      emailInput.setAttribute('required', 'required');
+    } else {
+      emailRow.style.display = 'none';
+      emailInput.removeAttribute('required');
+      emailInput.value = ''; // Clear email when hidden
+      emailError.style.display = 'none'; // Hide error if role changes
+    }
+  }
+
+  toggleEmailField();
+  peranSelect.addEventListener('change', toggleEmailField);
+
+  tambahPenggunaForm.addEventListener('submit', async function(event) {
+    event.preventDefault();
+
+    let isValid = true;
+
+    if (kataSandiInput.value.length < 8) {
+      passwordError.textContent = 'Kata sandi minimal 8 karakter';
+      passwordError.style.display = 'block';
+      isValid = false;
+    } else {
+      passwordError.style.display = 'none';
+    }
+
+    if (peranSelect.value === 'pemilik') {
+      if (!emailInput.value || !/\S+@\S+\.\S+/.test(emailInput.value)) {
+        emailError.textContent = 'Format email tidak valid';
+        emailError.style.display = 'block';
+        isValid = false;
+      } else {
+        emailError.style.display = 'none';
+      }
+    } else {
+        emailError.style.display = 'none';
+    }
+
+    if (!isValid) {
+      showAlert('error', 'Validasi Gagal!', 'Mohon periksa kembali input Anda.');
+      return;
+    }
+
+    Swal.fire({
+      title: 'Konfirmasi Penambahan Pengguna?',
+      text: "Anda akan menambahkan pengguna baru dengan informasi ini.",
+      icon: 'question',
+      showCancelButton: true,
+      confirmButtonColor: '#3085d6', // Warna bawaan SweetAlert untuk konfirmasi
+      cancelButtonColor: '#d33',   // Warna bawaan SweetAlert untuk batal
+      confirmButtonText: 'Ya, Simpan!',
+      cancelButtonText: 'Batal'
+      // customClass dan buttonsStyling dihilangkan
+    }).then(async (result) => {
+      if (result.isConfirmed) {
+        const formData = {
+          nama: namaLengkapInput.value,
+          nama_pengguna: namaPenggunaInput.value,
+          kata_sandi: kataSandiInput.value,
+          peran: peranSelect.value,
+          email: emailInput.value || null
+        };
+
+        try {
+          const response = await fetch('/api/pemilik_tambah_pengguna', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(formData)
+          });
+
+          const apiResult = await response.json();
+
+          if (response.ok) {
+            showAlert('success', 'Berhasil!', apiResult.message, '/pemilik_pengguna');
+          } else {
+            if (apiResult.message.includes("Nama pengguna sudah terdaftar")) {
+              usernameError.textContent = apiResult.message;
+              usernameError.style.display = 'block';
+            } else if (apiResult.message.includes("Email sudah terdaftar") || apiResult.message.includes("Format email tidak valid")) {
+              emailError.textContent = apiResult.message;
+              emailError.style.display = 'block';
+            }
+            showAlert('error', 'Gagal!', apiResult.message || 'Terjadi kesalahan saat menambahkan pengguna.');
+          }
+        } catch (error) {
+          console.error('Error:', error);
+          showAlert('error', 'Error!', 'Terjadi kesalahan jaringan atau server saat menambahkan pengguna. Silakan coba lagi.');
+        }
+      }
+    });
+  });
+
+  namaLengkapInput.addEventListener('input', () => { /* no specific error yet */ });
+  namaPenggunaInput.addEventListener('input', () => { usernameError.style.display = 'none'; });
+  emailInput.addEventListener('input', () => { emailError.style.display = 'none'; });
+  kataSandiInput.addEventListener('input', () => { passwordError.style.display = 'none'; });
+</script>
+{% endblock %}

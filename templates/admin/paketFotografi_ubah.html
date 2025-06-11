@@ -1,0 +1,343 @@
+{% extends "admin/base_admin.html" %} {% block title %} Dashboard Admin | Oval
+Photo {% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Ubah Paket Fotografi</h6>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <div class="container mt-5">
+            <form
+              id="ubahPaketForm"
+              method="POST"
+              action="/admin_paketFotografi_ubah/{{ data._id }}"
+              enctype="multipart/form-data"
+            >
+              <input
+                type="hidden"
+                class="form-control"
+                name="_id"
+                value="{{ data._id }}"
+              />
+              <table class="table table-no-border">
+                <tbody>
+                  <tr>
+                    <td><label for="nama">Nama Paket</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="nama"
+                          name="nama"
+                          required
+                          value="{{ data.nama }}"
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="nameError"
+                        style="display: none"
+                        >Nama paket sudah ada</small
+                      >
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="layananSelect">Layanan</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <select
+  class="form-control"
+  id="layananSelect"
+  name="layanan"
+  onchange="fetchLayananDetails()"
+  required
+>
+  {% for l in layanan %}
+    <option value="{{ l._id }}"
+      {% if l._id == data.layanan_id %} selected {% endif %}
+    >
+      {{ l.nama }}
+    </option>
+  {% endfor %}
+</select>
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="harga">Harga</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="harga"
+                          name="harga"
+                          required
+                          value="{{ data.harga }}"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="deposit">Deposit</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="number"
+                          class="form-control"
+                          id="deposit"
+                          name="deposit"
+                          required
+                          value="{{ data.deposit }}"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="keuntungan">Keuntungan</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <textarea
+                          class="form-control"
+                          id="keuntungan"
+                          name="keuntungan"
+                          rows="5"
+                        >
+{{ data.keuntungan }}</textarea
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="tim_kerja">Tim Kerja</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <textarea
+                          class="form-control"
+                          id="tim_kerja"
+                          name="tim_kerja"
+                          rows="5"
+                        >
+{{ data.tim_kerja }}</textarea
+                        >
+                      </div>
+                    </td>
+                  </tr>
+                  <tr>
+                    <td><label for="periode">Periode Paket</label></td>
+                    <td>
+                      <div
+                        style="
+                          display: flex;
+                          gap: 10px;
+                          align-items: center;
+                          max-width: 500px;
+                        "
+                      >
+                        <input
+                          type="date"
+                          class="form-control"
+                          name="tanggal_mulai"
+                          id="tanggal_mulai"
+                          required
+                          value="{{ formatted_tanggal_mulai }}"
+                          style="
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            padding: 6px 10px;
+                            width: 140px;
+                          "
+                          onchange="checkFormValidity();"
+                        />
+
+                        <span>-</span>
+
+                        <input
+                          type="date"
+                          class="form-control"
+                          name="tanggal_selesai"
+                          id="tanggal_selesai"
+                          required
+                          value="{{ formatted_tanggal_selesai }}"
+                          style="
+                            border: 1px solid #ccc;
+                            border-radius: 5px;
+                            padding: 6px 10px;
+                            width: 140px;
+                          "
+                          onchange="checkFormValidity();"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <a
+                  href="/admin_paketFotografi"
+                  class="btn btn-outline-dark me-2 fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  >Kembali</a
+                >
+                <button
+                  type="submit"
+                  class="btn btn-dark fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  id="submitButton"
+                  disabled
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Menjalankan script setelah seluruh dokumen dimuat
+  document.addEventListener("DOMContentLoaded", function () {
+    // Mengambil elemen input dari form
+    const namaInput = document.getElementById("nama");
+    const layananSelect = document.getElementById("layananSelect");
+    const hargaInput = document.getElementById("harga");
+    const depositInput = document.getElementById("deposit");
+    const keuntunganInput = document.getElementById("keuntungan");
+    const timInput = document.getElementById("tim_kerja");
+    const tanggalMulai = document.getElementById("tanggal_mulai");
+    const tanggalSelesai = document.getElementById("tanggal_selesai");
+    const nameError = document.getElementById("nameError");
+    const submitBtn = document.getElementById("submitButton");
+
+    // Menyimpan nilai awal (sebelum ada perubahan)
+    const originalValues = {
+      nama: namaInput.value.trim(),
+      layanan: layananSelect.value.trim(),
+      harga: hargaInput.value.trim(),
+      deposit: depositInput.value.trim(),
+      keuntungan: keuntunganInput.value.trim(),
+      tim: timInput.value.trim(),
+      tanggalMulai: tanggalMulai.value.trim(),
+      tanggalSelesai: tanggalSelesai.value.trim(),
+    };
+
+    // Fungsi untuk mengecek apakah ada perubahan dari nilai awal
+    const checkForChanges = () => {
+      return (
+        namaInput.value.trim() !== originalValues.nama ||
+        layananSelect.value.trim() !== originalValues.layanan ||
+        hargaInput.value.trim() !== originalValues.harga ||
+        depositInput.value.trim() !== originalValues.deposit ||
+        keuntunganInput.value.trim() !== originalValues.keuntungan ||
+        timInput.value.trim() !== originalValues.tim ||
+        tanggalMulai.value.trim() !== originalValues.tanggalMulai ||
+        tanggalSelesai.value.trim() !== originalValues.tanggalSelesai
+      );
+    };
+
+    // Fungsi untuk memastikan semua input terisi
+    const checkInputsNotEmpty = () => {
+      return (
+        namaInput.value.trim() !== "" &&
+        layananSelect.value.trim() !== "" &&
+        hargaInput.value.trim() !== "" &&
+        depositInput.value.trim() !== "" &&
+        keuntunganInput.value.trim() !== "" &&
+        timInput.value.trim() !== "" &&
+        tanggalMulai.value.trim() !== "" &&
+        tanggalSelesai.value.trim() !== ""
+      );
+    };
+
+    // Fungsi untuk cek nama dan atur tombol submit
+    const checkNameAndToggleButton = () => {
+      const currentName = namaInput.value.trim();
+
+      // Jika nama berubah dan tidak kosong, periksa ke server
+      if (currentName !== "" && currentName !== originalValues.nama) {
+        fetch("/check_nama_paket", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ nama: currentName }),
+        })
+          .then((res) => res.json())
+          .then((data) => {
+            if (data.exists) {
+              nameError.style.display = "block";
+              submitBtn.disabled = true;
+            } else {
+              nameError.style.display = "none";
+              submitBtn.disabled = !(
+                checkForChanges() && checkInputsNotEmpty()
+              );
+            }
+          });
+      } else {
+        // Nama tidak berubah atau kosong
+        nameError.style.display = "none";
+        submitBtn.disabled = !(checkForChanges() && checkInputsNotEmpty());
+      }
+    };
+
+    // Tambahkan event listener ke setiap input
+    [
+      namaInput,
+      layananSelect,
+      hargaInput,
+      depositInput,
+      keuntunganInput,
+      timInput,
+      tanggalMulai,
+      tanggalSelesai,
+    ].forEach((input) => {
+      input.addEventListener("input", checkNameAndToggleButton);
+    });
+
+    // Cek saat halaman dimuat
+    checkNameAndToggleButton();
+  });
+
+  // Konfirmasi sebelum submit form
+  document
+    .getElementById("ubahPaketForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      const form = this;
+
+      Swal.fire({
+        title: "Apakah kamu yakin?",
+        text: "Paket fotografi akan diubah.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, simpan!",
+        cancelButtonText: "Batal",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Paket fotografi berhasil diubah.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            willClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+</script>
+
+{% endblock %}

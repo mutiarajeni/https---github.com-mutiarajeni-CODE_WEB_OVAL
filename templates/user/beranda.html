@@ -1,0 +1,307 @@
+{% extends 'user/base_user.html' %}{% block content %}
+<!-- Hero Section -->
+<section class="hero" id="beranda">
+  <main class="content">
+    <h1>Abadikan Momen Kamu Bersama Oval Photo</h1>
+    <p>Momen indah tercipta karena kehadiranmu</p>
+    <a href="/katalog_layanan" class="cta">Pesan Sekarang</a>
+  </main>
+</section>
+
+<!--Isi Konten-->
+<div class="subutama-container" role="main">
+
+  <!--Content Section 1 (Kenapa?)-->
+  <div class="kenapa-container">
+    <div class="kenapa-image">
+      <img src="static/img/studio.jpg" alt="Studio Oval Photo"/>
+    </div>
+    <div class="kenapa-content">
+      <h2>Kenapa Oval Photo?</h2>
+      <p>
+        Oval Photo adalah pilihan tepat untuk kamu yang menginginkan hasil fotografi terbaik dan berkualitas. Kami mengutamakan keindahan dan kepuasan klien, didukung oleh tim profesional berpengalaman dan teknologi modern. Kami menyediakan layanan yang disesuaikan dengan kebutuhan kamu.
+      </p>
+      <a href="/tentang-kami" class="kenapa-button">Selengkapnya</a>
+    </div>
+  </div>
+
+  <!--Content Section 2 (Galeri)-->  
+  <div class="gallery">
+   <h2>Galeri</h2>
+    <div class="gallery-grid">
+        {% if random_gallery_images %}
+            {# Loop melalui gambar yang dikirim dari backend #}
+            {% for image_filename in random_gallery_images %}
+                {# Terapkan kelas 'wide' untuk setiap gambar kedua, atau 'tall' untuk setiap gambar ketiga #}
+                {# Ini adalah contoh sederhana untuk variasi. Anda bisa menggunakan logika yang lebih kompleks jika diinginkan. #}
+                {% set loop_index = loop.index %}
+                <img
+                    src="{{ url_for('static', filename='images/imgGaleri/' + image_filename) }}"
+                    alt="Foto Galeri {{ loop_index }}"
+                    {# Tambahkan kelas 'wide' atau 'tall' secara bergantian untuk demo tata letak #}
+                    {% if loop_index % 3 == 0 %} class="tall"
+                    {% elif loop_index % 2 == 0 %} class="wide"
+                    {% endif %}
+                />
+            {% endfor %}
+        {% else %}
+            <p>Tidak ada foto galeri yang tersedia untuk ditampilkan.</p>
+        {% endif %}
+    </div>
+
+    <!--Button Selengkapnya-->
+      <div class="btn-container-gallery" type="button" onclick="window.location.href='/galeri'">
+        <button>Selengkapnya</button>
+      </div>
+
+  </div>
+
+  <!--Content Section 3 (Katalog Layanan)-->
+  <div class="layanan">
+    <div class="layanan">
+                <h2>Katalog Layanan</h2>
+                <div class="layanan-container">
+                    {% if layanan %} {# Tambahkan pengecekan ini untuk memastikan 'layanan' tidak kosong #}
+                        {% for layanan_item in layanan %}
+                        <div class="layanan-card">
+                            <img
+                                src="{{ url_for('static', filename='images/imgLayanan/' ~ layanan_item.gambar) }}"
+                                alt="{{ layanan_item.nama }}"
+                            />
+                            <div class="layanan-card-content">
+                                <h3>{{ layanan_item.nama }}</h3>
+                                <p>{{ layanan_item.deskripsi }}</p>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                        <p>Belum ada layanan yang tersedia saat ini.</p>
+                    {% endif %}
+                </div>
+            </div>
+    <!--Button Selengkapnya-->
+      <div class="Ly-btn-container" type="button" onclick="window.location.href='/katalog_layanan'">
+        <button>Selengkapnya</button>
+      </div>
+
+  </div>
+
+</div>
+
+<!--Content Section 4 (Tahapan)-->
+<h2 class="subutama-container"  style="font-size: clamp(20px, 4vw, 28px); color: #000000; line-height: 1.3; text-align: justify; margin-bottom:20px; font-weight: 600"
+  >Tahapan Pemesanan
+</h2>
+
+<section class="timeline-section">
+  <div class="timeline-wrapper">
+
+    <!-- Baris atas -->
+    <div class="timeline-row row-top">
+      <div class="step"><span class="circle">1</span><p>Pilih layanan fotografi yang kamu inginkan</p></div>
+      <div class="step"><span class="circle">2</span><p>Pilih paket layanan sesuai dengan kebutuhan kamu</p></div>
+      <div class="step"><span class="circle">3</span><p>Lakukan pengisian formulir pemesanan </p></div>
+      <div class="step step-down"><span class="circle">4</span><p>Tunggu selama 1x24 jam untuk dikonfirmasi</p></div>
+    </div>
+
+    <!-- Baris bawah -->
+    <div class="timeline-row row-bottom">
+      <div class="step"><span class="circle">5</span><p>Lakukan pembayaran deposit </p></div>
+      <div class="step"><span class="circle">6</span><p>Sesi pemotretan dan pembayaran pelunasan</p></div>
+      <div class="step"><span class="circle">7</span><p>Menerima hasil foto dan keuntungan lainnya sesuai dengan paket layanan yang dipesan</p></div>
+      <div class="step"><span class="circle">8</span><p>Memberikan penilaian dan ulasan terhadap layanan yang diberikan</p></div>
+    </div>
+</section>
+
+
+<!--Content Section 5 (Testimoni)-->
+<h2 class="subutama-container"  style="font-size: clamp(20px, 4vw, 28px); color: #000000; line-height: 1.3; text-align: justify; margin-bottom:20px; font-weight: 600"
+  >Penilaian dan Ulasan dari Klien
+</h2>
+
+<section aria-label="Testimonial Section" class="testimonial-section">
+  <p>
+    <a aria-label="Selengkapnya" class="testimonial-button" href="/ulasan">
+    Selengkapnya
+    </a>
+  </p>
+
+  <div aria-atomic="true" aria-live="polite" class="testimonial-card" id="testimonial-card" role="region">
+    <div class="testimonial-profile">
+      <img alt="Foto close-up Rina Wijaya, wanita Asia dengan rambut hitam panjang, tersenyum cerah mengenakan pakaian kasual putih" height="90" src="https://storage.googleapis.com/a1aa/image/10b18516-222e-4fa1-a781-277de6c21702.jpg" width="90"/>
+    </div>
+
+    <div class="testimonial-content">
+      <div class="testimonial-header">
+      <h3 id="testimonial-name">
+        Rina Wijaya
+      </h3>
+      <span class="testimonial-date" id="testimonial-date">
+        07/06/2024
+      </span>
+      </div>
+      <div aria-label="Rating bintang lima" class="testimonial-stars">
+      ★★★★★
+      </div>
+      <div class="testimonial-package" id="testimonial-package">
+      Paket Indoor (Studio) - Layanan Prewedding
+      </div>
+      <p class="testimonial-text" id="testimonial-text">
+      "Saya memesan layanan pre-wedding di Oval Photo, dan hasilnya di luar ekspektasi!
+          Fotografernya sangat kreatif dalam memilih konsep. Kami tidak hanya mendapatkan foto yang indah,
+          tetapi juga pengalaman yang menyenangkan selama sesi pemotretan. Benar-benar worth it!"
+      </p>
+    </div>
+
+  </div>
+
+  <div aria-label="Navigasi testimonial" class="testimonial-navigation" role="tablist">
+    <span aria-controls="testimonial-card" aria-selected="true" class="dot active" data-index="0" role="tab" tabindex="0">
+    </span>
+    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="1" role="tab" tabindex="-1">
+    </span>
+    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="2" role="tab" tabindex="-1">
+    </span>
+    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="3" role="tab" tabindex="-1">
+    </span>
+  </div>
+
+</section>
+
+
+<!-- Scripts Testimoni -->
+<script>
+  const testimonials = [
+    {
+      name: "Rina Wijaya",
+      date: "07/06/2024",
+      stars: 5,
+      package: "Paket Indoor (Studio) - Layanan Prewedding",
+      text: `"Saya memesan layanan pre-wedding di Oval Photo, dan hasilnya di luar ekspektasi!
+      Fotografernya sangat kreatif dalam memilih konsep. Kami tidak hanya mendapatkan foto yang indah,
+      tetapi juga pengalaman yang menyenangkan selama sesi pemotretan. Benar-benar worth it!"`,
+      imgSrc: "https://placehold.co/90x90/png?text=Rina+Wijaya",
+      imgAlt: "Foto Rina Wijaya, wanita Asia dengan rambut hitam panjang, tersenyum cerah mengenakan pakaian kasual putih"
+    },
+    {
+      name: "Andi Pratama",
+      date: "15/05/2024",
+      stars: 4,
+      package: "Paket Outdoor (Pantai) - Layanan Prewedding",
+      text: `"Layanan yang sangat memuaskan dengan hasil foto yang natural dan indah.
+      Tim fotografer sangat profesional dan sabar menghadapi cuaca yang kurang mendukung.
+      Saya sangat merekomendasikan Oval Photo untuk sesi prewedding outdoor."`,
+      imgSrc: "https://placehold.co/90x90/png?text=Andi+Pratama",
+      imgAlt: "Foto close-up Andi Pratama, pria Asia dengan rambut pendek hitam, mengenakan kemeja biru muda, tersenyum ramah di luar ruangan"
+    },
+    {
+      name: "Sari Lestari",
+      date: "22/04/2024",
+      stars: 5,
+      package: "Paket Studio - Layanan Foto Keluarga",
+      text: `"Oval Photo memberikan pengalaman foto keluarga yang menyenangkan dan hasil yang sangat memuaskan.
+      Anak-anak kami merasa nyaman dan fotografernya sangat sabar.
+      Foto-foto yang dihasilkan sangat natural dan penuh kehangatan."`,
+      imgSrc: "https://placehold.co/90x90/png?text=Sari+Lestari",
+      imgAlt: "Foto Sari Lestari"
+    },
+    {
+      name: "Budi Santoso",
+      date: "10/03/2024",
+      stars: 3,
+      package: "Paket Event - Layanan Dokumentasi Pernikahan",
+      text: `"Dokumentasi pernikahan kami berjalan lancar dengan hasil yang cukup baik.
+      Ada beberapa momen yang kurang tertangkap, tapi secara keseluruhan kami puas dengan layanan dan hasilnya."`,
+      imgSrc: "https://placehold.co/90x90/png?text=Budi+Santoso",
+      imgAlt: "Foto close-up Budi Santoso, pria Asia dengan rambut pendek dan kacamata, mengenakan jas hitam, tersenyum ringan"
+    }
+  ];
+
+  const testimonialCard = document.getElementById("testimonial-card");
+  const nameEl = document.getElementById("testimonial-name");
+  const dateEl = document.getElementById("testimonial-date");
+  const starsEl = testimonialCard.querySelector(".testimonial-stars");
+  const packageEl = document.getElementById("testimonial-package");
+  const textEl = document.getElementById("testimonial-text");
+  const profileImg = testimonialCard.querySelector(".testimonial-profile img");
+  const dots = document.querySelectorAll(".dot");
+
+  let currentIndex = 0;
+  let intervalId;
+
+  function updateTestimonial(index) {
+    if (index === currentIndex) return;
+    // Fade out
+    testimonialCard.classList.add("fade-out");
+
+    // After fade out, update content and fade in
+    setTimeout(() => {
+      const t = testimonials[index];
+      nameEl.textContent = t.name;
+      dateEl.textContent = t.date;
+      starsEl.textContent = "★".repeat(t.stars) + "☆".repeat(5 - t.stars);
+      starsEl.setAttribute("aria-label", `Rating bintang ${t.stars} dari 5`);
+      packageEl.textContent = t.package;
+      textEl.textContent = t.text;
+      profileImg.src = t.imgSrc;
+      profileImg.alt = t.imgAlt;
+
+      // Update dots active state and aria-selected/tabindex
+      dots.forEach((dot, i) => {
+        if (i === index) {
+          dot.classList.add("active");
+          dot.setAttribute("aria-selected", "true");
+          dot.setAttribute("tabindex", "0");
+        } else {
+          dot.classList.remove("active");
+          dot.setAttribute("aria-selected", "false");
+          dot.setAttribute("tabindex", "-1");
+        }
+      });
+
+      testimonialCard.classList.remove("fade-out");
+      currentIndex = index;
+    }, 500);
+  }
+
+  function nextTestimonial() {
+    let nextIndex = currentIndex + 1;
+    if (nextIndex >= testimonials.length) nextIndex = 0;
+    updateTestimonial(nextIndex);
+  }
+
+  // Auto slide every 6 seconds
+  function startAutoSlide() {
+    intervalId = setInterval(nextTestimonial, 4000);
+  }
+
+  function stopAutoSlide() {
+    clearInterval(intervalId);
+  }
+
+  // Dot click event
+  dots.forEach(dot => {
+    dot.addEventListener("click", () => {
+      stopAutoSlide();
+      const index = parseInt(dot.getAttribute("data-index"));
+      updateTestimonial(index);
+      startAutoSlide();
+    });
+    dot.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " "){
+        e.preventDefault();
+        dot.click();
+      }
+    });
+  });
+
+  // Initialize
+  startAutoSlide();
+</script>
+
+
+<!--Jarak Tambahan-->
+<div class="jarak-section"></div>
+
+
+{% endblock %}

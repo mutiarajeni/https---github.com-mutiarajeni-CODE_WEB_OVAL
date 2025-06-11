@@ -1,0 +1,91 @@
+{% extends "user/base_user.html" %} {% block content %}
+<header class="header">
+  <div class="header-content text-center">
+    <h1>FAQ <br />(Frequently Asked Questions)</h1>
+    <p>
+      <i class="bi bi-headset" style="margin-right: 5px"></i>
+      Butuh Bantuan? Hubungi Kita Sekarang!
+    </p>
+    <p style="margin-left: 80px">
+      <span style="color: #b9d3fa; font-weight: 600">+62 813-6233-8236</span>
+      (Telepon atau WhatsApp)
+    </p>
+  </div>
+</header>
+
+<div class="subutama-container" role="main">
+  <header class="kumpulfaq-header">
+    <div class="kumpulfaq-search-wrapper">
+      <i class="bi bi-search" aria-hidden="true"></i>
+      <input
+        type="text"
+        class="kumpulfaq-search-input"
+        placeholder="Cari pertanyaan kamu di sini"
+        aria-label="Search questions"
+        id="faqSearchInput"
+      />
+    </div>
+
+    <nav class="kumpulfaq-links" aria-label="Consultation and question links">
+      <a href="https://wa.me/+6281362338236" class="kumpulfaq-link-whatsapp">
+        <i class="bi bi-whatsapp" aria-hidden="true"></i>
+        Konsultasi Sekarang
+      </a>
+      <a href="/formfaq" class="kumpulfaq-link-question">
+        <i class="bi bi-question-circle-fill" aria-hidden="true"></i>
+        Saya Ingin Tanya
+      </a>
+    </nav>
+  </header>
+
+  <section
+    class="kumpulfaq-faq-list"
+    aria-label="Frequently Asked Questions"
+    id="faqList"
+  >
+    {% if faqs %} {% for faq in faqs %}
+    <details class="kumpulfaq-faq-item">
+      <summary>
+        <span class="kumpulfaq-bullet" aria-hidden="true"></span>
+        {{ faq.pertanyaan }}
+        <i class="bi bi-chevron-down kumpulfaq-icon" aria-hidden="true"></i>
+      </summary>
+      <p class="kumpulfaq-faq-content">{{ faq.jawaban }}</p>
+    </details>
+    {% endfor %} {% else %}
+    <p class="text-center">Belum ada FAQ yang tersedia.</p>
+    {% endif %}
+  </section>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("faqSearchInput");
+    const faqItems = document.querySelectorAll(".kumpulfaq-faq-item");
+
+    searchInput.addEventListener("keyup", function () {
+      const searchTerm = searchInput.value.toLowerCase();
+
+      faqItems.forEach((item) => {
+        const questionText = item
+          .querySelector("summary")
+          .textContent.toLowerCase();
+        const answerText = item.querySelector(".kumpulfaq-faq-content")
+          ? item
+              .querySelector(".kumpulfaq-faq-content")
+              .textContent.toLowerCase()
+          : "";
+
+        if (
+          questionText.includes(searchTerm) ||
+          answerText.includes(searchTerm)
+        ) {
+          item.style.display = ""; // Show item
+        } else {
+          item.style.display = "none"; // Hide item
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

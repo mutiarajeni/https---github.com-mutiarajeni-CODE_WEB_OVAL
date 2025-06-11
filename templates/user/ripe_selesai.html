@@ -1,0 +1,351 @@
+{% extends "user/base_user.html" %}{% block content %}
+<!-- Header -->
+<header class="header">
+  <div class="header-content text-center">
+    <h1>Riwayat Pemesanan</h1>
+    <p>Tinjau semua pesanan kamu sebelumnya di halaman ini</p>
+  </div>
+</header>
+
+<nav class="riwayat-nav" role="navigation" aria-label="Riwayat navigation">
+  <a href="/ripe_menunggu_konfirmasi" class="riwayat-link"
+    >Menunggu Konfirmasi</a
+  >
+  <a href="/riwayat_pemesanan" class="riwayat-link">Telah Dikonfirmasi</a>
+  <a href="/ripe_diproses" class="riwayat-link">Diproses</a>
+  <a href="#" class="riwayat-link riwayat-active" aria-current="page"
+    >Selesai</a
+  >
+</nav>
+
+<!-- Isi-->
+<div class="subutama-container">
+  {% for p in pesanan %}
+  <main
+    class="riwayatpemesanan-container"
+    role="main"
+    aria-label="Riwayat Pemesanan"
+  >
+    <header class="riwayat-header">
+      <!-- Judul paket -->
+      <div class="riwayat-header-left">
+        <h2>
+          Layanan Fotografi
+          <span class="riwayat-blue">{{ p.layanan }}</span>
+        </h2>
+        <div class="riwayat-paket-pcgk" aria-label="Riwayat Paket Diamond">
+          Paket {{ p.paket }}
+        </div>
+      </div>
+      <div
+        class="riwayat-status"
+        aria-label="Riwayat status Belum Bayar Deposit"
+      >
+        <div class="riwayat-status-dot" aria-hidden="true"></div>
+        {{ p.status_pesanan }}
+      </div>
+    </header>
+
+    <!-- Rincian pesanan -->
+    <section>
+      <h2
+        class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
+        tabindex="0"
+        aria-expanded="true"
+        aria-controls="riwayatpemesanan-pesanan-details"
+        id="riwayatpemesanan-pesanan-label"
+      >
+        Rincian Pesanan
+        <i
+          class="bi bi-caret-up-fill riwayatpemesanan-arrow"
+          aria-hidden="true"
+        ></i>
+      </h2>
+      <div
+        class="riwayatpemesanan-details"
+        id="riwayatpemesanan-pesanan-details"
+        aria-labelledby="riwayatpemesanan-pesanan-label"
+      >
+        <div class="riwayatpemesanan-info-block">
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-person-fill"></i>Nama Klien
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.nama_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-people-fill"></i>Nama Orang Tua
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.nama_orang_tua }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-envelope-fill"></i>Email
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.email_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-telephone-fill"></i>Nomor Telepon Aktif/WhatsApp
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.telepon_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-instagram"></i>Instagram
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.instagram_klien if p.instagram_klien else '-' }}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-facebook"></i>Facebook
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.facebook_klien if p.facebook_klien else '-' }}
+          </p>
+        </div>
+
+        <div class="riwayatpemesanan-info-block"></div>
+
+        <div class="riwayatpemesanan-info-block">
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-clock-fill"></i>Jam Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.jam_acara }} WIB</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-calendar-event-fill"></i>Tanggal Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{p.tanggal_mulai_acara_formatted}} -
+            {{p.tanggal_selesai_acara_formatted}}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Lokasi Acara berada di luar <br />
+            Kab. Labuhanbatu Selatan
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {% if p.lokasi_luar_labuhanbatu %}Ya{% else %}Tidak{% endif %}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Lokasi Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.lokasi }}</p>
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Alamat Lokasi
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.alamat_lokasi_acara }} ({% if p.link_maps_acara %}
+            <a
+              href="{{ p.link_maps_acara }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="color: black; text-decoration: underline"
+            >
+              Link Maps
+            </a>
+            {% else %} - {% endif %})
+          </p>
+        </div>
+      </div>
+    </section>
+    <!-- Rincian Pembayaran -->
+    <section>
+      <h2
+        class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
+        tabindex="0"
+        aria-expanded="true"
+        aria-controls="riwayatpemesanan-pembayaran-details"
+        id="riwayatpemesanan-pembayaran-label"
+      >
+        Rincian Pembayaran
+        <i
+          class="bi bi-caret-up-fill riwayatpemesanan-arrow"
+          aria-hidden="true"
+        ></i>
+      </h2>
+      <div
+        class="riwayatpemesanan-payment-details"
+        id="riwayatpemesanan-pembayaran-details"
+        aria-labelledby="riwayatpemesanan-pembayaran-label"
+      >
+        <div class="riwayatpemesanan-payment-row">
+          <span>Harga Paket</span>
+          <span class="riwayatpemesanan-bold">{{p.harga_paket|rupiah}}</span>
+        </div>
+        <div class="riwayatpemesanan-payment-row">
+          <span>Biaya Tambah Hari</span>
+          <span class="riwayatpemesanan-bold"
+            >{{p.biaya_tambah_hari|rupiah}}</span
+          >
+        </div>
+        <div class="riwayatpemesanan-payment-row">
+          <span>Biaya Lokasi</span>
+          <span class="riwayatpemesanan-bold">{{p.biaya_lokasi|rupiah}}</span>
+        </div>
+        <div class="riwayatpemesanan-payment-row border-bottom">
+          <span>Biaya Transportasi & Akomodasi</span>
+          <span class="riwayatpemesanan-bold"
+            >{{p.biaya_transportasi_akomodasi|rupiah}}</span
+          >
+        </div>
+        <div class="riwayatpemesanan-payment-row riwayatpemesanan-total">
+          <span>Total</span>
+          <span class="riwayatpemesanan-bold">{{p.total_harga|rupiah}}</span>
+        </div>
+        <div class="riwayatpemesanan-payment-row">
+          <span>Sudah Bayar Deposit</span>
+          <span class="riwayatpemesanan-bold">{{p.deposit|rupiah}}</span>
+        </div>
+        <div class="riwayatpemesanan-payment-row riwayatpemesanan-sisa">
+          <span>Sisa Pembayaran</span>
+          <span class="riwayatpemesanan-bold">{{p.sisa_bayar|rupiah}}</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- surat izin -->
+    <section class="riwayatpemesanan-file-sesction">
+      <h2
+        class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
+        tabindex="0"
+        aria-expanded="true"
+        aria-controls="riwayatpemesanan-pembayaran-details"
+        id="riwayatpemesanan-pembayaran-label"
+      >
+        Surat perizinan lokasi kamu
+      </h2>
+
+      <div>
+        <div
+          id="file-display-container-wrapper"
+          style="
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        gap: 8px;
+        border: 1px solid #4da6ff;
+        border-radius: 8px;
+        padding: 10px;
+        max-width: 100%;
+        {% if p.surat_izin_lokasi %}cursor: default;{% else %}cursor: pointer;{% endif %}
+      "
+          {%
+          if
+          p.surat_izin_lokasi
+          %}onclick="window.open('{{ url_for('static', filename='suratIzin/' ~ p.surat_izin_lokasi) }}', '_blank')"
+          {%
+          endif
+          %}
+        >
+          <span id="file-name" style="font-size: 14px; color: #4da6ff">
+            {% if p.surat_izin_lokasi %}
+            <div>
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                class="bi bi-file-earmark text-primary me-2"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"
+                />
+              </svg>
+              <span
+                class="text-decoration-underline"
+                style="word-break: break-all"
+              >
+                &nbsp; {{ p.surat_izin_lokasi }}</span
+              >
+            </div>
+            {% else %}
+            <p class="text-muted mb-0">Tidak ada file</p>
+            {% endif %}
+          </span>
+        </div>
+      </div>
+
+      <!-- Link drive foto -->
+      <div class="riwayatpemesanan-form-group">
+        <label for="tautan-foto" style="font-weight: 500; font-size: 12px"
+          ><br />
+          <br />Tautan hasil foto kamu <br />{% if p.link_google_drive %}
+          <a
+            href="{{ p.link_google_drive }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="font-size: 14px; color: #4da6ff; text-decoration: underline"
+          >
+            Link Google Drive
+          </a>
+          {% else %}
+          <small style="font-size: 14px; color: #4da6ff"
+            >Tunggu sampai Oval Photo memberikannya</small
+          >
+          {% endif %}</label
+        >
+      </div>
+    </section>
+
+    <!-- button -->
+    <section
+      class="riwayatpemesanan-buttons"
+      role="group"
+      aria-label="Action buttons"
+    >
+      <div class="riwayatpemesanan-left-buttons"></div>
+      <button
+        class="riwayatpemesanan-btn-primary"
+        type="button"
+        onclick="window.location.href='/formulasan'"
+      >
+        Nilai
+      </button>
+    </section>
+
+    <!-- Catatan-->
+    <section
+      class="riwayatpemesanan-notes"
+      aria-live="polite"
+      aria-atomic="true"
+    >
+      Catatan: {{ p.catatan }}
+    </section>
+  </main>
+  {% endfor %}
+
+  <script>
+    // Tombol panah interaktif untuk sections
+    document
+      .querySelectorAll("h2.riwayatpemesanan-section-title")
+      .forEach((header) => {
+        header.addEventListener("click", () => {
+          const expanded = header.getAttribute("aria-expanded") === "true";
+          const controls = header.getAttribute("aria-controls");
+          const content = document.getElementById(controls);
+          if (!content) return;
+
+          if (expanded) {
+            header.setAttribute("aria-expanded", "false");
+            header.classList.remove("riwayatpemesanan-expanded");
+            content.style.display = "none";
+          } else {
+            header.setAttribute("aria-expanded", "true");
+            header.classList.add("riwayatpemesanan-expanded");
+            content.style.display = "";
+          }
+        });
+
+        // Aksesibilitas keyboard: aktifkan Enter atau Spasi
+        header.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            header.click();
+          }
+        });
+      });
+  </script>
+</div>
+
+{% endblock %}

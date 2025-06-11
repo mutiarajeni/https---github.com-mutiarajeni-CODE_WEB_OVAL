@@ -1,0 +1,189 @@
+{% extends "user/base_user.html" %} {% block content %}
+<header
+  class="header-paket"
+  style="
+    background-image: url('{{ url_for('static', filename='images/imgLayanan/' ~ layanan.gambar) }}');
+  "
+>
+  <div class="header-paket-content text-center">
+    <h1>Paket Layanan {{ layanan.nama }}</h1>
+    <p>Temukan paket layanan fotografi yang tepat untuk kamu</p>
+  </div>
+</header>
+
+<div class="container paket-section">
+  <button
+    class="back-btn"
+    type="button"
+    onclick="window.location.href='/katalog_layanan'"
+  >
+    <i class="bi bi-arrow-left"></i>
+    Kembali
+  </button>
+</div>
+
+<div class="subutama-container" role="main">
+  <div class="row align-items-center">
+    <div class="grid-container-paket">
+      {% for paket in paket_list %}
+      <div class="card-paket">
+        <div class="card-paket-header">
+          <h3>{{ paket.nama }}</h3>
+        </div>
+        <div class="card-paket-body">
+          <div class="section-paket">
+            <p class="title">Keuntungan</p>
+            <p>{{ paket.keuntungan }}</p>
+          </div>
+
+          <div class="section-paket">
+            <p class="title">Tim Pekerja</p>
+            <p>{{ paket.tim_kerja }}</p>
+          </div>
+
+          <div class="price-section-paket">
+            <div class="price-paket">
+              <span class="currency">Rp</span>
+              <span
+                >{{ "{:,.0f}".format(paket.harga) | replace(',', '.') }}</span
+              >
+            </div>
+            <button
+              class="order-btnPaket"
+              type="button"
+              onclick="window.location.href='/booking?paket_id={{ paket._id|string }}'"
+            >
+              Pesan
+            </button>
+            <p class="validity-paket">
+              Berlaku dari {{ paket.tanggal_mulai_formatted }} - {{
+              paket.tanggal_selesai_formatted }}
+            </p>
+            <a href="/faqbb" class="faq-link-paket" role="button" tabindex="0">
+              <i class="bi bi-question-circle-fill"></i>
+              FAQ
+            </a>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <p>Tidak ada paket untuk layanan ini.</p>
+      {% endfor %}
+
+      <script
+        src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.3/js/all.min.js"
+        crossorigin="anonymous"
+      ></script>
+    </div>
+  </div>
+
+  <div class="subutama-container">
+    <main class="container-catatan" role="main" aria-label="Catatan Penting">
+      <div class="header-label-catatan" aria-label="Catatan Penting">
+        Catatan Penting<span class="text-red-catatan">!!</span>
+      </div>
+
+      <ol class="catatan">
+        <li class="catatan">
+          Klien wajib membayar deposit sebagai tanda jadi atas layanan dan paket
+          yang dipilih, sebesar:
+          <ul class="catatan">
+            <li class="catatan">
+              Rp500.000 untuk layanan paket enggagement I, semua paket layanan
+              prewedding, dan semua paket layanan wedding, atau
+            </li>
+            <li class="catatan">
+              Rp200.000 untuk layanan paket enggagement II
+            </li>
+          </ul>
+          Sisa pembayaran (pelunasan) dapat dibayar setelah sesi pemotretan
+          selesai atau setelah pembayaran deposit melalui menu ‘Riwayat
+          Pemesanan’.
+        </li>
+
+        <li class="catatan">
+          Link Google Drive yang berisi
+          <span class="text-red-catatan"
+            >file foto hasil edit akan dikirim dalam 3-5 hari</span
+          >
+          setelah hari pemotretan yang dapat diakses melalui menu ‘Riwayat
+          Pemesanan’, email, dan WhatsApp.
+          <span class="text-red-catatan"
+            >Album foto akan diproduksi dalam 2-3 minggu</span
+          >
+          dan akan dikirimkan melalui jasa pengiriman.
+        </li>
+
+        <li class="catatan">
+          Jadwal pemotretan dapat diubah melalui menu ‘Riwayat Pemesanan’ dengan
+          memilih opsi ‘Ubah Jadwal’. Pastikan jadwal yang diinginkan masih
+          tersedia dengan memeriksa ketersediaan jadwal di menu ‘Katalog
+          Layanan’.
+        </li>
+
+        <li class="catatan">
+          Tambah hari dapat dilakukan melalui menu ‘Riwayat Pemesanan’ dengan
+          memilih opsi ‘Ubah Jadwal’ dan
+          <span class="text-red-catatan"
+            >akan dikenakan biaya tambahan sebesar Rp500.000 untuk setiap 1
+            (satu) tambahan hari.</span
+          >
+        </li>
+
+        <li class="catatan">
+          Lokasi acara/pemotretan yang berada di luar Kab. Labuhanbatu Selatan
+          akan dikenakan biaya tambahan untuk transportasi dan akomodasi. Oval
+          Photo akan menginformasikan biaya tambahan ini melalui telepon atau
+          WhatsApp sebelum klien melakukan pembayaran deposit (pastikan nomor
+          yang kamu isikan bisa dihubungi ya!). Jika klien menyetujui biaya
+          tambahan tersebut, maka jumlahnya akan tercantum pada rincian
+          pembayaran di menu 'Riwayat Pemesanan'. Namun, jika tidak disetujui,
+          maka pemesanan akan dibatalkan.
+        </li>
+
+        <li class="catatan">
+          Lokasi acara/pemotretan yang memerlukan perizinan, diharapkan untuk
+          mengunggah surat perizinan pada formulir pesanan atau pada menu
+          ‘Riwayat Pemesanan’ sebelum dilakukan sesi pemotretan.
+        </li>
+
+        <li class="catatan">
+          Jika kamu memiliki pertanyaan lain seputar layanan fotografi Oval
+          Photo, kamu dapat meng-klik
+          <a
+            href="/formfaq"
+            class="faq-btn-catatan"
+            role="button"
+            aria-label="FAQ"
+          >
+            <i class="fas fa-question-circle" aria-hidden="true"></i>FAQ
+          </a>
+          untuk melihat pertanyaan yang serupa dengan yang ingin kamu tanyakan.
+          Jika tidak menemukan pertanyaan serupa, maka kamu dapat menanyakannya
+          melalui tempat yang sudah disediakan pada halaman ‘FAQ’.
+        </li>
+
+        <li class="catatan">
+          Jika mengalami kendala yang belum terselesaikan atau membutuhkan
+          bantuan serta konsultasi, maka kamu dapat menghubungi nomor +62
+          813-6233-8236 (via telepon) atau meng–klik
+          <a
+            href="https://wa.me/+6281362338236"
+            class="whatsapp-btn-catatan"
+            role="button"
+            aria-label="Konsultasi Sekarang"
+            target="_blank"
+            rel="noopener"
+          >
+            <i class="fab fa-whatsapp" aria-hidden="true"></i>Konsultasi
+            Sekarang
+          </a>
+        </li>
+      </ol>
+    </main>
+  </div>
+
+  <div class="jarak-section"></div>
+
+  {% endblock %}
+</div>

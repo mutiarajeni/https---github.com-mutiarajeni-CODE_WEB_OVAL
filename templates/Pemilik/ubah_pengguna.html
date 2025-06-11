@@ -1,0 +1,329 @@
+{% extends "pemilik/base_pemilik.html" %}
+{% block title %}Ubah Pengguna{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Ubah Pengguna</h6>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <div class="container mt-5">
+            <form id="ubahPenggunaForm">
+              <table class="table table-no-border">
+                <tbody>
+                  <tr>
+                    <td><label for="namaLengkap">Nama Lengkap</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="namaLengkap"
+                          name="namaLengkap"
+                          value="{{ user.full_name }}"
+                          disabled {# Nama Lengkap tidak dapat diubah #}
+                          style=" border-style: solid !important;
+                            border-color: #e0e0e0  !important;
+                            background-color: #f9f9f9 !important;
+                            color: #b0b0b0  !important;
+                            opacity: 1 !important;"
+                        />
+                      </div>
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="namaPengguna">Nama Pengguna</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="text"
+                          class="form-control"
+                          id="namaPengguna"
+                          name="namaPengguna"
+                          required
+                          value="{{ user.username }}"
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="usernameError"
+                        style="display: none"
+                        >Nama pengguna sudah ada atau tidak valid</small
+                      >
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="kataSandi">Kata Sandi</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="password"
+                          class="form-control"
+                          id="kataSandi"
+                          name="kataSandi"
+                          placeholder="Masukkan kata sandi baru (opsional)"
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="passwordError"
+                        style="display: none"
+                        >Kata sandi minimal 8 karakter</small
+                      >
+                    </td>
+                  </tr>
+
+                  <tr>
+                    <td><label for="peranSelect">Peran</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <select
+                          class="form-control"
+                          id="peranSelect"
+                          name="peran"
+                          disabled {# Peran tidak dapat diubah #}
+                          style="border-style: solid !important;"
+                        >
+                          <option value="admin" {% if user.role == 'admin' %}selected{% endif %}>Admin</option>
+                          <option value="pemilik" {% if user.role == 'pemilik' %}selected{% endif %}>Pemilik</option>
+                        </select>
+                      </div>
+                    </td>
+                  </tr>
+                  {# Baris email selalu muncul (tidak ada display: none;) #}
+                  <tr id="emailRow"> 
+                    <td><label for="email">Email</label></td>
+                    <td>
+                      <div class="input-group input-group-outline">
+                        <input
+                          type="email"
+                          class="form-control"
+                          id="email"
+                          name="email"
+                          placeholder="Tidak perlu masukan email"
+                          style="border-style: solid !important;"
+                          {# Nilai diisi jika ada, dan disabled jika peran bukan pemilik #}
+                          value="{% if user.role == 'pemilik' %}{{ user.email if user.email else '' }}{% else %}{% endif %}"
+                          {% if user.role == 'admin' %}disabled{% endif %} {# Disabled jika peran admin #}
+                        />
+                      </div>
+                      <small
+                        class="text-danger"
+                        id="emailError"
+                        style="display: none"
+                        >Format email tidak valid atau email sudah terdaftar</small
+                      >
+                    </td>
+                  </tr>
+                </tbody>
+              </table>
+              <div class="text-end mt-3">
+                <a
+                  href="/pemilik_pengguna"
+                  class="btn btn-outline-dark me-2 fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  >Kembali</a
+                >
+                <button
+                  type="submit"
+                  class="btn btn-dark fw-normal"
+                  style="text-transform: none; font-size: 1rem"
+                  id="submitButton"
+                  disabled
+                >
+                  Simpan
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Fungsi helper untuk menampilkan SweetAlert
+  function showAlert(icon, title, text, redirectUrl = null) {
+    Swal.fire({
+      icon: icon,
+      title: title,
+      text: text,
+      showConfirmButton: true,
+      confirmButtonText: 'Oke'
+    }).then((result) => {
+      if (result.isConfirmed && redirectUrl) {
+        window.location.href = redirectUrl;
+      } else if (redirectUrl) {
+        window.location.href = redirectUrl;
+      }
+    });
+  }
+
+  document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('ubahPenggunaForm');
+    const namaLengkapInput = document.getElementById('namaLengkap');
+    const namaPenggunaInput = document.getElementById('namaPengguna');
+    const kataSandiInput = document.getElementById('kataSandi');
+    const peranSelect = document.getElementById('peranSelect');
+    const emailInput = document.getElementById('email');
+    const submitButton = document.getElementById('submitButton');
+    const usernameError = document.getElementById('usernameError');
+    const passwordError = document.getElementById('passwordError');
+    const emailError = document.getElementById('emailError');
+
+    // Data pengguna awal dari Jinja2
+    const initialUserData = {
+      full_name: namaLengkapInput.value,
+      username: namaPenggunaInput.value,
+      email: emailInput.value,
+      role: peranSelect.value
+    };
+
+    // Fungsi untuk memeriksa apakah ada perubahan
+    function checkForChanges() {
+      const currentData = {
+        username: namaPenggunaInput.value,
+        password: kataSandiInput.value,
+        email: emailInput.value,
+      };
+
+      let changed = false;
+
+      // Cek nama pengguna
+      if (currentData.username !== initialUserData.username) {
+        changed = true;
+      }
+
+      // Cek kata sandi (hanya jika diisi)
+      if (currentData.password.length > 0) {
+        changed = true;
+      }
+
+      // Cek email: hanya jika input email TIDAK disabled
+      // dan ada perubahan nilai
+      if (!emailInput.disabled && currentData.email !== initialUserData.email) {
+          changed = true;
+      }
+      
+      submitButton.disabled = !changed;
+    }
+
+    // Event listener untuk perubahan pada input
+    namaPenggunaInput.addEventListener('input', checkForChanges);
+    kataSandiInput.addEventListener('input', checkForChanges);
+    emailInput.addEventListener('input', checkForChanges);
+
+    // Initial check on load
+    checkForChanges();
+
+
+    form.addEventListener('submit', async function(event) {
+      event.preventDefault();
+
+      // Reset error messages
+      usernameError.style.display = 'none';
+      passwordError.style.display = 'none';
+      emailError.style.display = 'none';
+
+      const username = namaPenggunaInput.value;
+      const password = kataSandiInput.value;
+      let email = emailInput.value;
+      const role = peranSelect.value;
+
+
+      // Validasi sisi klien
+      if (!username) {
+        showAlert('error', 'Validasi Gagal!', 'Nama Pengguna harus diisi.');
+        return;
+      }
+
+      if (password.length > 0 && password.length < 8) {
+        passwordError.style.display = 'block';
+        return;
+      }
+
+      // Validasi email berdasarkan peran yang sudah ada
+      if (initialUserData.role === 'pemilik') {
+          if (!email) {
+              showAlert('error', 'Validasi Gagal!', 'Email harus diisi untuk peran Pemilik.');
+              emailError.style.display = 'block';
+              return;
+          }
+          if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              emailError.style.display = 'block';
+              showAlert('error', 'Validasi Gagal!', 'Format email tidak valid.');
+              return;
+          }
+      } else if (initialUserData.role === 'admin') {
+          if (email && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+              emailError.style.display = 'block';
+              showAlert('error', 'Validasi Gagal!', 'Format email tidak valid.');
+              return;
+          }
+      }
+
+      // Konfirmasi sebelum mengirim
+      Swal.fire({
+        title: 'Konfirmasi Perubahan',
+        text: 'Apakah Anda yakin ingin menyimpan perubahan ini?',
+        icon: 'warning',
+        showCancelButton: true,
+        confirmButtonColor: '#3085d6',
+        cancelButtonColor: '#d33',
+        confirmButtonText: 'Ya, Simpan!',
+        cancelButtonText: 'Batal'
+      }).then(async (result) => {
+        if (result.isConfirmed) {
+          try {
+            const dataToSend = {
+              nama_pengguna: username,
+            };
+
+            if (password.length > 0) {
+              dataToSend.kata_sandi = password;
+            }
+            
+            dataToSend.email = email; 
+
+            const response = await fetch(`/api/pemilik_update_pengguna/{{ user._id }}`, {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify(dataToSend)
+            });
+
+            const apiResult = await response.json();
+
+            if (response.ok && apiResult.success) {
+              showAlert('success', 'Berhasil!', apiResult.message, '{{ url_for("pemilik_pengguna") }}');
+            } else {
+              showAlert('error', 'Gagal!', apiResult.message || 'Terjadi kesalahan saat memperbarui pengguna.');
+              if (apiResult.message && apiResult.message.includes("Nama pengguna sudah terdaftar")) {
+                  usernameError.style.display = 'block';
+              }
+              if (apiResult.message && apiResult.message.includes("Kata sandi minimal 8 karakter")) {
+                  passwordError.style.display = 'block';
+              }
+              if (apiResult.message && (apiResult.message.includes("Format email tidak valid") || apiResult.message.includes("Email sudah terdaftar"))) {
+                  emailError.style.display = 'block';
+              }
+            }
+          } catch (error) {
+            console.error('Error:', error);
+            showAlert('error', 'Error!', 'Terjadi kesalahan jaringan atau server saat memperbarui pengguna.');
+          }
+        }
+      });
+    });
+  });
+</script>
+{% endblock %}

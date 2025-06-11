@@ -1,0 +1,22 @@
+{% extends "user/base_user.html" %}
+
+{% block title %}
+Pembayaran | Oval Photo
+{% endblock %}
+
+{% block content %}
+<h1>Pembayaran</h1>
+<p>Silakan lakukan pembayaran melalui metode yang tersedia.</p>
+<p>Transfer ke rekening berikut:</p>
+<ul>
+    <li>Bank ABC - 1234567890 a.n. Oval Photo</li>
+</ul>
+<p>Setelah pembayaran, silakan unggah bukti pembayaran.</p>
+<form action="/ulasan" method="post" enctype="multipart/form-data">
+    <div class="form-group">
+        <label for="bukti">Unggah Bukti Pembayaran</label>
+        <input type="file" class="form-control-file" id="bukti" name="bukti" required>
+    </div>
+    <button type="submit" class="btn btn-primary">Kirim Bukti Pembayaran</button>
+</form>
+{% endblock %}

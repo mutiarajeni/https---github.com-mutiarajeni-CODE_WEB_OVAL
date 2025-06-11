@@ -1,0 +1,359 @@
+{% extends "admin/base_admin.html" %} {% block title %}FAQ Admin{% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <div class="row">
+            <div class="col-6 d-flex align-items-center">
+              <h5 class="text-white text-capitalize ps-3">
+                FAQ (Frequently Asked Questions)
+              </h5>
+            </div>
+            <div class="col-6 text-end">
+              <a
+                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                href="/admin_faq_tambah"
+              >
+                <i class="material-icons text-dark me-1 fs-4">add</i
+                >&nbsp;&nbsp;Tambah Pertanyaan
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        {# HAPUS BLOK get_flashed_messages() INI SECARA KESELURUHAN #}
+        {# {% with messages = get_flashed_messages(with_categories=true) %} {% if #}
+        {# messages %} {% for category, message in messages %} #}
+        {# <div #}
+        {# class="alert alert-{{ category }} alert-dismissible text-white" #}
+        {# role="alert" #}
+        {# > #}
+        {# {{ message }} #}
+        {# <button #}
+        {# type="button" #}
+        {# class="btn-close text-lg py-3 opacity-10" #}
+        {# data-bs-dismiss="alert" #}
+        {# aria-label="Close" #}
+        {# > #}
+        {# <span aria-hidden="true">×</span> #}
+        {# </button> #}
+        {# </div> #}
+        {# {% endfor %} {% endif %} {% endwith %} #}
+
+        <table id="dataTable" class="table align-items-center mb-0">
+          <thead>
+            <tr>
+              <th class="text-center fs-7 fw-bold ms-2"></th>
+              <th class="text-center fs-7 fw-bold">
+                Nama Pengirim
+              </th>
+              <th class="text-center fs-7 fw-bold">
+                Email Pengirim
+              </th>
+              <th class="text-center fs-7 fw-bold">Pertanyaan</th>
+              <th class="text-center fs-7 fw-bold">Jawaban</th>
+              <th class="text-center fs-7 fw-bold">Status</th>
+              <th class="text-center fs-7 fw-bold">Aksi</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for faq in faqs %}
+            <tr>
+              <td>
+                <div class="text-center text-normal">
+                  <h6 class="mb-0 text-normal ms-4">{{ loop.index }}.</h6>
+                </div>
+              </td>
+              <td class="align-middle text-center text-base">
+                <span class="text-normal"
+                  >{{ faq.nama_pengaju if faq.nama_pengaju else '-' }}</span
+                >
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span class="text-normal"
+                  >{{ faq.email_pengaju if faq.email_pengaju else '-' }}</span
+                >
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span
+                  class="text-normal"
+                  title="{{ faq.pertanyaan }}"
+                  >{{ faq.pertanyaan[:20] }}{% if faq.pertanyaan|length > 20
+                  %}...{% endif %}</span
+                >
+              </td>
+              <td class="align-middle text-center text-sm">
+                <span
+                  class="text-normal"
+                  title="{{ faq.jawaban }}"
+                  >{{ faq.jawaban[:15] }}{% if faq.jawaban|length > 20 %}...{%
+                  endif %}</span
+                >
+              </td>
+              <td class="align-middle text-center text-normal">
+                <span
+                  class="badge badge-sm {% if faq.status == 'pending' %}bg-gradient-warning{% else %}bg-gradient-success{% endif %}"
+                >
+                  {{ 'Pending' if faq.status == 'pending' else 'Diterbitkan'
+                  }}
+                </span>
+              </td>
+              <td class="align-middle text-center">
+                <div
+                  class="d-flex align-items-center justify-content-center gap-2"
+                >
+                  <label class="switch">
+                    <input
+                      type="checkbox"
+                      id="toggleSwitch_{{ faq._id }}"
+                      data-faq-id="{{ faq._id }}"
+                      {%
+                      if
+                      faq.is_active
+                      %}checked{%
+                      endif
+                      %}
+                    />
+                    <span class="slider round"></span>
+                  </label>
+                  <span
+                    class="status-text me-3"
+                    id="statusText_{{ faq._id }}"
+                  >
+                    {% if faq.is_active %}Aktif{% else %}Tidak Aktif{% endif
+                    %}
+                  </span>
+
+                  <a
+                    class="btn btn-link px-3 mb-0"
+                    href="/admin_faq_ubah/{{ faq._id }}"
+                    style="
+                      padding: 0.375rem 0.75rem;
+                      text-transform: none;
+                      font-size: 12px;
+                      line-height: 1;
+                      font-weight: normal
+                    "
+                  >
+                    <i class="material-icons text-normal me-2">edit</i>Ubah
+                  </a>
+                </div>
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  /* Style untuk toggle switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    vertical-align: middle;
+  }
+
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
+
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+  }
+
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
+
+  input:focus + .slider {
+    box-shadow: 0 0 1px #4caf50;
+  }
+
+  input:checked + .slider:before {
+    -webkit-transform: translateX(20px); /* Geser lingkaran saat aktif */
+    -ms-transform: translateX(20px);
+    transform: translateX(20px);
+  }
+
+  /* Rounded sliders */
+  .slider.round {
+    border-radius: 20px; /* Agar slider bulat */
+  }
+
+  .slider.round:before {
+    border-radius: 50%; /* Agar lingkaran bulat */
+  }
+
+  /* Style untuk teks status Aktif/Tidak Aktif */
+  .status-text {
+    font-size: 12px; /* Ukuran teks */
+    font-weight: 500;
+    color: #494949; /* Warna teks */
+    white-space: nowrap; /* Mencegah teks terpotong */
+  }
+
+  /* Pastikan kolom Aksi rata tengah dan itemnya sejajar horizontal */
+  td.align-middle.text-center {
+    vertical-align: middle !important;
+    text-align: center !important;
+  }
+
+  .btn-link {
+    text-decoration: none !important; /* Hapus garis bawah */
+    box-shadow: none !important; /* Hapus shadow jika ada */
+  }
+</style>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    // --- SweetAlert Handler dari URL Parameters (GLOBAL FOR ALL ADMIN PAGES) ---
+    const urlParams = new URLSearchParams(window.location.search);
+    const saStatus = urlParams.get('_sa_status');
+    const saMessage = urlParams.get('_sa_message');
+
+    if (saStatus && saMessage) {
+      let icon = 'info'; // Default
+      if (saStatus === 'success') {
+        icon = 'success';
+      } else if (saStatus === 'error' || saStatus === 'danger') { // danger is also mapped to error icon
+        icon = 'error';
+      } else if (saStatus === 'warning') {
+        icon = 'warning';
+      }
+
+      Swal.fire({
+        title: saStatus.charAt(0).toUpperCase() + saStatus.slice(1), // Capitalize first letter (e.g., "Success")
+        text: saMessage,
+        icon: icon,
+        confirmButtonText: 'Oke'
+      }).then(() => {
+        // Hapus parameter SweetAlert dari URL setelah ditampilkan untuk mencegah re-trigger
+        urlParams.delete('_sa_status');
+        urlParams.delete('_sa_message');
+        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        window.history.replaceState({}, document.title, newUrl);
+      });
+    }
+    // --- Akhir SweetAlert Handler ---
+
+    const toggleSwitches = document.querySelectorAll(
+      '.switch input[type="checkbox"]'
+    );
+
+    toggleSwitches.forEach((switchElement) => {
+      switchElement.addEventListener("change", function () {
+        const faqId = this.dataset.faqId;
+        const newIsActive = this.checked; // true jika aktif, false jika nonaktif
+        const statusTextElement = document.getElementById(
+          `statusText_${faqId}`
+        );
+
+        // Revert switch temporarily
+        this.checked = !newIsActive;
+
+        Swal.fire({
+          title: "Konfirmasi Perubahan Status",
+          text: `Anda yakin ingin ${
+            newIsActive ? "mengaktifkan" : "menonaktifkan"
+          } FAQ ini?`,
+          icon: "question",
+          showCancelButton: true,
+          confirmButtonColor: newIsActive ? "#4CAF50" : "#f44336", // Green for activate, Red for deactivate
+          cancelButtonColor: "#7b809a", // Grey
+          confirmButtonText: "Ya, Lanjutkan!",
+          cancelButtonText: "Batal",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/admin_faq_toggle_status/${faqId}`, {
+              method: "POST",
+              headers: {
+                "Content-Type": "application/json",
+              },
+              // body: JSON.stringify({ is_active: newIsActive }), // Backend only needs ID, but sending status is harmless
+            })
+              .then((response) => {
+                if (!response.ok) {
+                    return response.json().then(errData => {
+                        let errorMessage = (errData && errData.message) ? errData.message : `HTTP error! Status: ${response.status}`;
+                        throw new Error(errorMessage);
+                    });
+                }
+                return response.json();
+              })
+              .then((data) => {
+                if (data.success) {
+                  // Update UI if successful
+                  switchElement.checked = data.new_is_active; // Set status based on backend response
+                  if (statusTextElement) {
+                    statusTextElement.textContent = data.new_is_active
+                      ? "Aktif"
+                      : "Tidak Aktif";
+                  }
+                  Swal.fire(
+                    "Berhasil!",
+                    data.message || `Status FAQ berhasil diubah menjadi ${
+                      data.new_is_active ? "Aktif" : "Tidak Aktif"
+                    }.`,
+                    "success"
+                  );
+                } else {
+                  // If backend reports failure
+                  Swal.fire(
+                    "Gagal!",
+                    data.message || "Gagal mengubah status FAQ.",
+                    "error"
+                  );
+                  switchElement.checked = !data.new_is_active; // Revert switch
+                }
+              })
+              .catch((error) => {
+                console.error("Error:", error);
+                Swal.fire(
+                  "Error!",
+                  "Terjadi kesalahan saat berkomunikasi dengan server: " + error.message,
+                  "error"
+                );
+                switchElement.checked = !newIsActive; // Revert switch if network/server error
+              });
+          } else {
+            // If user cancels, revert the switch to its original position
+            switchElement.checked = !newIsActive;
+          }
+        });
+      });
+    });
+  });
+</script>
+{% endblock %}

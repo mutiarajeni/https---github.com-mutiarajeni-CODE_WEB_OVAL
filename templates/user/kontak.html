@@ -1,0 +1,115 @@
+{% extends "user/base_user.html" %}{% block content %}
+<!-- Header -->
+<header class="header">
+  <div class="header-content text-center">
+    <h1>Kontak</h1>
+    <p>Hubungi kami untuk informasi lebih lanjut. Kami siap membantu kamu!</p>
+  </div>
+</header>
+
+<!--Isi Kontak-->
+<div class="subutama-container" role="main">
+  <h1 class="kontak-title">Hubungi Kami</h1>
+  <p class="kontak-text-sm">
+    Butuh informasi lebih lanjut? Tim Oval Photo siap membantu kamu dengan
+    solusi dan informasi lengkap untuk semua kebutuhan fotografi kamu.
+  </p>
+  <div class="kontak-info">
+    <div class="kontak-info-item">
+      <i class="bi bi-envelope-fill kontak-icon" aria-hidden="true"></i>
+      <div>
+        <p class="kontak-label">Email</p>
+        <a href="mailto:ovalphotosupport@gmail.com"
+          >ovalphotosupport@gmail.com</a
+        >
+      </div>
+    </div>
+  </div>
+
+  <div class="kontak-info">
+    <div class="kontak-info-item">
+      <i class="bi bi-telephone-fill kontak-icon" aria-hidden="true"></i>
+      <div>
+        <p class="kontak-label">Nomor Telepon/Whatsapp</p>
+        <a href="https://wa.me/+6281362338236">+62 813-6233-8230</a>
+      </div>
+    </div>
+
+    <div class="kontak-info-item">
+      <i class="bi bi-geo-alt-fill kontak-icon" aria-hidden="true"></i>
+      <div>
+        <p class="kontak-label">Lokasi Studio</p>
+        <p>
+          Jl. Lintas Sumatera Cikampak, Aek Batu, Kec. Torgamba, Kab.
+          Labuhanbatu Selatan, Sumatera Utara
+        </p>
+      </div>
+    </div>
+  </div>
+  <iframe
+    aria-label="Interactive Google Map showing location of Jl. Lintas Sumatera Cikampak, Aek Batu, Torgamba, Labuhanbatu Selatan, Sumatera Utara"
+    class="kontak-map"
+    loading="lazy"
+    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3982.927927927927!2d99.0730003152603!3d2.591234798010682!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3031f3a3a7a7a7a7%3A0x123456789abcdef0!2sJl.%20Lintas%20Sumatera%2C%20Aek%20Batu%2C%20Torgamba%2C%20Labuhanbatu%20Selatan%2C%20Sumatera%20Utara!5e0!3m2!1sen!2sid!4v1698199999999!5m2!1sen!2sid"
+    allowfullscreen=""
+    referrerpolicy="no-referrer-when-downgrade"
+  ></iframe>
+
+  <!---button sosmed-->
+  <p class="kontak-social-label">Sosial Media</p>
+  <div class="kontak-social">
+    <a
+      href="https://www.instagram.com/ovalphoto?igsh=N2tzZG9pZHd3YXNm"
+      class="kontak-social-button"
+      aria-label="Instagram"
+      role="button"
+      tabindex="0"
+    >
+      <i class="bi bi-instagram" aria-hidden="true"></i>
+    </a>
+    <a
+      href="https://www.facebook.com/yudaza?mibextid=ZbWKwL"
+      class="kontak-social-button"
+      aria-label="Facebook"
+      role="button"
+      tabindex="0"
+    >
+      <i class="bi bi-facebook" aria-hidden="true"></i>
+    </a>
+    <a
+      href="https://wa.me/+6281362338236"
+      class="kontak-social-button"
+      aria-label="WhatsApp"
+      role="button"
+      tabindex="0"
+    >
+      <i class="bi bi-whatsapp" aria-hidden="true"></i>
+    </a>
+  </div>
+
+  <!---kamu punya pertanyaan-->
+  <h2 class="kontak-subtitle">Kamu Punya Pertanyaan?</h2>
+  <p class="kontak-paragraph">
+    Kami telah merangkum pertanyaan yang sering diajukan agar kamu bisa
+    menemukan informasi dengan mudah dan cepat. Jika kamu memiliki pertanyaan
+    lainnya, jangan ragu untuk menghubungi kami ya! Klik ‘FAQ’ untuk melihat
+    selengkapnya.
+  </p>
+
+  <!---button faq-->
+  <div style="display: flex; justify-content: center">
+    <button
+      class="kontak-faq-button"
+      type="button"
+      onclick="window.location.href='/faqbb'"
+    >
+      <i class="bi bi-question-circle-fill" style="margin-right: 8px"></i> FAQ
+      (Frequently Asked Questions)
+    </button>
+  </div>
+</div>
+
+<!---JARAK TAMBAHAN (biar gk keganggu yang lain)-->
+<div class="jarak-section"></div>
+
+{% endblock %}

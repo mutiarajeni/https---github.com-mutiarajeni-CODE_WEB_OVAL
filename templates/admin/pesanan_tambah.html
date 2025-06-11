@@ -1,0 +1,896 @@
+{% extends "admin/base_admin.html" %} {% block title %} Dashboard Admin | Oval
+Photo {% endblock %} {% block content %}
+
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <h6 class="text-white text-capitalize ps-3">Tambah Pesanan</h6>
+        </div>
+      </div>
+
+      <div class="card-body px-4 pb-4">
+        <form
+          id="tambahPesananForm"
+          method="POST"
+          action="/admin_pesanan_tambah"
+          enctype="multipart/form-data"
+        >
+          <div class="row">
+            <div class="col-md-6 col-12">
+              <div class="table-responsive">
+                <table class="table table-borderless">
+                  <tbody>
+                    <tr>
+                      <td>
+                        <label for="tanggal_pemesanan">Tanggal Pemesanan</label>
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px; border-radius: 5px"
+                        >
+                          <input
+                            type="date"
+                            class="form-control"
+                            id="tanggal_pemesanan"
+                            name="tanggal_pemesanan"
+                            required
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><label for="layananSelect">Layanan</label></td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <select
+                            class="form-control"
+                            id="layananSelect"
+                            name="layanan_id"
+                            onchange="fetchPaketByLayanan(); checkFormValidity();"
+                            required
+                          >
+                            <option value="">Pilih Layanan</option>
+                            {% for layanan in layanan_list %}
+                            <option value="{{ layanan._id|string }}">
+                              {{ layanan.nama }}
+                            </option>
+                            {% endfor %}
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><label for="paketSelect">Paket</label></td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <label class="form-label"></label>
+                          <select
+                            class="form-control"
+                            id="paketSelect"
+                            name="paket_id"
+                            onchange="displayPaketPrice(); checkFormValidity();"
+                            required
+                          >
+                            <option value="">Pilih Paket</option>
+                          </select>
+                        </div>
+                        <div>
+                          <small style="color: green"
+                            >Harga paket:
+                            <span id="hargaPaket">Rp 0</span></small
+                          >
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><label for="nama_klien">Nama Klien</label></td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nama_klien"
+                            name="nama_klien"
+                            required
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="nama_orang_tua">Nama Orang Tua</label>
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="nama_orang_tua"
+                            name="nama_orang_tua"
+                            required
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><label for="email_klien">Alamat Email</label></td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="email"
+                            class="form-control"
+                            id="email_klien"
+                            name="email_klien"
+                            required
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="telepon_klien"
+                          >No. Telepon/WhatsApp Klien</label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="telepon_klien"
+                            name="telepon_klien"
+                            required
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="instagram_klien"
+                          >Instagram<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="instagram_klien"
+                            name="instagram_klien"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="facebook_klien"
+                          >Facebook<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="text"
+                            class="form-control"
+                            id="facebook_klien"
+                            name="facebook_klien"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><label for="periode">Waktu Acara</label></td>
+                      <td>
+                        <div
+                          style="
+                            display: flex;
+                            gap: 10px;
+                            align-items: center;
+                            max-width: 500px;
+                          "
+                        >
+                          <input
+                            type="time"
+                            class="form-control"
+                            name="jam_acara"
+                            required
+                            style="
+                              border: 1px solid #ccc;
+                              border-radius: 5px;
+                              padding: 6px 10px;
+                              width: 90px;
+                            "
+                          />
+
+                          <div
+                            style="
+                              display: flex;
+                              gap: 10px;
+                              align-items: center;
+                              max-width: 500px;
+                            "
+                          >
+                            <input
+                              type="date"
+                              class="form-control"
+                              name="tanggal_mulai_acara"
+                              id="tanggal_mulai_acara"
+                              required
+                              style="
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                padding: 6px 10px;
+                                width: 140px;
+                              "
+                              placeholder="Tanggal Mulai"
+                              onchange=" checkFormValidity(); validateDateRange();"
+                              oninput="checkFormValidity(); validateDateRange();"
+                            />
+
+                            <span>-</span>
+
+                            <input
+                              type="date"
+                              class="form-control"
+                              name="tanggal_selesai_acara"
+                              id="tanggal_selesai_acara"
+                              required
+                              style="
+                                border: 1px solid #ccc;
+                                border-radius: 5px;
+                                padding: 6px 10px;
+                                width: 140px;
+                              "
+                              placeholder="Tanggal Selesai"
+                              onchange=" checkFormValidity(); validateDateRange();"
+                              oninput="checkFormValidity(); validateDateRange();"
+                            />
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label
+                          >Lokasi Acara berada di luar<br />Kab. Labuhanbatu
+                          Selatan</label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          style="display: flex; gap: 20px; align-items: center"
+                        >
+                          <label>
+                            <input
+                              type="radio"
+                              name="lokasi_luar"
+                              value="iya"
+                              onchange="handleLokasiLuarChange();"
+                              required
+                            />
+                            Iya, berada di luar
+                          </label>
+                          <label>
+                            <input
+                              type="radio"
+                              name="lokasi_luar"
+                              value="tidak"
+                              onchange="handleLokasiLuarChange();"
+                              required
+                            />
+                            Tidak
+                          </label>
+                        </div>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+
+            <div class="col-md-6 col-12">
+              <div class="table-responsive">
+                <table class="table table-borderless">
+                  <tbody>
+                    <tr id="lokasiDropdownRow">
+                      <td><label for="lokasiSelect">Lokasi Acara</label></td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <label class="form-label"></label>
+                          <select
+                            class="form-control"
+                            id="lokasiSelect"
+                            name="lokasi_id"
+                            onchange="displayLokasiPrice();"
+                            required
+                          >
+                            <option value="" disabled>
+                              Pilih Lokasi Sendiri
+                            </option>
+                            {% for lokasi in lokasi_list %}
+                            <option value="{{ lokasi._id|string }}">
+                              {{ lokasi.nama }}
+                            </option>
+                            {% endfor %}
+                            <option value="pilih_lokasi_sendiri" selected>
+                              Pilih Lokasi Sendiri
+                            </option>
+                          </select>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr id="alamatLokasiManualRow">
+                      <td>
+                        <label for="alamat_lokasi_manual">Alamat Lokasi</label>
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <textarea
+                            class="form-control"
+                            id="alamat_lokasi_manual"
+                            name="alamat_lokasi_manual"
+                            rows="5"
+                            oninput="checkFormValidity()"
+                          ></textarea>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr id="linkMapsManualRow">
+                      <td>
+                        <label for="link_maps_manual"
+                          >Link Maps<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <textarea
+                            class="form-control"
+                            id="link_maps_manual"
+                            name="link_maps_manual"
+                            rows="5"
+                          ></textarea>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="surat_izin_lokasi">
+                          Surat Izin Lokasi<br />
+                          <small style="color: orange">(Opsional)</small>
+                        </label>
+                      </td>
+                      <td>
+                        <div style="max-width: 100%">
+                          <div
+                            id="file-display-container-wrapper"
+                            style="
+                              display: inline-flex;
+                              align-items: center;
+                              gap: 8px;
+                              border: 1px solid #ccc;
+                              border-radius: 8px;
+                              padding: 10px;
+                              cursor: pointer;
+                              max-width: fit-content;
+                            "
+                          >
+                            <input
+                              type="file"
+                              id="surat_izin_lokasi_input"
+                              name="surat_izin_lokasi"
+                              style="display: none"
+                              accept=".doc,.docx,.pdf,image/jpeg,image/jpg,image/png"
+                              onchange="displayFileName(); checkFormValidity();"
+                            />
+                            <span
+                              id="file-icon"
+                              onclick="document.getElementById('surat_izin_lokasi_input').click();"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="20"
+                                height="20"
+                                fill="currentColor"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"
+                                />
+                                <path
+                                  d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
+                                />
+                              </svg>
+                            </span>
+                            <span
+                              id="file-name"
+                              onclick="document.getElementById('surat_izin_lokasi_input').click();"
+                              >Upload Surat Izin</span
+                            >
+                            <span
+                              id="clear-file-btn"
+                              style="
+                                cursor: pointer;
+                                display: none;
+                                margin-left: auto;
+                              "
+                              onclick="clearFileSelection(event);"
+                            >
+                              <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                width="16"
+                                height="16"
+                                fill="currentColor"
+                                class="bi bi-x-circle-fill"
+                                viewBox="0 0 16 16"
+                              >
+                                <path
+                                  d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
+                                />
+                              </svg>
+                            </span>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="biayaTambahHari"
+                          >Biaya Tambah Hari<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="biayaTambahHari"
+                            name="biayaTambahHari"
+                            value=""
+                            oninput="checkFormValidity()"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="biayaLokasi"
+                          >Biaya Lokasi<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="biayaLokasi"
+                            name="biayaLokasi"
+                            value=""
+                            oninput="checkFormValidity()"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td>
+                        <label for="biaya_transportasi"
+                          >Biaya Transportasi & Akomodasi<br /><small
+                            style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
+                      </td>
+                      <td>
+                        <div
+                          class="input-group input-group-outline"
+                          style="max-width: 500px"
+                        >
+                          <input
+                            type="number"
+                            class="form-control"
+                            id="biaya_transportasi"
+                            name="biaya_transportasi"
+                            value=""
+                            oninput="checkFormValidity()"
+                          />
+                        </div>
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><label>Total Pembayaran</label></td>
+                      <td>
+                        <span id="totalPembayaran" style="font-weight: bold"
+                          >Rp 0</span
+                        >
+                        <input
+                          type="hidden"
+                          id="hiddenTotalHarga"
+                          name="total_harga"
+                          value="0"
+                        />
+                      </td>
+                    </tr>
+                    <tr>
+                      <td><label>Deposit</label></td>
+                      <td>
+                        <span id="depositPaketDisplay" style="font-weight: bold"
+                          >Rp 0</span
+                        >
+                        <input
+                          type="hidden"
+                          id="hiddenDepositPaket"
+                          name="deposit"
+                          value="0"
+                        />
+                      </td>
+                    </tr>
+
+                    <tr>
+                      <td><label>Sisa Bayar</label></td>
+                      <td>
+                        <span
+                          id="sisaBayar"
+                          style="color: red; font-weight: bold"
+                          >Rp 0</span
+                        >
+                        <input
+                          type="hidden"
+                          id="hiddenSisaBayar"
+                          name="sisa_bayar"
+                          value="0"
+                        />
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+
+          <div class="text-end mt-4">
+            <a
+              href="/admin_pesanan"
+              class="btn btn-outline-dark me-2 fw-normal"
+              style="text-transform: none; font-size: 1rem"
+              >Kembali</a
+            >
+            <button
+              type="submit"
+              class="btn btn-dark fw-normal"
+              style="text-transform: none; font-size: 1rem"
+              id="submitButton"
+              disabled
+            >
+              Simpan
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Global variable to store paket data for easy lookup
+  let allPaketData = [];
+  let allLokasiData = [];
+
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/all_paket")
+      .then((response) => response.json())
+      .then((data) => {
+        allPaketData = data;
+        checkFormValidity();
+      });
+
+    fetch("/api/all_lokasi")
+      .then((response) => response.json())
+      .then((data) => {
+        allLokasiData = data;
+        displayLokasiPrice();
+        checkFormValidity();
+      });
+
+    const today = new Date();
+    document.getElementById("tanggal_pemesanan").value = today
+      .toISOString()
+      .split("T")[0];
+
+    const form = document.getElementById("tambahPesananForm");
+    const relevantInputs = form.querySelectorAll(
+      "input:not([type='file']), select, textarea"
+    );
+    relevantInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        checkFormValidity();
+        updateTotalDanSisaBayar();
+      });
+      input.addEventListener("change", () => {
+        checkFormValidity();
+        updateTotalDanSisaBayar();
+      });
+    });
+
+    document
+      .getElementById("biaya_transportasi")
+      .addEventListener("input", updateTotalDanSisaBayar);
+
+    // Initial call to display file name (in case there's a pre-selected file, though not typical for a new form)
+    displayFileName();
+  });
+
+  function fetchPaketByLayanan() {
+    const layananId = document.getElementById("layananSelect").value;
+    const paketSelect = document.getElementById("paketSelect");
+    paketSelect.innerHTML = '<option value="">Pilih Paket</option>';
+    document.getElementById("hargaPaket").innerText = "Rp 0";
+
+    if (layananId) {
+      const filteredPaket = allPaketData.filter(
+        (paket) => paket.layanan_id === layananId
+      );
+      filteredPaket.forEach((paket) => {
+        const option = document.createElement("option");
+        option.value = paket._id;
+        option.innerText = paket.nama;
+        paketSelect.appendChild(option);
+      });
+    }
+    checkFormValidity();
+    updateTotalDanSisaBayar();
+  }
+
+  function displayPaketPrice() {
+    const paketId = document.getElementById("paketSelect").value;
+    const hargaPaketSpan = document.getElementById("hargaPaket");
+    const selectedPaket = allPaketData.find((paket) => paket._id === paketId);
+
+    if (selectedPaket) {
+      hargaPaketSpan.innerText = formatRupiah(selectedPaket.harga);
+    } else {
+      hargaPaketSpan.innerText = "Rp 0";
+    }
+    updateTotalDanSisaBayar();
+    checkFormValidity();
+  }
+
+  function displayLokasiPrice() {
+    const lokasiId = document.getElementById("lokasiSelect").value;
+    const alamatInput = document.getElementById("alamat_lokasi_manual");
+    const mapsInput = document.getElementById("link_maps_manual");
+
+    alamatInput.removeAttribute("required");
+    alamatInput.value = "";
+    mapsInput.value = "";
+
+    if (lokasiId === "pilih_lokasi_sendiri") {
+      alamatInput.setAttribute("required", "true");
+    } else {
+      const lokasi = allLokasiData.find((lokasi) => lokasi._id === lokasiId);
+      if (lokasi) {
+        alamatInput.value = lokasi.alamat;
+        mapsInput.value = lokasi.link_maps || "";
+      }
+    }
+    updateTotalDanSisaBayar();
+    checkFormValidity();
+  }
+
+  function calculateAdditionalDayCost() {
+    const start = new Date(
+      document.getElementById("tanggal_mulai_acara").value
+    );
+    const end = new Date(
+      document.getElementById("tanggal_selesai_acara").value
+    );
+    const biayaSpan = document.getElementById("biayaTambahHari");
+    let additionalCost = 0;
+
+    if (start && end && end > start) {
+      const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
+      additionalCost = diffDays * ADDITIONAL_DAY_COST_PER_DAY;
+    }
+    biayaSpan.innerText = formatRupiah(additionalCost);
+    updateTotalDanSisaBayar();
+    checkFormValidity();
+  }
+
+  function updateTotalDanSisaBayar() {
+    const paketId = document.getElementById("paketSelect").value;
+
+    const biayaLokasi = parseInt(
+      document.getElementById("biayaLokasi").value || "0"
+    );
+    const biayaTambahHari = parseInt(
+      document.getElementById("biayaTambahHari").value || "0"
+    );
+    const biayaTransport = parseInt(
+      document.getElementById("biaya_transportasi").value || "0"
+    );
+
+    let hargaPaket = 0;
+    let deposit = 0;
+
+    const selectedPaket = allPaketData.find((paket) => paket._id === paketId);
+    if (selectedPaket) {
+      hargaPaket = parseInt(selectedPaket.harga || 0);
+      deposit = parseInt(selectedPaket.deposit || 0);
+    }
+
+    const total = hargaPaket + biayaTambahHari + biayaLokasi + biayaTransport;
+    const sisa = total - deposit;
+
+    document.getElementById("totalPembayaran").innerText = formatRupiah(total);
+    document.getElementById("depositPaketDisplay").innerText =
+      formatRupiah(deposit);
+    document.getElementById("sisaBayar").innerText = formatRupiah(sisa);
+
+    document.getElementById("hiddenTotalHarga").value = total;
+    document.getElementById("hiddenDepositPaket").value = deposit;
+    document.getElementById("hiddenSisaBayar").value = sisa;
+  }
+
+  function formatRupiah(amount) {
+    return new Intl.NumberFormat("id-ID", {
+      style: "currency",
+      currency: "IDR",
+      minimumFractionDigits: 0,
+    }).format(amount);
+  }
+
+  // --- New function to display selected file name and toggle clear button ---
+  function displayFileName() {
+    const fileInput = document.getElementById("surat_izin_lokasi_input");
+    const fileNameSpan = document.getElementById("file-name");
+    const clearFileBtn = document.getElementById("clear-file-btn");
+    const fileIcon = document.getElementById("file-icon");
+
+    if (fileInput.files.length > 0) {
+      fileNameSpan.textContent = fileInput.files[0].name;
+      clearFileBtn.style.display = "inline-block"; // Show the 'x' button
+      // You can change the icon here based on file type if needed
+      // For now, let's keep the upload icon or a generic document icon
+      fileIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"/>
+        </svg>
+      `; // Generic document icon
+    } else {
+      fileNameSpan.textContent = "Upload Surat Izin";
+      clearFileBtn.style.display = "none"; // Hide the 'x' button
+      fileIcon.innerHTML = `
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+        </svg>
+      `; // Original upload icon
+    }
+  }
+
+  // --- New function to clear selected file ---
+  function clearFileSelection() {
+    const fileInput = document.getElementById("surat_izin_lokasi_input");
+    fileInput.value = ""; // Clear the file input
+    displayFileName(); // Update the display
+    checkFormValidity(); // Re-check form validity
+  }
+
+  function checkFormValidity() {
+    const form = document.getElementById("tambahPesananForm");
+    const submitButton = document.getElementById("submitButton");
+    const inputs = form.querySelectorAll("[required]");
+    let valid = true;
+    inputs.forEach((input) => {
+      if (input.type === "radio") {
+        const radios = form.querySelectorAll(`input[name="${input.name}"]`);
+        if (![...radios].some((r) => r.checked)) valid = false;
+      } else if (!input.value.trim()) {
+        valid = false;
+      }
+    });
+    submitButton.disabled = !valid;
+  }
+
+  document
+    .getElementById("tambahPesananForm")
+    .addEventListener("submit", function (event) {
+      event.preventDefault();
+      var form = this;
+
+      if (!form.checkValidity()) {
+        form.reportValidity();
+        return;
+      }
+
+      Swal.fire({
+        title: "Apakah kamu yakin?",
+        text: "Pesanan akan disimpan.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonColor: "#3085d6",
+        cancelButtonColor: "#d33",
+        confirmButtonText: "Ya, simpan!",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          Swal.fire({
+            title: "Berhasil!",
+            text: "Pesanan berhasil disimpan.",
+            icon: "success",
+            timer: 2000,
+            timerProgressBar: true,
+            willClose: () => {
+              form.submit();
+            },
+          });
+        }
+      });
+    });
+</script>
+
+{% endblock %}

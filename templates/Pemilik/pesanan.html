@@ -1,0 +1,79 @@
+{% extends "pemilik/base_pemilik.html" %} {% block title %} Photo {% endblock %}
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <div class="row">
+            <div class="col-6 d-flex align-items-center">
+              <h5 class="text-white text-capitalize ps-3">Pesanan</h5>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <table id="dataTable" class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th
+                  class="text-center text-dark fs-7 fw-bold"
+                  style="width: 50px"
+                ></th>
+                <th class="text-center text-dark fs-7 fw-bold">Nama Klien</th>
+                <th class="text-center text-dark fs-7 fw-bold">Layanan</th>
+                <th class="text-center text-dark fs-7 fw-bold">Waktu Acara</th>
+                <th class="text-center text-dark fs-7 fw-bold">Status</th>
+                <th class="text-center text-dark fs-7 fw-bold">Aksi</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for pesanan in pesanan %}
+              <tr>
+                <td class="text-center align-middle">{{ loop.index }}.</td>
+
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.nama_klien }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.layanan }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.jam_acara }} WIB,
+                    {{pesanan.tanggal_mulai_acara_formatted}}-{{pesanan.tanggal_selesai_acara_formatted}}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <span class="mb-0" style="font-weight: normal"
+                    >{{ pesanan.status_pesanan }}</span
+                  >
+                </td>
+                <td class="text-center align-middle">
+                  <div class="d-flex justify-content-center gap-4">
+                    <!-- Tombol Detail -->
+                    <a
+                      href="/pemilik_pesanan_detail?pesanan_id={{ pesanan._id }}"
+                      class="text-decoration-none d-flex align-items-center"
+                      style="color: #1a73e8"
+                    >
+                      <i class="material-icons me-1">visibility</i>
+                      <span style="font-weight: normal">Detail</span>
+                    </a>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
