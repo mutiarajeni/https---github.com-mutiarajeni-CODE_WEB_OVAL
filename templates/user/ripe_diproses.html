@@ -8,14 +8,20 @@
 </header>
 
 <nav class="riwayat-nav" role="navigation" aria-label="Riwayat navigation">
-  <a href="ripe_menunggu_konfirmasi" class="riwayat-link"
+  <a href="{{ url_for('ripe_menunggu_konfirmasi') }}" class="riwayat-link"
     >Menunggu Konfirmasi</a
   >
-  <a href="/riwayat_pemesanan" class="riwayat-link">Telah Dikonfirmasi</a>
-  <a href="#" class="riwayat-link riwayat-active" aria-current="page"
+  <a href="{{ url_for('riwayat_pemesanan') }}" class="riwayat-link"
+    >Telah Dikonfirmasi</a
+  >
+  <a
+    href="{{ url_for('ripe_diproses') }}"
+    class="riwayat-link riwayat-active"
+    aria-current="page"
     >Diproses</a
   >
-  <a href="/ripe_selesai" class="riwayat-link">Selesai</a>
+  <a href="{{ url_for('ripe_selesai') }}" class="riwayat-link">Selesai</a>
+  <a href="{{ url_for('ripe_dibatalkan') }}" class="riwayat-link">Dibatalkan</a>
 </nav>
 
 <!-- Isi-->
@@ -39,9 +45,14 @@
       </div>
       <div
         class="riwayat-status"
+        style="color: #007bff"
         aria-label="Riwayat status Belum Bayar Deposit"
       >
-        <div class="riwayat-status-dot" aria-hidden="true"></div>
+        <div
+          class="riwayat-status-dot"
+          style="background-color: #007bff"
+          aria-hidden="true"
+        ></div>
         {{ p.status_pesanan }}
       </div>
     </header>
@@ -284,7 +295,11 @@
           role="group"
           aria-label="Bayar Deposit"
         >
-          <button class="riwayatpemesanan-btn-outline" type="button">
+          <button
+            class="riwayatpemesanan-btn-outline ubah-jadwal-btn"
+            type="button"
+            data-id="{{ p._id }}"
+          >
             Ubah Jadwal
           </button>
         </section>
@@ -332,6 +347,15 @@
   {% endfor %}
 
   <script>
+    // --- START: Added JavaScript for "Ubah Jadwal" button ---
+    document.querySelectorAll(".ubah-jadwal-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const pesananId = this.getAttribute("data-id");
+        window.location.href = `/jadwal/ubah/${pesananId}`; // Navigate to the edit page
+      });
+    });
+    // --- END: Added JavaScript for "Ubah Pesanan" button ---
+
     // Tombol panah interaktif untuk sections
     document
       .querySelectorAll("h2.riwayatpemesanan-section-title")

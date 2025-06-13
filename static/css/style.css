@@ -618,15 +618,15 @@ footer ul li {
   margin-bottom: 32px;
 }
 .layanan-container {
-   display: flex; /* Aktifkan Flexbox */
-    justify-content: flex-start; /* Kartu dimulai dari kiri */
-    gap: 30px; /* Jarak antar kartu */
-    flex-wrap: nowrap; /* <<< PENTING! Ini mencegah kartu melipat ke baris baru */
-    max-width: 100%; /* Wadah bisa selebar mungkin */
-    margin: 0 auto; /* Menengahkan wadah kartu */
-    overflow-x: auto; /* <<< PENTING! Mengaktifkan scroll horizontal */
-    -webkit-overflow-scrolling: touch; /* Memperbaiki pengalaman scrolling di iOS */
-    padding-bottom: 10px; 
+  display: flex; /* Aktifkan Flexbox */
+  justify-content: flex-start; /* Kartu dimulai dari kiri */
+  gap: 30px; /* Jarak antar kartu */
+  flex-wrap: nowrap; /* <<< PENTING! Ini mencegah kartu melipat ke baris baru */
+  max-width: 100%; /* Wadah bisa selebar mungkin */
+  margin: 0 auto; /* Menengahkan wadah kartu */
+  overflow-x: auto; /* <<< PENTING! Mengaktifkan scroll horizontal */
+  -webkit-overflow-scrolling: touch; /* Memperbaiki pengalaman scrolling di iOS */
+  padding-bottom: 10px;
 }
 
 .layanan-card {
@@ -636,7 +636,7 @@ footer ul li {
   width: 300px;
   min-width: 300px; /* <<< PENTING! Mencegah kartu menyusut di bawah 300px */
   flex-basis: 300px; /* <<< PENTING! Memberikan ukuran dasar ideal di Flexbox */
-  flex-shrink: 0; 
+  flex-shrink: 0;
   padding: 20px;
   text-align: left;
   transition: transform 0.3s ease-in-out;
@@ -648,13 +648,13 @@ footer ul li {
 
 .layanan-card img {
   width: 100%;
-    height: 200px; /* Tambah tinggi gambar, coba nilai yang lebih besar */
-    object-fit: cover; /* Pastikan gambar tidak terdistorsi */
-    border-top-left-radius: 16px; /* Sesuaikan dengan border-radius card */
-    border-top-right-radius: 16px;
-    border-bottom-left-radius: 16px; /* Hapus border-radius bawah agar menyatu dengan konten */
-    border-bottom-right-radius: 16px;
-    margin-bottom: 15px; 
+  height: 200px; /* Tambah tinggi gambar, coba nilai yang lebih besar */
+  object-fit: cover; /* Pastikan gambar tidak terdistorsi */
+  border-top-left-radius: 16px; /* Sesuaikan dengan border-radius card */
+  border-top-right-radius: 16px;
+  border-bottom-left-radius: 16px; /* Hapus border-radius bawah agar menyatu dengan konten */
+  border-bottom-right-radius: 16px;
+  margin-bottom: 15px;
 }
 
 .layanan-card h3 {
@@ -696,100 +696,101 @@ footer ul li {
 /* Laptop */
 /* Laptop (max-width: 1266px) */
 @media (max-width: 1266px) {
-    .layanan-container {
-        gap: 24px;
-    }
-    .layanan-card {
-        width: 280px;
-        min-width: 280px;
-        flex-basis: 280px;
-    }
-    .layanan-card img {
-        height: 180px; /* Sesuaikan tinggi gambar untuk ukuran ini */
-    }
-    .layanan-card-content {
-        padding: 18px; /* Padding konten teks */
-    }
-    .layanan-card h3 {
-        font-size: 17px;
-    }
-    .layanan-card p {
-        font-size: 11px;
-    }
+  .layanan-container {
+    gap: 24px;
+  }
+  .layanan-card {
+    width: 280px;
+    min-width: 280px;
+    flex-basis: 280px;
+  }
+  .layanan-card img {
+    height: 180px; /* Sesuaikan tinggi gambar untuk ukuran ini */
+  }
+  .layanan-card-content {
+    padding: 18px; /* Padding konten teks */
+  }
+  .layanan-card h3 {
+    font-size: 17px;
+  }
+  .layanan-card p {
+    font-size: 11px;
+  }
 }
 
 /* Custom Tablet (max-width: 992px) */
 @media (max-width: 992px) {
-    .layanan-container {
-        gap: 20px;
-        /* justify-content: center; */ /* Hapus ini jika Anda ingin scrollable di tablet juga */
-                                  /* Biarkan flex-start agar konsisten untuk scroll */
-    }
-    .layanan-card {
-        width: 240px;
-        min-width: 240px;
-        flex-basis: 240px;
-    }
-    .layanan-card img {
-        height: 160px; /* Sesuaikan tinggi gambar */
-    }
-    .layanan-card-content {
-        padding: 16px;
-    }
-    .layanan-card h3 {
-        font-size: 16px;
-    }
-    .layanan-card p {
-        font-size: 11px;
-    }
+  .layanan-container {
+    gap: 20px;
+    /* justify-content: center; */ /* Hapus ini jika Anda ingin scrollable di tablet juga */
+    /* Biarkan flex-start agar konsisten untuk scroll */
+  }
+  .layanan-card {
+    width: 240px;
+    min-width: 240px;
+    flex-basis: 240px;
+  }
+  .layanan-card img {
+    height: 160px; /* Sesuaikan tinggi gambar */
+  }
+  .layanan-card-content {
+    padding: 16px;
+  }
+  .layanan-card h3 {
+    font-size: 16px;
+  }
+  .layanan-card p {
+    font-size: 11px;
+  }
 }
 
 /* Mobile (max-width: 420px) */
 @media (max-width: 420px) {
-    .layanan {
-        margin: 40px 0; /* Hilangkan margin auto di samping, ganti dengan 0 */
-        padding: 0; /* Hapus padding auto */
-    }
-    .layanan h2 {
-        margin-left: 20px; /* Beri margin agar judul tidak menempel tepi */
-        margin-right: 20px;
-        text-align: left; /* Pastikan judul tetap rata kiri */
-    }
-    .layanan-container {
-        gap: 16px;
-        /* justify-content: center; */ /* Hapus ini jika ingin scrollable di mobile */
-        padding-left: 20px; /* Padding di awal scrollable area */
-        padding-right: 20px; /* Padding di akhir scrollable area */
-        /* Pastikan tidak ada justify-content: center jika ingin scrollable penuh */
-    }
-    .layanan-card {
-        /* Gunakan calc() untuk lebar kartu agar ada padding di kedua sisi layar */
-        width: calc(100vw - 40px); /* 100vw - (20px padding kiri + 20px padding kanan) */
-        min-width: calc(100vw - 40px);
-        flex-basis: calc(100vw - 40px);
-        max-width: 320px; /* Batasi lebar maksimal kartu mobile */
-    }
-    .layanan-card img {
-        height: 180px; /* Sesuaikan tinggi gambar untuk mobile */
-    }
-    .layanan-card-content {
-        padding: 16px;
-    }
-    .layanan-card h3 {
-        font-size: 16px;
-    }
-    .layanan-card p {
-        font-size: 12px;
-    }
-    .layanan .Ly-btn-container {
-        margin-top: 1.5rem;
-    }
-    .layanan button {
-        font-size: 14px;
-        padding: 12px 24px;
-    }
+  .layanan {
+    margin: 40px 0; /* Hilangkan margin auto di samping, ganti dengan 0 */
+    padding: 0; /* Hapus padding auto */
+  }
+  .layanan h2 {
+    margin-left: 20px; /* Beri margin agar judul tidak menempel tepi */
+    margin-right: 20px;
+    text-align: left; /* Pastikan judul tetap rata kiri */
+  }
+  .layanan-container {
+    gap: 16px;
+    /* justify-content: center; */ /* Hapus ini jika ingin scrollable di mobile */
+    padding-left: 20px; /* Padding di awal scrollable area */
+    padding-right: 20px; /* Padding di akhir scrollable area */
+    /* Pastikan tidak ada justify-content: center jika ingin scrollable penuh */
+  }
+  .layanan-card {
+    /* Gunakan calc() untuk lebar kartu agar ada padding di kedua sisi layar */
+    width: calc(
+      100vw - 40px
+    ); /* 100vw - (20px padding kiri + 20px padding kanan) */
+    min-width: calc(100vw - 40px);
+    flex-basis: calc(100vw - 40px);
+    max-width: 320px; /* Batasi lebar maksimal kartu mobile */
+  }
+  .layanan-card img {
+    height: 180px; /* Sesuaikan tinggi gambar untuk mobile */
+  }
+  .layanan-card-content {
+    padding: 16px;
+  }
+  .layanan-card h3 {
+    font-size: 16px;
+  }
+  .layanan-card p {
+    font-size: 12px;
+  }
+  .layanan .Ly-btn-container {
+    margin-top: 1.5rem;
+  }
+  .layanan button {
+    font-size: 14px;
+    padding: 12px 24px;
+  }
 }
-
 
 /*============================== Content Section 4 (Tahapan) - Beranda ===============================*/
 .timeline-section {
@@ -3112,7 +3113,6 @@ p.signup-text a:hover {
   gap: 12px;
   outline: none;
   align-items: flex-start; /* Kunci: Menyelaraskan item ke awal cross-axis (atas) */
-
 }
 
 .kumpulfaq-faq-item summary::-webkit-details-marker {
@@ -3126,7 +3126,6 @@ p.signup-text a:hover {
   background-color: #60a5fa; /* blue-400 */
   border-radius: 9999px;
   margin-top: 4px;
-  
 }
 
 .kumpulfaq-faq-item summary .kumpulfaq-icon {
@@ -3255,7 +3254,6 @@ p.formfaq-description {
   text-align: justify;
 }
 
-
 /* ============================================== FORM ULASAN ======================================= */
 /* formulasan flex wrapper */
 .formulasan-flex {
@@ -3282,43 +3280,42 @@ p.formfaq-description {
 
 /* Variabel CSS untuk konfigurasi kustom */
 :root {
-    --indent-offset: calc(40px + 1rem); /* Lebar foto profil + jarak (gap) */
-    --text-color-primary: #000000; /* Warna teks utama */
-    --text-color-secondary: #000000; /* Warna teks sekunder/deskripsi */
-    --text-color-light: rgba(0, 0, 0, 0.45); /* Warna teks ringan/label */
-    --text-color-placeholder: #9ca3af; /* Warna placeholder textarea */
+  --indent-offset: calc(40px + 1rem); /* Lebar foto profil + jarak (gap) */
+  --text-color-primary: #000000; /* Warna teks utama */
+  --text-color-secondary: #000000; /* Warna teks sekunder/deskripsi */
+  --text-color-light: rgba(0, 0, 0, 0.45); /* Warna teks ringan/label */
+  --text-color-placeholder: #9ca3af; /* Warna placeholder textarea */
 
-    /* Variabel untuk mengatur margin, default bisa diatur di sini */
-    --margin-pkg-top: 0.5rem;
-    --margin-pkg-bottom: 1.5rem;
-    --margin-heading-bottom: 0.5rem;
-    --margin-paragraph-bottom: 1rem;
-    --margin-penilaian-desc-bottom: 1.5rem;
-    --margin-stars-top: 2rem;
-    --margin-stars-bottom: 10px;
-    --margin-star-labels-bottom: 24px;
-    --margin-textarea-bottom: 1.5rem;
-    --margin-buttons-top: 1rem;
+  /* Variabel untuk mengatur margin, default bisa diatur di sini */
+  --margin-pkg-top: 0.5rem;
+  --margin-pkg-bottom: 1.5rem;
+  --margin-heading-bottom: 0.5rem;
+  --margin-paragraph-bottom: 1rem;
+  --margin-penilaian-desc-bottom: 1.5rem;
+  --margin-stars-top: 2rem;
+  --margin-stars-bottom: 10px;
+  --margin-star-labels-bottom: 24px;
+  --margin-textarea-bottom: 1.5rem;
+  --margin-buttons-top: 1rem;
 }
 
 /* Kelas untuk indentasi teks */
 .formulasan-indent-text {
-    margin-left: var(--indent-offset);
+  margin-left: var(--indent-offset);
 }
 
 /* Kelas untuk indentasi blok (seperti blok rating) */
 .formulasan-indent-block {
-    margin-left: var(--indent-offset);
-    width: calc(100% - var(--indent-offset)); /* Sesuaikan lebar blok */
-    box-sizing: border-box; /* Penting untuk perhitungan lebar yang benar */
+  margin-left: var(--indent-offset);
+  width: calc(100% - var(--indent-offset)); /* Sesuaikan lebar blok */
+  box-sizing: border-box; /* Penting untuk perhitungan lebar yang benar */
 }
-
 
 /* formulasan headings */
 .formulasan-left h2,
 .formulasan-left h3 {
   font-weight: 600;
-  font-size:  clamp(14px, 3vw, 16px);;
+  font-size: clamp(14px, 3vw, 16px);
   margin-bottom: var(--margin-heading-bottom); /* Menggunakan variabel */
   color: var(--text-color-primary); /* Menggunakan variabel */
 }
@@ -3330,7 +3327,8 @@ p.formfaq-description {
   color: var(--text-color-secondary); /* Menggunakan variabel */
 }
 
-.formulasan-penilaian-desc { /* Specific class for this paragraph */
+.formulasan-penilaian-desc {
+  /* Specific class for this paragraph */
   margin-bottom: var(--margin-penilaian-desc-bottom); /* Menggunakan variabel */
 }
 
@@ -3391,7 +3389,7 @@ p.formfaq-description {
 
 /* formulasan star icon */
 .formulasan-star {
-  font-size: clamp(36px, 4vw, 46px);;
+  font-size: clamp(36px, 4vw, 46px);
   line-height: 1;
   color: #bfdbfe; /* Warna bintang tidak terisi (tetap biru muda) */
   transition: color 0.2s ease;
@@ -3425,7 +3423,9 @@ p.formfaq-description {
   font-family: inherit;
   margin-bottom: var(--margin-textarea-bottom); /* Menggunakan variabel */
   box-sizing: border-box; /* Memastikan padding termasuk dalam lebar */
-  width: calc(100% - var(--indent-offset)); /* Mengurangi lebar total karena ada margin-left */
+  width: calc(
+    100% - var(--indent-offset)
+  ); /* Mengurangi lebar total karena ada margin-left */
 }
 .formulasan-textarea::placeholder {
   color: var(--text-color-placeholder); /* Menggunakan variabel */
@@ -3576,7 +3576,7 @@ main.riwayatpemesanan-container {
   display: flex;
   align-items: center;
   gap: 8px;
-  color: #d9a800;
+
   font-weight: 600;
   font-size: 12px;
   white-space: nowrap;
@@ -3584,7 +3584,6 @@ main.riwayatpemesanan-container {
 .riwayat-status-dot {
   width: 16px;
   height: 16px;
-  background-color: #d9a800;
   border-radius: 50%;
   flex-shrink: 0;
 }

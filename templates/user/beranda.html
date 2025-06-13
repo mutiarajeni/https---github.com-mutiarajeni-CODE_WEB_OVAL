@@ -114,189 +114,147 @@
 </section>
 
 
-<!--Content Section 5 (Testimoni)-->
-<h2 class="subutama-container"  style="font-size: clamp(20px, 4vw, 28px); color: #000000; line-height: 1.3; text-align: justify; margin-bottom:20px; font-weight: 600"
-  >Penilaian dan Ulasan dari Klien
+<!-- Ulasan -->
+<h2 class="subutama-container" style="font-size: clamp(20px, 4vw, 28px); color: #000000; line-height: 1.3; text-align: justify; margin-bottom:20px; font-weight: 600">
+  Penilaian dan Ulasan dari Klien
 </h2>
 
 <section aria-label="Testimonial Section" class="testimonial-section">
   <p>
-    <a aria-label="Selengkapnya" class="testimonial-button" href="/ulasan">
-    Selengkapnya
+    <a aria-label="Selengkapnya" class="testimonial-button" href="{{ url_for('ulasan') }}">
+      Selengkapnya
     </a>
   </p>
 
-  <div aria-atomic="true" aria-live="polite" class="testimonial-card" id="testimonial-card" role="region">
-    <div class="testimonial-profile">
-      <img alt="Foto close-up Rina Wijaya, wanita Asia dengan rambut hitam panjang, tersenyum cerah mengenakan pakaian kasual putih" height="90" src="https://storage.googleapis.com/a1aa/image/10b18516-222e-4fa1-a781-277de6c21702.jpg" width="90"/>
+  {% if testimonials %}
+    <div aria-atomic="true" aria-live="polite" class="testimonial-card" id="testimonial-card" role="region">
+      <div class="testimonial-profile">
+        <img alt="{{ testimonials[0].imgAlt }}" height="90" src="{{ testimonials[0].imgSrc }}" width="90"/>
+      </div>
+
+      <div class="testimonial-content">
+        <div class="testimonial-header">
+          <h3 id="testimonial-name">{{ testimonials[0].name }}</h3>
+          <span class="testimonial-date" id="testimonial-date">{{ testimonials[0].date }}</span>
+        </div>
+        <div aria-label="Rating bintang {{ testimonials[0].stars }} dari 5" class="testimonial-stars" id="testimonial-stars">
+          </div>
+        <div class="testimonial-package" id="testimonial-package">
+          {{ testimonials[0].package }}
+        </div>
+        <p class="testimonial-text" id="testimonial-text">
+          "{{ testimonials[0].text }}"
+        </p>
+      </div>
     </div>
 
-    <div class="testimonial-content">
-      <div class="testimonial-header">
-      <h3 id="testimonial-name">
-        Rina Wijaya
-      </h3>
-      <span class="testimonial-date" id="testimonial-date">
-        07/06/2024
-      </span>
-      </div>
-      <div aria-label="Rating bintang lima" class="testimonial-stars">
-      ★★★★★
-      </div>
-      <div class="testimonial-package" id="testimonial-package">
-      Paket Indoor (Studio) - Layanan Prewedding
-      </div>
-      <p class="testimonial-text" id="testimonial-text">
-      "Saya memesan layanan pre-wedding di Oval Photo, dan hasilnya di luar ekspektasi!
-          Fotografernya sangat kreatif dalam memilih konsep. Kami tidak hanya mendapatkan foto yang indah,
-          tetapi juga pengalaman yang menyenangkan selama sesi pemotretan. Benar-benar worth it!"
-      </p>
+    <div aria-label="Navigasi testimonial" class="testimonial-navigation" role="tablist">
+      {% for testimonial in testimonials %}
+        <span aria-controls="testimonial-card"
+              aria-selected="{{ 'true' if loop.first else 'false' }}"
+              class="dot {{ 'active' if loop.first else '' }}"
+              data-index="{{ loop.index0 }}"
+              role="tab"
+              tabindex="{{ '0' if loop.first else '-1' }}">
+        </span>
+      {% endfor %}
     </div>
-
-  </div>
-
-  <div aria-label="Navigasi testimonial" class="testimonial-navigation" role="tablist">
-    <span aria-controls="testimonial-card" aria-selected="true" class="dot active" data-index="0" role="tab" tabindex="0">
-    </span>
-    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="1" role="tab" tabindex="-1">
-    </span>
-    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="2" role="tab" tabindex="-1">
-    </span>
-    <span aria-controls="testimonial-card" aria-selected="false" class="dot" data-index="3" role="tab" tabindex="-1">
-    </span>
-  </div>
-
+  {% else %}
+    <p style="text-align: center; margin-top: 20px; color: #555;">Belum ada ulasan untuk ditampilkan.</p>
+  {% endif %}
 </section>
 
 
-<!-- Scripts Testimoni -->
 <script>
-  const testimonials = [
-    {
-      name: "Rina Wijaya",
-      date: "07/06/2024",
-      stars: 5,
-      package: "Paket Indoor (Studio) - Layanan Prewedding",
-      text: `"Saya memesan layanan pre-wedding di Oval Photo, dan hasilnya di luar ekspektasi!
-      Fotografernya sangat kreatif dalam memilih konsep. Kami tidak hanya mendapatkan foto yang indah,
-      tetapi juga pengalaman yang menyenangkan selama sesi pemotretan. Benar-benar worth it!"`,
-      imgSrc: "https://placehold.co/90x90/png?text=Rina+Wijaya",
-      imgAlt: "Foto Rina Wijaya, wanita Asia dengan rambut hitam panjang, tersenyum cerah mengenakan pakaian kasual putih"
-    },
-    {
-      name: "Andi Pratama",
-      date: "15/05/2024",
-      stars: 4,
-      package: "Paket Outdoor (Pantai) - Layanan Prewedding",
-      text: `"Layanan yang sangat memuaskan dengan hasil foto yang natural dan indah.
-      Tim fotografer sangat profesional dan sabar menghadapi cuaca yang kurang mendukung.
-      Saya sangat merekomendasikan Oval Photo untuk sesi prewedding outdoor."`,
-      imgSrc: "https://placehold.co/90x90/png?text=Andi+Pratama",
-      imgAlt: "Foto close-up Andi Pratama, pria Asia dengan rambut pendek hitam, mengenakan kemeja biru muda, tersenyum ramah di luar ruangan"
-    },
-    {
-      name: "Sari Lestari",
-      date: "22/04/2024",
-      stars: 5,
-      package: "Paket Studio - Layanan Foto Keluarga",
-      text: `"Oval Photo memberikan pengalaman foto keluarga yang menyenangkan dan hasil yang sangat memuaskan.
-      Anak-anak kami merasa nyaman dan fotografernya sangat sabar.
-      Foto-foto yang dihasilkan sangat natural dan penuh kehangatan."`,
-      imgSrc: "https://placehold.co/90x90/png?text=Sari+Lestari",
-      imgAlt: "Foto Sari Lestari"
-    },
-    {
-      name: "Budi Santoso",
-      date: "10/03/2024",
-      stars: 3,
-      package: "Paket Event - Layanan Dokumentasi Pernikahan",
-      text: `"Dokumentasi pernikahan kami berjalan lancar dengan hasil yang cukup baik.
-      Ada beberapa momen yang kurang tertangkap, tapi secara keseluruhan kami puas dengan layanan dan hasilnya."`,
-      imgSrc: "https://placehold.co/90x90/png?text=Budi+Santoso",
-      imgAlt: "Foto close-up Budi Santoso, pria Asia dengan rambut pendek dan kacamata, mengenakan jas hitam, tersenyum ringan"
+document.addEventListener('DOMContentLoaded', function() {
+  // Mengambil data testimoni yang sudah di-passing dari backend Flask.
+  // Filter `tojson` memastikan data aman untuk disisipkan ke dalam JavaScript.
+  const testimonials = {{ testimonials|tojson }};
+
+  // Hanya jalankan skrip jika ada testimoni
+  if (testimonials && testimonials.length > 0) {
+    const testimonialCard = document.getElementById("testimonial-card");
+    const nameEl = document.getElementById("testimonial-name");
+    const dateEl = document.getElementById("testimonial-date");
+    const starsEl = document.getElementById("testimonial-stars"); // Pilih berdasarkan ID baru
+    const packageEl = document.getElementById("testimonial-package");
+    const textEl = document.getElementById("testimonial-text");
+    const profileImg = testimonialCard.querySelector(".testimonial-profile img");
+    const dots = document.querySelectorAll(".dot");
+
+    let currentIndex = 0;
+    let intervalId;
+
+    // Fungsi untuk memperbarui konten testimoni dengan efek fade
+    function updateTestimonial(index) {
+      if (index === currentIndex && document.activeElement !== dots[index]) return; // Hindari update yang tidak perlu
+      
+      testimonialCard.style.opacity = '0'; // Mulai fade out
+
+      setTimeout(() => {
+        const t = testimonials[index];
+        nameEl.textContent = t.name;
+        dateEl.textContent = t.date;
+        packageEl.textContent = t.package;
+        textEl.textContent = `"${t.text}"`; // Tambahkan tanda kutip
+        profileImg.src = t.imgSrc;
+        profileImg.alt = t.imgAlt;
+
+        // Generate bintang
+        starsEl.innerHTML = "★".repeat(t.stars) + "☆".repeat(5 - t.stars);
+        starsEl.setAttribute("aria-label", `Rating bintang ${t.stars} dari 5`);
+
+        // Perbarui status 'active' pada dots
+        dots.forEach((dot, i) => {
+          const isActive = i === index;
+          dot.classList.toggle("active", isActive);
+          dot.setAttribute("aria-selected", isActive);
+          dot.setAttribute("tabindex", isActive ? "0" : "-1");
+        });
+
+        testimonialCard.style.opacity = '1'; // Selesaikan dengan fade in
+        currentIndex = index;
+      }, 300); // Waktu harus cocok dengan durasi transisi CSS
     }
-  ];
 
-  const testimonialCard = document.getElementById("testimonial-card");
-  const nameEl = document.getElementById("testimonial-name");
-  const dateEl = document.getElementById("testimonial-date");
-  const starsEl = testimonialCard.querySelector(".testimonial-stars");
-  const packageEl = document.getElementById("testimonial-package");
-  const textEl = document.getElementById("testimonial-text");
-  const profileImg = testimonialCard.querySelector(".testimonial-profile img");
-  const dots = document.querySelectorAll(".dot");
+    // Fungsi untuk slide otomatis
+    function startAutoSlide() {
+      clearInterval(intervalId); // Hapus interval sebelumnya untuk menghindari duplikasi
+      intervalId = setInterval(() => {
+        const nextIndex = (currentIndex + 1) % testimonials.length;
+        updateTestimonial(nextIndex);
+      }, 6000); // Ganti testimoni setiap 6 detik
+    }
 
-  let currentIndex = 0;
-  let intervalId;
-
-  function updateTestimonial(index) {
-    if (index === currentIndex) return;
-    // Fade out
-    testimonialCard.classList.add("fade-out");
-
-    // After fade out, update content and fade in
-    setTimeout(() => {
-      const t = testimonials[index];
-      nameEl.textContent = t.name;
-      dateEl.textContent = t.date;
-      starsEl.textContent = "★".repeat(t.stars) + "☆".repeat(5 - t.stars);
-      starsEl.setAttribute("aria-label", `Rating bintang ${t.stars} dari 5`);
-      packageEl.textContent = t.package;
-      textEl.textContent = t.text;
-      profileImg.src = t.imgSrc;
-      profileImg.alt = t.imgAlt;
-
-      // Update dots active state and aria-selected/tabindex
-      dots.forEach((dot, i) => {
-        if (i === index) {
-          dot.classList.add("active");
-          dot.setAttribute("aria-selected", "true");
-          dot.setAttribute("tabindex", "0");
-        } else {
-          dot.classList.remove("active");
-          dot.setAttribute("aria-selected", "false");
-          dot.setAttribute("tabindex", "-1");
+    // Event listener untuk klik pada dots
+    dots.forEach(dot => {
+      dot.addEventListener("click", () => {
+        const index = parseInt(dot.getAttribute("data-index"));
+        clearInterval(intervalId); // Hentikan slide otomatis saat interaksi manual
+        updateTestimonial(index);
+        startAutoSlide(); // Mulai lagi slide otomatis setelah interaksi
+      });
+      // Untuk aksesibilitas keyboard
+      dot.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          dot.click();
         }
       });
-
-      testimonialCard.classList.remove("fade-out");
-      currentIndex = index;
-    }, 500);
-  }
-
-  function nextTestimonial() {
-    let nextIndex = currentIndex + 1;
-    if (nextIndex >= testimonials.length) nextIndex = 0;
-    updateTestimonial(nextIndex);
-  }
-
-  // Auto slide every 6 seconds
-  function startAutoSlide() {
-    intervalId = setInterval(nextTestimonial, 4000);
-  }
-
-  function stopAutoSlide() {
-    clearInterval(intervalId);
-  }
-
-  // Dot click event
-  dots.forEach(dot => {
-    dot.addEventListener("click", () => {
-      stopAutoSlide();
-      const index = parseInt(dot.getAttribute("data-index"));
-      updateTestimonial(index);
-      startAutoSlide();
     });
-    dot.addEventListener("keydown", (e) => {
-      if (e.key === "Enter" || e.key === " "){
-        e.preventDefault();
-        dot.click();
-      }
-    });
-  });
+    
+    // Inisialisasi: Tambahkan transisi CSS dan generate bintang untuk item pertama
+    const style = document.createElement('style');
+    style.innerHTML = `#testimonial-card { transition: opacity 0.3s ease-in-out; }`;
+    document.head.appendChild(style);
+    
+    // Generate bintang untuk ulasan pertama yang sudah di-render server
+    starsEl.innerHTML = "★".repeat(testimonials[0].stars) + "☆".repeat(5 - testimonials[0].stars);
 
-  // Initialize
-  startAutoSlide();
+    // Mulai slide otomatis
+    startAutoSlide();
+  }
+});
 </script>
 
 

@@ -1,7 +1,7 @@
 {% extends "user/base_user.html" %} {% block content %}
 <header class="header">
   <div class="header-content text-center">
-    <h1>Formulir Pemesanan</h1>
+    <h1>Ubah Jadwal Pemesanan</h1>
     <p>
       <i class="bi bi-headset" style="margin-right: 5px"></i>
       Butuh Bantuan? Hubungi Kita Sekarang!
@@ -17,7 +17,7 @@
   <form
     class="formlayanan-form"
     id="bookingForm"
-    action="/booking"
+    action="/jadwal/ubah/{{ pesanan._id }}"
     method="POST"
     enctype="multipart/form-data"
   >
@@ -25,38 +25,34 @@
       type="hidden"
       id="layanan_id"
       name="layanan_id"
-      value="{{ selected_layanan_id }}"
+      value="{{ pesanan.layanan_id }}"
     />
     <input
       type="hidden"
       id="paket_id"
       name="paket_id"
-      value="{{ selected_paket_id }}"
+      value="{{ pesanan.paket_id }}"
     />
     <input
       type="hidden"
       id="harga_paket_dasar"
       name="harga_paket_dasar"
-      value="{{ selected_paket_harga_raw }}"
+      value="{{ pesanan.harga_paket }}"
     />
     <input
       type="hidden"
       id="deposit_paket_dasar"
       name="deposit_paket_dasar"
-      value="{{ selected_paket_deposit_raw }}"
-    />
-    <input
-      type="hidden"
-      id="tanggal_pemesanan"
-      name="tanggal_pemesanan"
-      value=""
+      value="{{ pesanan.deposit }}"
     />
     <input
       type="hidden"
       id="biaya_transportasi"
       name="biaya_transportasi"
-      value="0"
+      value="{{ pesanan.biaya_transportasi_akomodasi }}"
     />
+
+
     <div>
       <small
         >Simbol bintang (<span class="text-red-catatan">*</span>) menandakan
@@ -64,6 +60,9 @@
       >
     </div>
     <div><br /></div>
+
+
+
     <div class="formlayanan-row">
       <div>
         <label for="nama_layanan" class="formlayanan-label">
@@ -74,7 +73,7 @@
           id="nama_layanan"
           name="nama_layanan"
           class="formlayanan-input formlayanan-required"
-          value="{{ selected_layanan_nama if selected_layanan_nama else 'layanan yang dipilih' }}"
+          value="{{ selected_layanan_nama }}"
           disabled
           required
         />
@@ -88,14 +87,12 @@
           id="paket_nama"
           name="paket_nama"
           class="formlayanan-input formlayanan-required"
-          value="{{ selected_paket_nama if selected_paket_nama else 'paket yang dipilih' }} (Rp {{ selected_paket_harga if selected_paket_harga else
-          '0' }})"
+          value="{{ selected_paket_nama }} (Rp {{ selected_paket_harga }})"
           disabled
           required
         />
         <small style="color: green">
-          Deposit: Rp {{ selected_paket_deposit if selected_paket_deposit else
-          '0' }}
+          Deposit: Rp {{ selected_paket_deposit }}
         </small>
       </div>
       <div>
@@ -108,6 +105,8 @@
           name="nama_klien"
           placeholder="Masukkan nama lengkap klien"
           class="formlayanan-input formlayanan-required"
+          value="{{ pesanan.nama_klien }}"
+          disabled
           required
         />
       </div>
@@ -122,6 +121,8 @@
           name="nama_orang_tua"
           placeholder="Masukkan nama orang tua klien"
           class="formlayanan-input formlayanan-required"
+          value="{{ pesanan.nama_orang_tua }}"
+          disabled
           required
         />
       </div>
@@ -136,6 +137,8 @@
           name="email_klien"
           placeholder="Masukkan email klien"
           class="formlayanan-input formlayanan-required"
+          value="{{ pesanan.email_klien }}"
+          disabled
           required
         />
         <p class="formlayanan-text-xs">Contoh: ovalphoto@gmail.com</p>
@@ -153,6 +156,8 @@
           name="telepon_klien"
           placeholder="Masukkan nomor telepon aktif/WhatsApp klien"
           class="formlayanan-input formlayanan-required"
+          value="{{ pesanan.telepon_klien }}"
+          disabled
           required
         />
         <p class="formlayanan-text-xs">Contoh: +62-861-3409-8790</p>
@@ -166,6 +171,8 @@
           name="instagram_klien"
           placeholder="Masukkan akun instagram klien"
           class="formlayanan-input"
+          value="{{ pesanan.instagram_klien }}"
+          disabled
         />
         <p class="formlayanan-text-xs">Contoh: @ovalphoto</p>
       </div>
@@ -178,6 +185,8 @@
           name="facebook_klien"
           placeholder="Masukkan akun facebook klien"
           class="formlayanan-input"
+          value="{{ pesanan.facebook_klien }}"
+          disabled
         />
         <p class="formlayanan-text-xs">Contoh: Oval Photo</p>
       </div>
@@ -192,6 +201,7 @@
             class="form-control"
             name="jam_acara"
             id="jam_acara"
+            value="{{ pesanan.jam_acara }}"
             required
             style="
               border: 1px solid #ccc;
@@ -223,6 +233,7 @@
             class="form-control"
             name="tanggal_mulai_acara"
             id="tanggal_mulai_acara"
+            value="{{ pesanan.tanggal_mulai_acara_str }}"
             required
             style="
               border: 1px solid #ccc;
@@ -242,6 +253,7 @@
             class="form-control"
             name="tanggal_selesai_acara"
             id="tanggal_selesai_acara"
+            value="{{ pesanan.tanggal_selesai_acara_str }}"
             required
             style="
               border: 1px solid #ccc;
@@ -278,6 +290,8 @@
             class="formlayanan-required"
             onchange="handleLokasiLuarChange(); checkFormValidity();"
             required
+            {% if pesanan.lokasi_luar_labuhanbatu %}checked{% endif %}
+            disabled
           />
           <div>
             <span class="formlayanan-text-bold">Iya, berada di luar</span><br />
@@ -296,6 +310,8 @@
             class="formlayanan-required"
             onchange="handleLokasiLuarChange(); checkFormValidity();"
             required
+            {% if not pesanan.lokasi_luar_labuhanbatu %}checked{% endif %}
+            disabled
           />
           <div>
             <span class="formlayanan-text-bold">Tidak</span><br />
@@ -318,12 +334,21 @@
           onchange="displayLokasiPrice(); checkFormValidity();"
           class="formlayanan-select formlayanan-required"
           required
+          disabled
         >
           <option value="" disabled>Pilih lokasi dari daftar</option>
           {% for lokasi in lokasi_list %}
-          <option value="{{ lokasi._id|string }}">{{ lokasi.nama }}</option>
+          <option
+            value="{{ lokasi._id|string }}"
+            {% if pesanan.lokasi_id and pesanan.lokasi_id|string == lokasi._id|string %}selected{% endif %}
+          >
+            {{ lokasi.nama }}
+          </option>
           {% endfor %}
-          <option value="pilih_lokasi_sendiri" selected>
+          <option
+            value="pilih_lokasi_sendiri"
+            {% if not pesanan.lokasi_id %}selected{% endif %}
+          >
             Pilih lokasi saya sendiri
           </option>
         </select>
@@ -344,7 +369,8 @@
           placeholder="Masukan alamat lokasi pemotretan/acara kamu"
           class="formlayanan-textarea formlayanan-required"
           oninput="checkFormValidity()"
-        ></textarea>
+          disabled
+        >{{ pesanan.alamat_lokasi_acara }}</textarea>
         <p class="formlayanan-text-xs">Isikan alamat dengan lengkap</p>
       </div>
 
@@ -358,7 +384,8 @@
           rows="5"
           placeholder="Masukan link maps dari lokasi pemotretan/acara kamu"
           class="formlayanan-textarea"
-        ></textarea>
+          disabled
+        >{{ pesanan.link_maps_acara }}</textarea>
         <p class="formlayanan-text-xs">
           Contoh: https://maps.app.goo.gl/F28Y86DMYdHLySvT7
         </p>
@@ -380,7 +407,7 @@
         class="formlayanan-btn formlayanan-btn-pesan"
         disabled
       >
-        Pesan
+        Ubah Jadwal
       </button>
     </div>
   </form>
@@ -399,122 +426,120 @@
     </h2>
     <div class="modal-body">
       <ol class="catatan">
-        <li class="catatan">
-          Lokasi pemotretan yang direkomendasikan Oval Photo dikenakan biaya
-          tambahan yang akan diinformasikan setelah pesanan dikonfirmasi,
-          kecuali untuk lokasi 'Pilihan Saya Sendiri'.
-        </li>
+      <li class="catatan">
+        Lokasi pemotretan yang direkomendasikan Oval Photo dikenakan biaya
+        tambahan yang akan diinformasikan setelah pesanan dikonfirmasi, kecuali
+        untuk lokasi 'Pilihan Saya Sendiri'.
+      </li>
 
-        <li class="catatan">
-          Pesanan yang berhasil terkirim akan dilakukan pemeriksaan selama 1 x
-          24 jam. Pastikan selalu memeriksa riwayat pesanan kamu dan lakukan
-          pembayaran deposit setelah pesanan kamu dikonfirmasi.
-        </li>
+      <li class="catatan">
+        Pesanan yang berhasil terkirim akan dilakukan pemeriksaan selama 1 x 24
+        jam. Pastikan selalu memeriksa riwayat pesanan kamu dan lakukan
+        pembayaran deposit setelah pesanan kamu dikonfirmasi.
+      </li>
 
-        <li class="catatan">
-          Klien wajib membayar deposit sebagai tanda jadi atas layanan dan paket
-          yang dipilih, sebesar:
-          <ul class="catatan">
-            <li class="catatan">
-              Rp500.000 untuk layanan paket enggagement I, semua paket layanan
-              prewedding, dan semua paket layanan wedding, atau
-            </li>
-            <li class="catatan">
-              Rp200.000 untuk layanan paket enggagement II
-            </li>
-          </ul>
-          Sisa pembayaran (pelunasan) dapat dilakukan setelah sesi pemotretan
-          selesai atau setelah deposit dibayarkan melalui menu ‘Riwayat
-          Pemesanan’. Klien juga diperbolehkan membayar seluruh biaya layanan
-          sekaligus di awal.
-        </li>
+      <li class="catatan">
+        Klien wajib membayar deposit sebagai tanda jadi atas layanan dan paket
+        yang dipilih, sebesar:
+        <ul class="catatan">
+          <li class="catatan">
+            Rp500.000 untuk layanan paket enggagement I, semua paket layanan
+            prewedding, dan semua paket layanan wedding, atau
+          </li>
+          <li class="catatan">Rp200.000 untuk layanan paket enggagement II</li>
+        </ul>
+        Sisa pembayaran (pelunasan) dapat dilakukan setelah sesi pemotretan
+        selesai atau setelah deposit dibayarkan melalui menu ‘Riwayat
+        Pemesanan’. Klien juga diperbolehkan membayar seluruh biaya layanan
+        sekaligus di awal.
+      </li>
 
-        <li class="catatan">
-          <span class="text-red-catatan"
-            >Jadwal pemotretan hanya dapat diubah satu kali</span
-          >, dan perubahan dapat dilakukan melalui menu ‘Riwayat Pemesanan’ pada
-          tab ‘Diproses’ dengan memilih opsi ‘Ubah Jadwal’. Sebelum melakukan
-          perubahan, pastikan jadwal yang diinginkan masih tersedia dengan
-          memeriksa terlebih dahulu di menu ‘Katalog Layanan’.
-          <span class="text-red-catatan"
-            >Jika perubahan jadwal melibatkan penambahan hari, maka akan
-            dikenakan biaya tambahan</span
-          >
-          yang akan diinformasikan melalui menu ‘Riwayat Pemesanan’ pada tab
-          ‘Telah Dikonfirmasi’ setelah perubahan jadwal berhasil dikonfirmasi.
-        </li>
+      <li class="catatan">
+        <span class="text-red-catatan"
+          >Jadwal pemotretan hanya dapat diubah satu kali</span
+        >, dan perubahan dapat dilakukan melalui menu ‘Riwayat Pemesanan’ pada
+        tab ‘Diproses’ dengan memilih opsi ‘Ubah Jadwal’. Sebelum melakukan
+        perubahan, pastikan jadwal yang diinginkan masih tersedia dengan
+        memeriksa terlebih dahulu di menu ‘Katalog Layanan’.
+        <span class="text-red-catatan"
+          >Jika perubahan jadwal melibatkan penambahan hari, maka akan dikenakan
+          biaya tambahan</span
+        >
+        yang akan diinformasikan melalui menu ‘Riwayat Pemesanan’ pada tab
+        ‘Telah Dikonfirmasi’ setelah perubahan jadwal berhasil dikonfirmasi.
+      </li>
 
-        <li class="catatan">
-          <span class="text-red-catatan"
-            >Klien yang mengubah jadwal lebih dari satu kali akan dikenakan
-            biaya tambahan</span
-          >. Hal ini diberlakukan untuk menghindari bentrok jadwal dengan klien
-          lain dan sebagai bentuk kompensasi atas penyesuaian waktu dan sumber
-          daya tim. Informasi mengenai biaya tambahan ini dapat dilihat melalui
-          menu ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’ setelah
-          perubahan jadwal berhasil dikonfirmasi.
-        </li>
+      <li class="catatan">
+        <span class="text-red-catatan"
+          >Klien yang mengubah jadwal lebih dari satu kali akan dikenakan biaya
+          tambahan</span
+        >. Hal ini diberlakukan untuk menghindari bentrok jadwal dengan klien
+        lain dan sebagai bentuk kompensasi atas penyesuaian waktu dan sumber
+        daya tim. Informasi mengenai biaya tambahan ini dapat dilihat melalui
+        menu ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’ setelah perubahan
+        jadwal berhasil dikonfirmasi.
+      </li>
 
-        <li class="catatan">
-          Lokasi acara/pemotretan yang berada di luar Kab. Labuhanbatu Selatan
-          akan dikenakan biaya tambahan untuk transportasi dan akomodasi. Oval
-          Photo akan menginformasikan biaya tambahan ini melalui telepon atau
-          WhatsApp sebelum klien melakukan pembayaran deposit (pastikan nomor
-          yang kamu isikan bisa dihubungi ya!). Jika klien menyetujui biaya
-          tambahan tersebut, maka jumlahnya akan tercantum pada rincian
-          pembayaran di menu ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’.
-          Namun, jika tidak disetujui, maka pemesanan akan dibatalkan.
-        </li>
+      <li class="catatan">
+        Lokasi acara/pemotretan yang berada di luar Kab. Labuhanbatu Selatan
+        akan dikenakan biaya tambahan untuk transportasi dan akomodasi. Oval
+        Photo akan menginformasikan biaya tambahan ini melalui telepon atau
+        WhatsApp sebelum klien melakukan pembayaran deposit (pastikan nomor yang
+        kamu isikan bisa dihubungi ya!). Jika klien menyetujui biaya tambahan
+        tersebut, maka jumlahnya akan tercantum pada rincian pembayaran di menu
+        ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’. Namun, jika tidak
+        disetujui, maka pemesanan akan dibatalkan.
+      </li>
 
-        <li class="catatan">
-          Lokasi acara/pemotretan yang memerlukan perizinan, diharapkan untuk
-          mengunggah surat perizinan pada menu ‘Riwayat Pemesanan’ pada tab
-          ‘Menunggu Konfirmasi’ sebelum dilakukan sesi pemotretan.
-        </li>
+      <li class="catatan">
+        Lokasi acara/pemotretan yang memerlukan perizinan, diharapkan untuk
+        mengunggah surat perizinan pada menu ‘Riwayat Pemesanan’ pada tab
+        ‘Menunggu Konfirmasi’ sebelum dilakukan sesi pemotretan.
+      </li>
 
-        <li class="catatan">
-          Link Google Drive yang berisi
-          <span class="text-red-catatan"
-            >file foto hasil edit akan dikirim dalam 3-5 hari</span
-          >
-          setelah hari pemotretan yang dapat diakses melalui menu ‘Riwayat
-          Pemesanan’ pada tab ‘Selesai’.
-          <span class="text-red-catatan"
-            >Album foto akan diproduksi dalam 2-3 minggu</span
-          >
-          dan akan dikirimkan melalui jasa pengiriman.
-        </li>
+      <li class="catatan">
+        Link Google Drive yang berisi
+        <span class="text-red-catatan"
+          >file foto hasil edit akan dikirim dalam 3-5 hari</span
+        >
+        setelah hari pemotretan yang dapat diakses melalui menu ‘Riwayat
+        Pemesanan’ pada tab ‘Selesai’.
+        <span class="text-red-catatan"
+          >Album foto akan diproduksi dalam 2-3 minggu</span
+        >
+        dan akan dikirimkan melalui jasa pengiriman.
+      </li>
 
-        <li class="catatan">
-          Jika kamu memiliki pertanyaan lain seputar layanan fotografi Oval
-          Photo, kamu dapat meng-klik
-          <a
-            href="/formfaq"
-            class="faq-btn-catatan"
-            role="button"
-            aria-label="FAQ"
-          >
-            <i class="bi bi-question-circle-fill" aria-hidden="true"></i>FAQ
-          </a>
-          untuk melihat pertanyaan yang serupa dengan yang ingin kamu tanyakan.
-          Jika tidak menemukan pertanyaan serupa, maka kamu dapat menanyakannya
-          melalui tempat yang sudah disediakan pada halaman ‘FAQ’.
-        </li>
+      <li class="catatan">
+        Jika kamu memiliki pertanyaan lain seputar layanan fotografi Oval Photo,
+        kamu dapat meng-klik
+        <a
+          href="/formfaq"
+          class="faq-btn-catatan"
+          role="button"
+          aria-label="FAQ"
+        >
+          <i class="bi bi-question-circle-fill" aria-hidden="true"></i>FAQ
+        </a>
+        untuk melihat pertanyaan yang serupa dengan yang ingin kamu tanyakan.
+        Jika tidak menemukan pertanyaan serupa, maka kamu dapat menanyakannya
+        melalui tempat yang sudah disediakan pada halaman ‘FAQ’.
+      </li>
 
-        <li class="catatan">
-          Jika mengalami kendala yang belum terselesaikan atau membutuhkan
-          bantuan serta konsultasi, maka kamu dapat menghubungi nomor +62
-          813-6233-8236 (via telepon) atau meng–klik
-          <a
-            href="https://wa.me/+6281362338236"
-            class="whatsapp-btn-catatan"
-            role="button"
-            aria-label="Konsultasi Sekarang"
-          >
-            <i class="bi bi-whatsapp" aria-hidden="true"></i>Konsultasi Sekarang
-          </a>
-        </li>
-      </ol>
+      <li class="catatan">
+        Jika mengalami kendala yang belum terselesaikan atau membutuhkan bantuan
+        serta konsultasi, maka kamu dapat menghubungi nomor +62 813-6233-8236
+        (via telepon) atau meng–klik
+        <a
+          href="https://wa.me/+6281362338236"
+          class="whatsapp-btn-catatan"
+          role="button"
+          aria-label="Konsultasi Sekarang"
+        >
+          <i class="bi bi-whatsapp" aria-hidden="true"></i>Konsultasi Sekarang
+        </a>
+      </li>
+    </ol>
       <div class="checkbox-container">
         <input type="checkbox" id="agreeCheckbox" />
         <label for="agreeCheckbox"
@@ -528,7 +553,7 @@
         class="formlayanan-btn formlayanan-btn-pesan"
         disabled
       >
-        Kirim
+        Kirim Perubahan
       </button>
     </div>
   </div>
@@ -679,80 +704,66 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
-  // Global variable to store paket data for easy lookup (if needed)
-  let allPaketData = [];
   let allLokasiData = [];
-  // --- START: New Global variable for booked dates ---
   let bookedDateRanges = {{ booked_date_ranges | tojson }};
-  // --- END: New Global variable for booked dates ---
+  // Store initial form values to detect changes
+  const initialFormValues = {};
 
   document.addEventListener("DOMContentLoaded", function () {
-    // Set current date for tanggal_pemesanan
-    const today = new Date();
-    document.getElementById("tanggal_pemesanan").value = today
-      .toISOString()
-      .split("T")[0];
-
     // Fetch all lokasi data
     fetch("/api/all_lokasi")
       .then((response) => response.json())
       .then((data) => {
         allLokasiData = data;
         displayLokasiPrice(); // Call this after lokasi data is loaded
-        checkFormValidity(); // Initial check after loading dynamic data
+        storeInitialFormValues(); // Store initial values after dynamic data is loaded
+        checkFormValidityAndChanges(); // Initial check after loading dynamic data
       });
 
     const form = document.getElementById("bookingForm");
-    const showNotesButton = document.getElementById("showNotesButton"); // The "Pesan" button
+    const showNotesButton = document.getElementById("showNotesButton"); // The "Ubah Pesanan" button
     const notesModal = document.getElementById("notesModal");
     const closeNotesModal = document.getElementById("closeNotesModal");
     const agreeCheckbox = document.getElementById("agreeCheckbox");
-    const sendButton = document.getElementById("sendButton"); // The "Kirim" button inside the modal
+    const sendButton = document.getElementById("sendButton"); // The "Kirim Perubahan" button inside the modal
 
-    // Attach event listeners to all required inputs
-    const requiredInputs = form.querySelectorAll("[required]");
-    requiredInputs.forEach((input) => {
-      input.addEventListener("input", checkFormValidity);
-      input.addEventListener("change", checkFormValidity);
+    // Attach event listeners to all relevant inputs (non-disabled)
+    const inputsToMonitor = form.querySelectorAll(
+      'input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+    );
+    inputsToMonitor.forEach((input) => {
+      input.addEventListener("input", checkFormValidityAndChanges);
+      input.addEventListener("change", checkFormValidityAndChanges);
     });
 
     // Special handling for radio buttons
     const radioGroups = document.querySelectorAll('input[name="lokasi_luar"]');
     radioGroups.forEach((radio) => {
-      radio.addEventListener("change", checkFormValidity);
+      // These are disabled in your HTML, so they won't trigger changes for the "Ubah Jadwal" button.
+      // If you enable them later, their change event will be captured by the general inputsToMonitor listener.
     });
 
-    // Special handling for select element
-    document
-      .getElementById("lokasiSelect")
-      .addEventListener("change", checkFormValidity);
-
     // Initial check for form validity on page load
-    checkFormValidity();
+    // This will be called after initialFormValues are stored
+    // and after allLokasiData is fetched.
 
-    // Event listener for the "Pesan" button
+    // Event listener for the "Ubah Pesanan" button
     showNotesButton.addEventListener("click", function (event) {
-      // Prevent default form submission initially
       event.preventDefault();
 
-      // Check form validity using native browser validation
       if (!form.checkValidity()) {
-        form.reportValidity(); // Show native validation messages
-        return; // Stop if form is not valid
-      }
-
-      // --- START: New Date Validation before showing modal ---
-      if (!validateDateRange()) {
-        // If date range is invalid, do not show modal and return
+        form.reportValidity();
         return;
       }
-      // --- END: New Date Validation before showing modal ---
 
-      // Show the notes modal
-      notesModal.style.display = "flex"; // Use flex to center
-      // Reset checkbox and send button state when modal opens
+      if (!validateDateRange()) {
+        return;
+      }
+
+      notesModal.style.display = "flex";
       agreeCheckbox.checked = false;
       sendButton.disabled = true;
+      sendButton.textContent = "Kirim Perubahan"; // Ensure button text is correct
     });
 
     // Event listener for closing the notes modal
@@ -772,12 +783,12 @@
       sendButton.disabled = !agreeCheckbox.checked;
     });
 
-    // Event listener for the "Kirim" button inside the modal
+    // Event listener for the "Kirim Perubahan" button inside the modal
     sendButton.addEventListener("click", function () {
       if (agreeCheckbox.checked) {
         Swal.fire({
-          title: "Sudah yakin melakukan pemesanan?",
-          text: "Periksa kembali pesanan kamu dan pastikan tidak ada data yang salah!",
+          title: "Sudah yakin mengubah jadwal?",
+          text: "Periksa kembali perubahan kamu dan pastikan tidak ada data yang salah!",
           icon: "question",
           showCancelButton: true,
           confirmButtonColor: "#3085d6",
@@ -786,26 +797,66 @@
           cancelButtonText: "Periksa Dulu",
         }).then((result) => {
           if (result.isConfirmed) {
-            // User clicked "Sudah Yakin"
-            // Show success message and then submit the form
             Swal.fire({
-              title: "Pesanan kamu berhasil terkirim!",
-              text: "Tunggu selama 1 x 24 jam hingga pesanan kamu dikonfirmasi. Setelah itu segera lakukan pembayaran deposit ya! ",
+              title: "Perubahan jadwal berhasil terkirim!",
+              text: "Data pesanan Anda telah diperbarui.",
               icon: "success",
               timerProgressBar: true,
-              timer: 4000, // Show for 4 seconds
-              showConfirmButton: false, // No confirm button
+              timer: 4000,
+              showConfirmButton: false,
               willClose: () => {
-                // Now, actually submit the form after the success message closes
                 form.submit();
               },
             });
-            notesModal.style.display = "none"; // Hide the notes modal
+            notesModal.style.display = "none";
           }
         });
       }
     });
   });
+
+  // Function to store initial form values
+  function storeInitialFormValues() {
+    const form = document.getElementById("bookingForm");
+    const inputs = form.querySelectorAll(
+      'input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+    );
+    inputs.forEach((input) => {
+      if (input.type === 'radio') {
+        initialFormValues[input.name] = form.querySelector(`input[name="${input.name}"]:checked`)?.value || '';
+      } else if (input.type === 'checkbox') {
+        initialFormValues[input.id] = input.checked;
+      }
+      else {
+        initialFormValues[input.id] = input.value;
+      }
+    });
+  }
+
+  // Function to check if form has changed
+  function hasFormChanged() {
+    const form = document.getElementById("bookingForm");
+    const inputs = form.querySelectorAll(
+      'input:not([disabled]), select:not([disabled]), textarea:not([disabled])'
+    );
+    for (const input of inputs) {
+      if (input.type === 'radio') {
+        const currentValue = form.querySelector(`input[name="${input.name}"]:checked`)?.value || '';
+        if (initialFormValues[input.name] !== currentValue) {
+          return true;
+        }
+      } else if (input.type === 'checkbox') {
+        if (initialFormValues[input.id] !== input.checked) {
+          return true;
+        }
+      } else {
+        if (initialFormValues[input.id] !== input.value) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
 
   function displayLokasiPrice() {
     const lokasiId = document.getElementById("lokasiSelect").value;
@@ -813,73 +864,56 @@
     const mapsInput = document.getElementById("link_maps_manual");
 
     // Clear previous values and required status for manual input
-    alamatInput.value = "";
-    mapsInput.value = "";
-    // Remove 'required' attribute initially
-    alamatInput.removeAttribute("required");
-
+    // Only clear if the user is changing *to* "pilih_lokasi_sendiri"
+    // or if the original value was not from a pre-selected location.
     if (lokasiId === "pilih_lokasi_sendiri") {
+      alamatInput.value = "";
+      mapsInput.value = "";
       alamatInput.setAttribute("required", "true"); // Add required for manual address
+      alamatInput.removeAttribute("disabled"); // Enable manual address input
+      mapsInput.removeAttribute("disabled"); // Enable manual maps input
     } else {
       const lokasi = allLokasiData.find((loc) => loc._id === lokasiId);
       if (lokasi) {
         alamatInput.value = lokasi.alamat || "";
         mapsInput.value = lokasi.link_maps || "";
-      } else {
-        // Handle case where location might not be found (e.g., if ID is invalid)
       }
+      alamatInput.setAttribute("disabled", "true"); // Disable if a specific location is chosen
+      mapsInput.setAttribute("disabled", "true"); // Disable if a specific location is chosen
+      alamatInput.removeAttribute("required"); // Remove required for manual address
     }
-    // No need for updateTotalDanSisaBayar() here, as it's not directly related to this function's scope.
-    checkFormValidity();
+    checkFormValidityAndChanges();
   }
 
   function handleLokasiLuarChange() {
-    // This function primarily exists to trigger checkFormValidity when radio changes.
-    checkFormValidity();
+    checkFormValidityAndChanges();
   }
 
-  function checkFormValidity() {
+  function checkFormValidityAndChanges() {
     const form = document.getElementById("bookingForm");
-    const showNotesButton = document.getElementById("showNotesButton"); // The "Pesan" button
+    const showNotesButton = document.getElementById("showNotesButton");
     let allRequiredFilled = true;
 
-    // List of specific required fields that must be filled
-    const requiredFieldIds = [
-      "nama_klien",
-      "nama_orang_tua",
-      "email_klien",
-      "telepon_klien",
-      "tanggal_mulai_acara",
-      "tanggal_selesai_acara",
-      "jam_acara",
-    ];
+    // Check only non-disabled required inputs
+    const requiredInputs = form.querySelectorAll(
+      "input[required]:not([disabled]), select[required]:not([disabled]), textarea[required]:not([disabled])"
+    );
 
-    requiredFieldIds.forEach((id) => {
-      const input = document.getElementById(id);
-      if (input && !input.value.trim()) {
+    requiredInputs.forEach((input) => {
+      if (input.type === "radio") {
+        const radioGroup = form.querySelectorAll(
+          `input[name="${input.name}"]:not([disabled])`
+        );
+        if (!Array.from(radioGroup).some((radio) => radio.checked)) {
+          allRequiredFilled = false;
+        }
+      } else if (!input.value.trim()) {
         allRequiredFilled = false;
       }
     });
 
-    // Check radio group for 'lokasi_luar'
-    const radioLokasiLuar = document.querySelector(
-      'input[name="lokasi_luar"]:checked'
-    );
-    if (!radioLokasiLuar) {
-      allRequiredFilled = false;
-    }
-
-    // Check 'lokasiSelect'
+    // Specific check for "alamat_lokasi_manual" if "pilih_lokasi_sendiri" is selected
     const lokasiSelect = document.getElementById("lokasiSelect");
-    if (
-      !lokasiSelect ||
-      lokasiSelect.value === "" ||
-      lokasiSelect.value === "Pilih lokasi dari daftar"
-    ) {
-      allRequiredFilled = false;
-    }
-
-    // Conditional check for 'alamat_lokasi_manual'
     const alamatLokasiManual = document.getElementById("alamat_lokasi_manual");
     if (
       lokasiSelect &&
@@ -889,18 +923,15 @@
       allRequiredFilled = false;
     }
 
-    // --- START: Incorporate date validation into overall form validity ---
     const isDateRangeValid = validateDateRange();
     if (!isDateRangeValid) {
-        allRequiredFilled = false;
+      allRequiredFilled = false;
     }
-    // --- END: Incorporate date validation into overall form validity ---
-
-    // Update the "Pesan" button's disabled state
-    showNotesButton.disabled = !allRequiredFilled;
+    
+    // Enable button only if all required fields are filled AND there are changes
+    showNotesButton.disabled = !(allRequiredFilled && hasFormChanged());
   }
 
-  // --- START: New JavaScript Function for Date Validation ---
   function validateDateRange() {
     const tanggalMulaiInput = document.getElementById("tanggal_mulai_acara");
     const tanggalSelesaiInput = document.getElementById("tanggal_selesai_acara");
@@ -911,29 +942,25 @@
 
     if (!startDate || !endDate) {
       dateRangeError.style.display = "none";
-      return true; // Allow initial state without dates
+      return true;
     }
 
-    const startDateTime = new Date(startDate + 'T00:00:00'); // Set to midnight for consistent comparison
-    const endDateTime = new Date(endDate + 'T23:59:59');   // Set to end of day
+    const startDateTime = new Date(startDate + 'T00:00:00');
+    const endDateTime = new Date(endDate + 'T23:59:59');
 
-    // Check if end date is before start date
     if (endDateTime < startDateTime) {
         dateRangeError.textContent = "Tanggal selesai tidak boleh sebelum tanggal mulai.";
         dateRangeError.style.display = "block";
         tanggalSelesaiInput.setCustomValidity("Tanggal selesai tidak boleh sebelum tanggal mulai.");
         return false;
     } else {
-        tanggalSelesaiInput.setCustomValidity(""); // Clear custom validity if valid
+        tanggalSelesaiInput.setCustomValidity("");
     }
 
-    // Check against booked ranges
     for (const range of bookedDateRanges) {
       const bookedStart = new Date(range.start + 'T00:00:00');
       const bookedEnd = new Date(range.end + 'T23:59:59');
 
-      // Check for overlap:
-      // (Start A <= End B) && (End A >= Start B)
       if (startDateTime <= bookedEnd && endDateTime >= bookedStart) {
         dateRangeError.textContent = "Tanggal atau rentang tanggal yang dipilih sudah tidak tersedia. Silakan pilih tanggal lain.";
         dateRangeError.style.display = "block";
@@ -944,11 +971,10 @@
     }
 
     dateRangeError.style.display = "none";
-    tanggalMulaiInput.setCustomValidity(""); // Clear custom validity
-    tanggalSelesaiInput.setCustomValidity(""); // Clear custom validity
+    tanggalMulaiInput.setCustomValidity("");
+    tanggalSelesaiInput.setCustomValidity("");
     return true;
   }
-  // --- END: New JavaScript Function for Date Validation ---
 </script>
 
 {% endblock %}

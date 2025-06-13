@@ -1,4 +1,6 @@
-{% extends "user/base_user.html" %}{% block content %}
+{% extends "user/base_user.html" %}
+
+{% block content %}
 <header class="header">
   <div class="header-content text-center">
     <h1>Riwayat Pemesanan</h1>
@@ -7,14 +9,11 @@
 </header>
 
 <nav class="riwayat-nav" role="navigation" aria-label="Riwayat navigation">
-  <a href="/ripe_menunggu_konfirmasi" class="riwayat-link"
-    >Menunggu Konfirmasi</a
-  >
-  <a href="#" class="riwayat-link riwayat-active" aria-current="page"
-    >Telah Dikonfirmasi</a
-  >
-  <a href="/ripe_diproses" class="riwayat-link">Diproses</a>
-  <a href="/ripe_selesai" class="riwayat-link">Selesai</a>
+  <a href="{{ url_for('ripe_menunggu_konfirmasi') }}" class="riwayat-link">Menunggu Konfirmasi</a>
+  <a href="{{ url_for('riwayat_pemesanan') }}" class="riwayat-link riwayat-active" aria-current="page">Telah Dikonfirmasi</a>
+  <a href="{{ url_for('ripe_diproses') }}" class="riwayat-link">Diproses</a>
+  <a href="{{ url_for('ripe_selesai') }}" class="riwayat-link">Selesai</a>
+  <a href="{{ url_for('ripe_dibatalkan') }}" class="riwayat-link">Dibatalkan</a> 
 </nav>
 
 <div class="subutama-container">
@@ -35,10 +34,10 @@
         </div>
       </div>
       <div
-        class="riwayat-status"
+        class="riwayat-status" style="color: #28A745;"
         aria-label="Riwayat status Belum Bayar Deposit"
       >
-        <div class="riwayat-status-dot" aria-hidden="true"></div>
+        <div class="riwayat-status-dot" style="background-color: #28A745;" aria-hidden="true"></div>
         {{ p.status_pesanan }}
       </div>
     </header>
@@ -189,11 +188,17 @@
         </div>
         <div class="riwayatpemesanan-payment-row">
           <span>Status Pembayaran Deposit</span>
-          <span class="riwayatpemesanan-bold">{{ p.status_pembayaran_deposit | default('Belum Bayar') }}</span>
+          <span class="riwayatpemesanan-bold" id="status-deposit-{{ p._id }}"
+            >{{ p.status_pembayaran_deposit | default('Belum Bayar') }}</span
+          >
         </div>
         <div class="riwayatpemesanan-payment-row">
           <span>Status Pembayaran Pelunasan</span>
-          <span class="riwayatpemesanan-bold">{{ p.status_pembayaran_pelunasan | default('Belum Bayar') }}</span>
+          <span
+            class="riwayatpemesanan-bold"
+            id="status-pelunasan-{{ p._id }}"
+            >{{ p.status_pembayaran_pelunasan | default('Belum Bayar') }}</span
+          >
         </div>
       </div>
     </section>
@@ -243,7 +248,7 @@
                 viewBox="0 0 16 16"
               >
                 <path
-                  d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"
+                  d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 2 0 0 0 1 1h8a1 2 0 0 0 1-1V4.5h-3z"
                 />
               </svg>
               <span
@@ -297,6 +302,7 @@
             type="button"
             data-pesanan-id="{{ p._id }}"
             data-payment-type="deposit"
+            id="deposit-button-{{ p._id }}"
             {% if p.status_pembayaran_deposit == 'Lunas' %}disabled{% endif %}
           >
             Bayar Deposit
@@ -331,6 +337,7 @@
             type="button"
             data-pesanan-id="{{ p._id }}"
             data-payment-type="pelunasan"
+            id="pelunasan-button-{{ p._id }}"
             {% if p.status_pembayaran_pelunasan == 'Lunas' %}disabled{% endif %}
           >
             Bayar Pelunasan
@@ -349,7 +356,10 @@
   </main>
   {% endfor %}
 
-  <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ MIDTRANS_CLIENT_KEY }}"></script>
+  <script
+    src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ MIDTRANS_CLIENT_KEY }}"
+  ></script>
   <script>
     // Tombol panah interaktif untuk sections
     document
@@ -382,56 +392,73 @@
       });
 
     // Midtrans Integration
-    document.querySelectorAll('.bayar-button').forEach(button => {
-        button.addEventListener('click', async () => {
-            const pesananId = button.dataset.pesananId;
-            const paymentType = button.dataset.paymentType; // 'deposit' or 'pelunasan'
+    document.querySelectorAll(".bayar-button").forEach((button) => {
+      button.addEventListener("click", async () => {
+        const pesananId = button.dataset.pesananId;
+        const paymentType = button.dataset.paymentType; // 'deposit' or 'pelunasan'
 
-            try {
-                const response = await fetch('/api/create_midtrans_transaction', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                    },
-                    body: JSON.stringify({
-                        pesanan_id: pesananId,
-                        payment_type: paymentType
-                    }),
-                });
+        try {
+          const response = await fetch("/api/create_midtrans_transaction", {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              pesanan_id: pesananId,
+              payment_type: paymentType,
+            }),
+          });
 
-                const data = await response.json();
+          const data = await response.json();
 
-                if (data.success) {
-                    snap.pay(data.token, {
-                        onSuccess: function(result){
-                            /* You may add your own implementation here */
-                            alert("Pembayaran Berhasil!"); console.log(result);
-                            window.location.reload(); // Reload page to update status
-                        },
-                        onPending: function(result){
-                            /* You may add your own implementation here */
-                            alert("Pembayaran Anda sedang menunggu konfirmasi!");  console.log(result);
-                            window.location.reload(); // Reload page to update status
-                        },
-                        onError: function(result){
-                            /* You may add your own implementation here */
-                            alert("Pembayaran Gagal!"); console.log(result);
-                        },
-                        onClose: function(){
-                            /* You may add your own implementation here */
-                            alert('Anda menutup pop-up tanpa menyelesaikan pembayaran');
-                        }
-                    });
-                } else {
-                    alert('Error: ' + data.message);
+          if (data.success) {
+            snap.pay(data.token, {
+              onSuccess: function (result) {
+                console.log(result);
+                // Update button and status immediately
+                const targetButton = document.getElementById(`${paymentType}-button-${pesananId}`);
+                if (targetButton) {
+                    targetButton.disabled = true;
+                    targetButton.innerText = "Lunas"; // Atau teks lain yang sesuai
                 }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                alert('Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.');
-            }
-        });
+                const statusElement = document.getElementById(`status-${paymentType}-${pesananId}`);
+                if (statusElement) {
+                    statusElement.innerText = "Lunas";
+                }
+                // Optionally, you might want to refresh the page or update the overall status as well
+                // window.location.reload();
+              },
+              onPending: function (result) {
+                /* You may add your own implementation here */
+                alert("Pembayaran Anda sedang menunggu konfirmasi!");
+                console.log(result);
+                // For pending, the status on the UI might not change immediately to "Lunas"
+                // It will be updated by the webhook when payment is actually settled.
+                // You might update the UI to "Pending" if you wish.
+                const statusElement = document.getElementById(`status-${paymentType}-${pesananId}`);
+                if (statusElement) {
+                    statusElement.innerText = "Pending";
+                }
+              },
+              onError: function (result) {
+                /* You may add your own implementation here */
+                alert("Pembayaran Gagal!");
+                console.log(result);
+              },
+              onClose: function () {
+                /* You may add your own implementation here */
+                alert("Anda menutup pop-up tanpa menyelesaikan pembayaran");
+              },
+            });
+          } else {
+            alert("Error: " + data.message);
+          }
+        } catch (error) {
+          console.error("Fetch error:", error);
+          alert("Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.");
+        }
+      });
     });
   </script>
 </div>
-
 {% endblock %}

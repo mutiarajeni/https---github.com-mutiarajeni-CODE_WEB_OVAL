@@ -33,10 +33,7 @@ Photo {% endblock %} {% block content %}
                 class="form-select form-select-sm w-auto text-muted"
                 style="font-size: 12px; min-width: 200px"
               >
-                {% set status_list = [ 'Menunggu Konfirmasi', 'Telah Dikonfirmasi', 'Belum Pemotretan', 'Sudah
-                Pemotretan', 'Belum Kirim File & Album', 'Sudah Kirim File &
-                Album', 'Gagal Dikonfirmasi',  'Pending Pembayaran', 'Pembayaran Kadaluarsa', 'Pembayaran Dibatalkan', 'Pembayaran Ditolak', 'Pesanan
-                Dibatalkan', 'Selesai'
+                {% set status_list = [ 'Menunggu Konfirmasi', 'Telah Dikonfirmasi', 'Belum Pemotretan', 'Sudah Pemotretan', 'Belum Kirim File & Album', 'Sudah Kirim File & Album', 'Gagal Dikonfirmasi', 'Pesanan Dibatalkan', 'Pembayaran Kadaluarsa', 'Pembayaran Dibatalkan', 'Pembayaran Ditolak', 'Selesai'
                 ] %} {% for status in status_list %}
                 <option
                   value="{{ status }}"
@@ -153,7 +150,7 @@ Photo {% endblock %} {% block content %}
                 <i class="bi bi-geo-alt-fill" style="font-size: 16px"></i>
                 <div>
                   <p class="text-black mb-1 fs-6 fw-normal">
-                    Lokasi Acara berada di luar <br> Kab. Labuhanbatu Selatan
+                    Lokasi Acara berada di luar <br /> Kab. Labuhanbatu Selatan
                   </p>
                   <p class="fw-bold fs-6 mb-0">
                     {% if p.lokasi_luar_labuhanbatu %}Ya{% else %}Tidak{%
@@ -205,8 +202,7 @@ Photo {% endblock %} {% block content %}
                 <i
                   class="bi bi-envelope-paper-fill me-2"
                   style="font-size: 14px"
-                ></i
-                >Surat Izin Lokasi
+                ></i>Surat Izin Lokasi
               </label>
               {% if p.surat_izin_lokasi %}
               <div class="d-flex align-items-center bg-light p-2 rounded">
@@ -310,8 +306,7 @@ Photo {% endblock %} {% block content %}
                 "
                 name="catatan"
                 form="updateOrderForm-{{ p._id }}"
-              >
-{{ p.catatan | default('') }}</textarea
+              >{{ p.catatan | default('') }}</textarea
               >
             </div>
 
@@ -331,47 +326,50 @@ Photo {% endblock %} {% block content %}
                 "
                 name="link_google_drive"
                 form="updateOrderForm-{{ p._id }}"
-              >
-{{ p.link_google_drive | default('') }}</textarea
+              >{{ p.link_google_drive | default('') }}</textarea
               >
             </div>
           </div>
         </div>
 
-
-
-
-
-
-
-
-
-
-        <div
-          class="d-flex flex-column flex-md-row justify-content-md-between align-items-md-center mt-3"
-        >
+        <div class="text-end mt-3">
           <a
             href="/admin_pesanan"
-            class="btn btn-outline-dark me-2 fw-normal mb-3 mb-md-0"
+            class="btn btn-outline-dark me-2 fw-normal"
             style="text-transform: none; font-size: 1rem"
             >Kembali</a
           >
-          <div class="text-end">
-            <button
-              type="button"
-              id="saveButton-{{ p._id }}"
-              class="btn btn-outline-dark fw-normal"
-              style="text-transform: none; font-size: 1rem"
-            >
-              Simpan
-            </button>
-          </div>
+          <button
+            type="button"
+            id="saveButton-{{ p._id }}"
+            class="btn save-button fw-normal"
+            disabled
+          >
+            Simpan
+          </button>
         </div>
       </section>
       {% endfor %}
     </div>
   </div>
 </div>
+
+<style>
+  .save-button {
+    text-transform: none;
+    font-size: 1.05rem;
+    color: #fff !important;
+    background-color: #000 !important;
+    border-color: #000 !important;
+  }
+
+  .save-button:disabled {
+    background-color: #ccc !important;
+    border-color: #ccc !important;
+    color: #fff !important;
+    cursor: not-allowed;
+  }
+</style>
 
 <script>
   function formatNumberInput(e) {
@@ -383,8 +381,87 @@ Photo {% endblock %} {% block content %}
     }
     value = parseInt(value, 10).toLocaleString("id-ID");
     input.value = value;
+
+    // Trigger check changes after formatting
+    checkChanges(input);
   }
 
+  // Function untuk cek apakah ada perubahan
+  function checkChanges(inputElement) {
+    const section = inputElement.closest("section");
+    const pesananId = section.querySelector("form").id.replace("updateOrderForm-", "");
+    const saveButton = document.getElementById("saveButton-" + pesananId);
+
+    const statusSelect = section.querySelector('select[name="status_pesanan"]');
+    const biayaTambahHari = section.querySelector('input[name="biaya_tambah_hari"]');
+    const biayaLokasi = section.querySelector('input[name="biaya_lokasi"]');
+    const biayaTransportasi = section.querySelector('input[name="biaya_transportasi"]');
+    const catatan = section.querySelector('textarea[name="catatan"]');
+    const linkGoogleDrive = section.querySelector('textarea[name="link_google_drive"]');
+
+    const initialData = JSON.parse(section.getAttribute("data-initial"));
+
+    let statusChanged = statusSelect.value !== initialData.status;
+    let biayaTambahHariChanged = biayaTambahHari.value.replace(/\./g, "") !== initialData.biaya_tambah_hari;
+    let biayaLokasiChanged = biayaLokasi.value.replace(/\./g, "") !== initialData.biaya_lokasi;
+    let biayaTransportasiChanged = biayaTransportasi.value.replace(/\./g, "") !== initialData.biaya_transportasi;
+    let catatanChanged = catatan.value.trim() !== initialData.catatan.trim();
+    let linkChanged = linkGoogleDrive.value.trim() !== initialData.link_google_drive.trim();
+
+    if (
+      statusChanged ||
+      biayaTambahHariChanged ||
+      biayaLokasiChanged ||
+      biayaTransportasiChanged ||
+      catatanChanged ||
+      linkChanged
+    ) {
+      saveButton.disabled = false;
+    } else {
+      saveButton.disabled = true;
+    }
+  }
+
+  // Inisialisasi event listener
+  document.querySelectorAll("section").forEach((section) => {
+    const pesananId = section.querySelector("form").id.replace("updateOrderForm-", "");
+
+    const statusSelect = section.querySelector('select[name="status_pesanan"]');
+    const biayaTambahHari = section.querySelector('input[name="biaya_tambah_hari"]');
+    const biayaLokasi = section.querySelector('input[name="biaya_lokasi"]');
+    const biayaTransportasi = section.querySelector('input[name="biaya_transportasi"]');
+    const catatan = section.querySelector('textarea[name="catatan"]');
+    const linkGoogleDrive = section.querySelector('textarea[name="link_google_drive"]');
+
+    // Simpan data awal di attribute
+    section.setAttribute(
+      "data-initial",
+      JSON.stringify({
+        status: statusSelect.value,
+        biaya_tambah_hari: biayaTambahHari.value.replace(/\./g, ""),
+        biaya_lokasi: biayaLokasi.value.replace(/\./g, ""),
+        biaya_transportasi: biayaTransportasi.value.replace(/\./g, ""),
+        catatan: catatan.value.trim(),
+        link_google_drive: linkGoogleDrive.value.trim(),
+      })
+    );
+
+    // Tambahkan event listener
+    statusSelect.addEventListener("change", () => checkChanges(statusSelect));
+    biayaTambahHari.addEventListener("input", () =>
+      checkChanges(biayaTambahHari)
+    );
+    biayaLokasi.addEventListener("input", () => checkChanges(biayaLokasi));
+    biayaTransportasi.addEventListener("input", () =>
+      checkChanges(biayaTransportasi)
+    );
+    catatan.addEventListener("input", () => checkChanges(catatan));
+    linkGoogleDrive.addEventListener("input", () =>
+      checkChanges(linkGoogleDrive)
+    );
+  });
+
+  // Event untuk SweetAlert tetap sama seperti yang sudah kamu buat
   document.querySelectorAll('[id^="saveButton-"]').forEach((button) => {
     button.addEventListener("click", function () {
       const pesananId = this.id.replace("saveButton-", "");

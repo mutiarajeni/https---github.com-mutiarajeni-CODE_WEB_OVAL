@@ -1,5 +1,4 @@
-{% extends "user/base_user.html" %}
-{% block content %}
+{% extends "user/base_user.html" %} {% block content %}
 <header class="header">
   <div class="header-content text-center">
     <h1>Katalog Layanan</h1>
@@ -80,8 +79,7 @@
           <th role="columnheader" scope="col">MIN</th>
         </tr>
       </thead>
-      <tbody id="calendarBody" role="rowgroup">
-        </tbody>
+      <tbody id="calendarBody" role="rowgroup"></tbody>
     </table>
     <br />
 
@@ -89,228 +87,6 @@
       Keterangan: Tanggal yang berwarna merah sudah terisi
     </h2>
   </div>
-
-  <script>
-    (() => {
-      const monthYearLabel = document.getElementById("monthYearLabel");
-      const calendarBody = document.getElementById("calendarBody");
-      const prevMonthBtn = document.getElementById("prevMonthBtn");
-      const nextMonthBtn = document.getElementById("nextMonthBtn");
-
-      // --- New: Get booked dates from backend ---
-      // This will be a JavaScript array of strings like ['2025-02-15', '2025-02-16']
-      const bookedDates = {{ booked_dates | tojson }};
-      // Convert the array of strings to a Set for faster lookup
-      const bookedDatesSet = new Set(bookedDates);
-      // --- End New ---
-
-      // Indonesian month names
-      const monthNames = [
-        "Januari",
-        "Februari",
-        "Maret",
-        "April",
-        "Mei",
-        "Juni",
-        "Juli",
-        "Agustus",
-        "September",
-        "Oktober",
-        "November",
-        "Desember",
-      ];
-
-      // Today date info
-      const today = new Date();
-      let currentYear = today.getFullYear();
-      let currentMonth = today.getMonth();
-
-      // Selected date (optional)
-      let selectedDate = null;
-
-      // Helper: get number of days in month
-      function daysInMonth(year, month) {
-        return new Date(year, month + 1, 0).getDate();
-      }
-
-      // Helper: get day of week (0=Monday, 6=Sunday) adjusted for Monday start
-      // JS getDay(): 0=Sunday, 1=Monday,... so we convert Sunday(0) to 6, Monday(1) to 0, etc.
-      function getWeekdayMondayStart(date) {
-        let day = date.getDay();
-        return day === 0 ? 6 : day - 1;
-      }
-
-      // Render calendar for given year and month
-      function renderCalendar(year, month) {
-        // Update header text
-        const monthName = monthNames[month];
-        monthYearLabel.textContent = `${monthName} ${year}`;
-
-        // Clear previous calendar body
-        calendarBody.innerHTML = "";
-
-        // First day of month
-        const firstDay = new Date(year, month, 1);
-        const firstDayWeekday = getWeekdayMondayStart(firstDay); // 0-based Monday start
-
-        // Number of days in current month
-        const numDays = daysInMonth(year, month);
-
-        // Number of days in previous month
-        const prevMonth = month === 0 ? 11 : month - 1;
-        const prevYear = month === 0 ? year - 1 : year;
-        const prevMonthDays = daysInMonth(prevYear, prevMonth);
-
-        // Calculate total cells needed (weeks * 7)
-        // We will show 6 rows always for consistent height
-        const totalCells = 6 * 7;
-
-        // Build array of day objects for each cell
-        // Each day object: {day: number, currentMonth: boolean, date: Date}
-        const days = [];
-
-        // Fill days from previous month
-        for (let i = firstDayWeekday - 1; i >= 0; i--) {
-          const dayNum = prevMonthDays - i;
-          days.push({
-            day: dayNum,
-            currentMonth: false,
-            date: new Date(prevYear, prevMonth, dayNum),
-          });
-        }
-
-        // Fill days of current month
-        for (let i = 1; i <= numDays; i++) {
-          days.push({
-            day: i,
-            currentMonth: true,
-            date: new Date(year, month, i),
-          });
-        }
-
-        // Fill days from next month to complete the grid
-        const nextMonth = (month + 1) % 12;
-        const nextYear = month === 11 ? year + 1 : year;
-        const nextDaysCount = totalCells - days.length;
-        for (let i = 1; i <= nextDaysCount; i++) {
-          days.push({
-            day: i,
-            currentMonth: false,
-            date: new Date(nextYear, nextMonth, i),
-          });
-        }
-
-        // Create rows and cells
-        for (let week = 0; week < 6; week++) {
-          const tr = document.createElement("tr");
-          tr.setAttribute("role", "row");
-
-          for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
-            const dayObj = days[week * 7 + dayIndex];
-            const td = document.createElement("td");
-            td.setAttribute("role", "gridcell");
-            td.tabIndex = dayObj.currentMonth ? 0 : -1;
-            td.textContent = dayObj.day;
-
-            // Sunday coloring (MIN = last column)
-            if (dayIndex === 6) {
-              td.classList.add("sunday");
-            }
-
-            // Inactive days (not current month)
-            if (!dayObj.currentMonth) {
-              td.classList.add("inactive");
-              td.setAttribute("aria-disabled", "true");
-            }
-
-            // Highlight today
-            if (
-              dayObj.currentMonth &&
-              dayObj.date.getFullYear() === today.getFullYear() &&
-              dayObj.date.getMonth() === today.getMonth() &&
-              dayObj.date.getDate() === today.getDate()
-            ) {
-              td.classList.add("today");
-              td.setAttribute("aria-current", "date");
-            }
-
-            // Highlight selected date
-            if (
-              selectedDate &&
-              dayObj.date.getFullYear() === selectedDate.getFullYear() &&
-              dayObj.date.getMonth() === selectedDate.getMonth() &&
-              dayObj.date.getDate() === selectedDate.getDate()
-            ) {
-              td.classList.add("selected");
-              td.setAttribute("aria-selected", "true");
-            } else {
-              td.setAttribute("aria-selected", "false");
-            }
-
-            // --- New: Add blocked-date class if the date is in bookedDatesSet ---
-            if (dayObj.currentMonth) { // Only block dates in the current month view
-                const dateString = dayObj.date.toISOString().slice(0, 10); // Format to YYYY-MM-DD
-                if (bookedDatesSet.has(dateString)) {
-                    td.classList.add("blocked-date");
-                    td.setAttribute("aria-label", `Tanggal ${dayObj.day} sudah terisi`);
-                    td.tabIndex = -1; // Make blocked dates not focusable by tab key
-                }
-            }
-            // --- End New ---
-
-
-            // Click event to select date (only current month and not blocked)
-            if (dayObj.currentMonth && !td.classList.contains("blocked-date")) { // Ensure not blocked
-              td.addEventListener("click", () => {
-                selectedDate = dayObj.date;
-                renderCalendar(currentYear, currentMonth);
-                alert(
-                  `Tanggal dipilih: ${selectedDate.getDate()} ${
-                    monthNames[selectedDate.getMonth()]
-                  } ${selectedDate.getFullYear()}`
-                );
-              });
-
-              // Keyboard accessibility: select date on Enter or Space
-              td.addEventListener("keydown", (e) => {
-                if (e.key === "Enter" || e.key === " ") {
-                  e.preventDefault();
-                  td.click();
-                }
-              });
-            }
-
-            tr.appendChild(td);
-          }
-          calendarBody.appendChild(tr);
-        }
-      }
-
-      // Navigation handlers
-      prevMonthBtn.addEventListener("click", () => {
-        currentMonth--;
-        if (currentMonth < 0) {
-          currentMonth = 11;
-          currentYear--;
-        }
-        selectedDate = null;
-        renderCalendar(currentYear, currentMonth);
-      });
-
-      nextMonthBtn.addEventListener("click", () => {
-        currentMonth++;
-        if (currentMonth > 11) {
-          currentMonth = 0;
-          currentYear++;
-        }
-        selectedDate = null;
-        renderCalendar(currentYear, currentMonth);
-      });
-
-      // Initial render
-      renderCalendar(currentYear, currentMonth);
-    })();
-  </script>
 </div>
 
 <div class="subutama-container" role="main">
@@ -328,101 +104,102 @@
     Layanan Tersedia
   </h2>
   <div class="service-container">
-    {% if layanan %}
-      {% for l in layanan %}
-      <div class="service">
-        <div class="service-content">
-          <img
-            src="../static/images/imgLayanan/{{ l.gambar }}"
-            alt="Gambar {{ l.nama }}"
-          />
-          <div class="text-box">
-            <h3>{{ l.nama }}</h3>
-            <p style="font-size: 1rem">{{ l.deskripsi }}</p>
-            <div class="btn-wrapper">
-              <button
-                aria-expanded="false"
-                aria-controls="packagesContainer-{{ l._id }}"
-                class="btn-katalog toggle-packages-btn"
-                data-layanan-id="{{ l._id }}"
-                type="button"
-              >
-                <span>Lihat Paket</span>
-                <i class="bi bi-caret-down-fill" style="margin-left: 10px"></i>
-              </button>
-            </div>
+    {% if layanan %} {% for l in layanan %}
+    <div class="service">
+      <div class="service-content">
+        <img
+          src="../static/images/imgLayanan/{{ l.gambar }}"
+          alt="Gambar {{ l.nama }}"
+        />
+        <div class="text-box">
+          <h3>{{ l.nama }}</h3>
+          <p style="font-size: 1rem">{{ l.deskripsi }}</p>
+          <div class="btn-wrapper">
+            <button
+              aria-expanded="false"
+              aria-controls="packagesContainer-{{ l._id }}"
+              class="btn-katalog toggle-packages-btn"
+              data-layanan-id="{{ l._id }}"
+              type="button"
+            >
+              <span>Lihat Paket</span>
+              <i class="bi bi-caret-down-fill" style="margin-left: 10px"></i>
+            </button>
           </div>
         </div>
       </div>
+    </div>
 
-      <div
-        class="max-w-5xl mx-auto mb-5 packages-container"
-        id="packagesContainer-{{ l._id }}"
-        style="display: none; margin-top: 20px; width: 100%"
-      >
-        <div class="dslybaru-scroll-horizontal">
-          {% if l.paket_list %}
-            {% for p in l.paket_list %}
-            <div class="card-paket" style="min-width: 350px">
-              <div class="card-paket-header">
-                <h3>{{ p.nama }}</h3>
-              </div>
-              <div class="card-paket-body">
-                <div class="section-paket">
-                  <p class="title">Keuntungan</p>
-                  <ul
-                    class="paket js-benefits-list"
-                    data-benefits="{{ p.keuntungan }}"
-                  >
-                    {# Konten li akan diisi oleh JavaScript #}
-                  </ul>
-                </div>
-
-                <div class="section-paket">
-                  <p class="title">Tim Pekerja</p>
-                  <ul class="paket js-team-list" data-team="{{ p.tim_kerja }}">
-                    {# Konten li akan diisi oleh JavaScript #}
-                  </ul>
-                </div>
-
-                <div class="price-section-paket">
-                  <div class="price-paket">
-                    <span class="currency">Rp</span>
-                    <span class="formatted-price">{{ "{:,.0f}".format(p.harga) }}</span>
-                  </div>
-                  <button
-                    class="order-btnPaket"
-                    type="button"
-                    onclick="window.location.href='/booking?paket_id={{ p._id|string }}'"
-                  >
-                    Pesan
-                  </button>
-                  <p class="validity-paket">
-                    Berlaku dari {{ p.tanggal_mulai_formatted }} - {{
-                    p.tanggal_selesai_formatted }}
-                  </p>
-                  <a
-                    href="/faqbb"
-                    class="faq-link-paket"
-                    role="button"
-                    tabindex="0"
-                  >
-                    <i class="bi bi-question-circle-fill"></i> FAQ
-                  </a>
-                </div>
-              </div>
+    <div
+      class="max-w-5xl mx-auto mb-5 packages-container"
+      id="packagesContainer-{{ l._id }}"
+      style="display: none; margin-top: 20px; width: 100%"
+    >
+      <div class="dslybaru-scroll-horizontal">
+        {% if l.paket_list %} {% for p in l.paket_list %}
+        <div class="card-paket" style="min-width: 350px">
+          <div class="card-paket-header">
+            <h3>{{ p.nama }}</h3>
+          </div>
+          <div class="card-paket-body">
+            <div class="section-paket">
+              <p class="title">Keuntungan</p>
+              <ul
+                class="paket js-benefits-list"
+                data-benefits="{{ p.keuntungan }}"
+              >
+                {# Konten li akan diisi oleh JavaScript #}
+              </ul>
             </div>
-            {% endfor %}
-          {% else %}
-            <p class="text-center" style="width: 100%; margin-top: 10px; font-style: italic">
-              Belum ada paket aktif.
-            </p>
-          {% endif %}
+
+            <div class="section-paket">
+              <p class="title">Tim Pekerja</p>
+              <ul class="paket js-team-list" data-team="{{ p.tim_kerja }}">
+                {# Konten li akan diisi oleh JavaScript #}
+              </ul>
+            </div>
+
+            <div class="price-section-paket">
+              <div class="price-paket">
+                <span class="currency">Rp</span>
+                <span class="formatted-price"
+                  >{{ "{:,.0f}".format(p.harga) }}</span
+                >
+              </div>
+              <button
+                class="order-btnPaket"
+                type="button"
+                onclick="window.location.href='/booking?paket_id={{ p._id|string }}'"
+              >
+                Pesan
+              </button>
+              <p class="validity-paket">
+                Berlaku dari {{ p.tanggal_mulai_formatted }} - {{
+                p.tanggal_selesai_formatted }}
+              </p>
+              <a
+                href="/faqbb"
+                class="faq-link-paket"
+                role="button"
+                tabindex="0"
+              >
+                <i class="bi bi-question-circle-fill"></i> FAQ
+              </a>
+            </div>
+          </div>
         </div>
+        {% endfor %} {% else %}
+        <p
+          class="text-center"
+          style="width: 100%; margin-top: 10px; font-style: italic"
+        >
+          Belum ada paket aktif.
+        </p>
+        {% endif %}
       </div>
-      {% endfor %}
-    {% else %}
-      <p>Tidak ada layanan yang tersedia saat ini.</p>
+    </div>
+    {% endfor %} {% else %}
+    <p>Tidak ada layanan yang tersedia saat ini.</p>
     {% endif %}
   </div>
 </div>
@@ -494,6 +271,18 @@
 
     <ol class="catatan">
       <li class="catatan">
+        Lokasi pemotretan yang direkomendasikan Oval Photo dikenakan biaya
+        tambahan yang akan diinformasikan setelah pesanan dikonfirmasi, kecuali
+        untuk lokasi 'Pilihan Saya Sendiri'.
+      </li>
+
+      <li class="catatan">
+        Pesanan yang berhasil terkirim akan dilakukan pemeriksaan selama 1 x 24
+        jam. Pastikan selalu memeriksa riwayat pesanan kamu dan lakukan
+        pembayaran deposit setelah pesanan kamu dikonfirmasi.
+      </li>
+
+      <li class="catatan">
         Klien wajib membayar deposit sebagai tanda jadi atas layanan dan paket
         yang dipilih, sebesar:
         <ul class="catatan">
@@ -503,37 +292,36 @@
           </li>
           <li class="catatan">Rp200.000 untuk layanan paket enggagement II</li>
         </ul>
-        Sisa pembayaran (pelunasan) dapat dibayar setelah sesi pemotretan
-        selesai atau setelah pembayaran deposit melalui menu ‘Riwayat
-        Pemesanan’.
+        Sisa pembayaran (pelunasan) dapat dilakukan setelah sesi pemotretan
+        selesai atau setelah deposit dibayarkan melalui menu ‘Riwayat
+        Pemesanan’. Klien juga diperbolehkan membayar seluruh biaya layanan
+        sekaligus di awal.
       </li>
 
       <li class="catatan">
-        Link Google Drive yang berisi
         <span class="text-red-catatan"
-          >file foto hasil edit akan dikirim dalam 3-5 hari</span
-        >
-        setelah hari pemotretan yang dapat diakses melalui menu ‘Riwayat
-        Pemesanan’, email, dan WhatsApp.
+          >Jadwal pemotretan hanya dapat diubah satu kali</span
+        >, dan perubahan dapat dilakukan melalui menu ‘Riwayat Pemesanan’ pada
+        tab ‘Diproses’ dengan memilih opsi ‘Ubah Jadwal’. Sebelum melakukan
+        perubahan, pastikan jadwal yang diinginkan masih tersedia dengan
+        memeriksa terlebih dahulu di menu ‘Katalog Layanan’.
         <span class="text-red-catatan"
-          >Album foto akan diproduksi dalam 2-3 minggu</span
+          >Jika perubahan jadwal melibatkan penambahan hari, maka akan dikenakan
+          biaya tambahan</span
         >
-        dan akan dikirimkan melalui jasa pengiriman.
+        yang akan diinformasikan melalui menu ‘Riwayat Pemesanan’ pada tab
+        ‘Telah Dikonfirmasi’ setelah perubahan jadwal berhasil dikonfirmasi.
       </li>
 
       <li class="catatan">
-        Jadwal pemotretan dapat diubah melalui menu ‘Riwayat Pemesanan’ dengan
-        memilih opsi ‘Ubah Jadwal’. Pastikan jadwal yang diinginkan masih
-        tersedia dengan memeriksa ketersediaan jadwal di menu ‘Katalog Layanan’.
-      </li>
-
-      <li class="catatan">
-        Tambah hari dapat dilakukan melalui menu ‘Riwayat Pemesanan’ dengan
-        memilih opsi ‘Ubah Jadwal’ dan
         <span class="text-red-catatan"
-          >akan dikenakan biaya tambahan sebesar Rp500.000 untuk setiap 1 (satu)
-          tambahan hari.</span
-        >
+          >Klien yang mengubah jadwal lebih dari satu kali akan dikenakan biaya
+          tambahan</span
+        >. Hal ini diberlakukan untuk menghindari bentrok jadwal dengan klien
+        lain dan sebagai bentuk kompensasi atas penyesuaian waktu dan sumber
+        daya tim. Informasi mengenai biaya tambahan ini dapat dilihat melalui
+        menu ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’ setelah perubahan
+        jadwal berhasil dikonfirmasi.
       </li>
 
       <li class="catatan">
@@ -543,14 +331,27 @@
         WhatsApp sebelum klien melakukan pembayaran deposit (pastikan nomor yang
         kamu isikan bisa dihubungi ya!). Jika klien menyetujui biaya tambahan
         tersebut, maka jumlahnya akan tercantum pada rincian pembayaran di menu
-        'Riwayat Pemesanan'. Namun, jika tidak disetujui, maka pemesanan akan
-        dibatalkan.
+        ‘Riwayat Pemesanan’ pada tab ‘Telah Dikonfirmasi’. Namun, jika tidak
+        disetujui, maka pemesanan akan dibatalkan.
       </li>
 
       <li class="catatan">
         Lokasi acara/pemotretan yang memerlukan perizinan, diharapkan untuk
-        mengunggah surat perizinan pada formulir pesanan atau pada menu ‘Riwayat
-        Pemesanan’ sebelum dilakukan sesi pemotretan.
+        mengunggah surat perizinan pada menu ‘Riwayat Pemesanan’ pada tab
+        ‘Menunggu Konfirmasi’ sebelum dilakukan sesi pemotretan.
+      </li>
+
+      <li class="catatan">
+        Link Google Drive yang berisi
+        <span class="text-red-catatan"
+          >file foto hasil edit akan dikirim dalam 3-5 hari</span
+        >
+        setelah hari pemotretan yang dapat diakses melalui menu ‘Riwayat
+        Pemesanan’ pada tab ‘Selesai’.
+        <span class="text-red-catatan"
+          >Album foto akan diproduksi dalam 2-3 minggu</span
+        >
+        dan akan dikirimkan melalui jasa pengiriman.
       </li>
 
       <li class="catatan">
@@ -562,7 +363,7 @@
           role="button"
           aria-label="FAQ"
         >
-          <i class="fas fa-question-circle" aria-hidden="true"></i>FAQ
+          <i class="bi bi-question-circle-fill" aria-hidden="true"></i>FAQ
         </a>
         untuk melihat pertanyaan yang serupa dengan yang ingin kamu tanyakan.
         Jika tidak menemukan pertanyaan serupa, maka kamu dapat menanyakannya
@@ -578,10 +379,8 @@
           class="whatsapp-btn-catatan"
           role="button"
           aria-label="Konsultasi Sekarang"
-          target="_blank"
-          rel="noopener"
         >
-          <i class="fab fa-whatsapp" aria-hidden="true"></i>Konsultasi Sekarang
+          <i class="bi bi-whatsapp" aria-hidden="true"></i>Konsultasi Sekarang
         </a>
       </li>
     </ol>
@@ -627,6 +426,202 @@
 </style>
 
 <script>
+  // Jadwal
+  (() => {
+      const monthYearLabel = document.getElementById("monthYearLabel");
+      const calendarBody = document.getElementById("calendarBody");
+      const prevMonthBtn = document.getElementById("prevMonthBtn");
+      const nextMonthBtn = document.getElementById("nextMonthBtn");
+
+      // --- PENTING: BARIS INI TETAP MENGAMBIL DARI BACKEND ANDA ---
+      // Pastikan backend Anda merender 'booked_dates' sebagai array JSON string (misalnya: ["2025-02-14", "2025-02-20"])
+      const bookedDates = {{ booked_dates | tojson | safe }}; // Tetap gunakan |safe
+      // --- AKHIR PENTING ---
+
+      // Konversi bookedDates ke Set untuk pencarian cepat.
+      // Tidak perlu memprosesnya lebih lanjut karena sudah dalam format YYYY-MM-DD dari backend.
+      const bookedDatesSet = new Set(bookedDates);
+
+      const monthNames = [
+          "Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli",
+          "Agustus", "September", "Oktober", "November", "Desember"
+      ];
+
+      const today = new Date();
+      // Untuk hari ini, kita akan membuat string YYYY-MM-DD secara konsisten juga.
+      const todayString = `${today.getFullYear()}-${(today.getMonth() + 1).toString().padStart(2, '0')}-${today.getDate().toString().padStart(2, '0')}`;
+
+      let currentYear = today.getFullYear();
+      let currentMonth = today.getMonth();
+
+      let selectedDate = null; // Tetap akan menyimpan objek Date saat tanggal dipilih
+
+      function daysInMonth(year, month) {
+          // Gunakan UTC date untuk perhitungan hari dalam bulan untuk menghindari masalah zona waktu
+          return new Date(Date.UTC(year, month + 1, 0)).getUTCDate();
+      }
+
+      function getWeekdayMondayStart(date) {
+          // Menggunakan getUTCDay() untuk mendapatkan hari dalam minggu secara UTC (0=Minggu, 1=Senin, dst)
+          // Lalu disesuaikan untuk Senin sebagai awal (0=Senin)
+          let day = date.getUTCDay();
+          return day === 0 ? 6 : day - 1; // Minggu (0) menjadi 6 (akhir), Senin (1) menjadi 0 (awal)
+      }
+
+      // Fungsi untuk mendapatkan string tanggal YYYY-MM-DD dari objek Date (UTC)
+      function getDateStringFromDateObject(dateObject) {
+          const year = dateObject.getUTCFullYear();
+          const month = (dateObject.getUTCMonth() + 1).toString().padStart(2, '0');
+          const day = dateObject.getUTCDate().toString().padStart(2, '0');
+          return `${year}-${month}-${day}`;
+      }
+
+      function renderCalendar(year, month) {
+          monthYearLabel.textContent = `${monthNames[month]} ${year}`;
+          calendarBody.innerHTML = "";
+
+          // Buat tanggal pertama bulan ini sebagai UTC untuk perhitungan konsisten
+          const firstDayOfMonthUTC = new Date(Date.UTC(year, month, 1));
+          const firstDayWeekday = getWeekdayMondayStart(firstDayOfMonthUTC);
+          const numDays = daysInMonth(year, month);
+
+          const days = [];
+
+          // Isi tanggal dari bulan sebelumnya
+          for (let i = 0; i < firstDayWeekday; i++) {
+              const prevMonthDate = new Date(firstDayOfMonthUTC);
+              prevMonthDate.setUTCDate(firstDayOfMonthUTC.getUTCDate() - (firstDayWeekday - i));
+              days.push({ day: prevMonthDate.getUTCDate(), currentMonth: false, date: prevMonthDate });
+          }
+
+          // Isi tanggal bulan saat ini
+          for (let i = 1; i <= numDays; i++) {
+              const currentMonthDate = new Date(Date.UTC(year, month, i));
+              days.push({ day: i, currentMonth: true, date: currentMonthDate });
+          }
+
+          // Isi tanggal dari bulan berikutnya untuk melengkapi grid
+          const remainingCells = 42 - days.length; // Total 6 minggu * 7 hari = 42 sel
+          for (let i = 1; i <= remainingCells; i++) {
+              const nextMonthDate = new Date(Date.UTC(year, month, numDays + i));
+              days.push({ day: nextMonthDate.getUTCDate(), currentMonth: false, date: nextMonthDate });
+          }
+
+          for (let week = 0; week < 6; week++) {
+              const tr = document.createElement("tr");
+              tr.setAttribute("role", "row");
+
+              for (let dayIndex = 0; dayIndex < 7; dayIndex++) {
+                  const dayObj = days[week * 7 + dayIndex];
+                  const td = document.createElement("td");
+                  td.setAttribute("role", "gridcell");
+
+                  if (!dayObj.currentMonth) {
+                      td.classList.add("inactive");
+                      td.setAttribute("aria-disabled", "true");
+                      td.tabIndex = -1;
+                      td.textContent = dayObj.day;
+                      tr.appendChild(td);
+                      continue;
+                  }
+
+                  td.tabIndex = 0;
+                  td.textContent = dayObj.day;
+
+                  // Bandingkan dengan todayString yang sudah dikonversi
+                  const currentCellDateString = getDateStringFromDateObject(dayObj.date);
+
+                  if (currentCellDateString === todayString) {
+                      td.classList.add("today");
+                      td.setAttribute("aria-current", "date");
+                  }
+
+                  if (
+                      selectedDate &&
+                      getDateStringFromDateObject(dayObj.date) === getDateStringFromDateObject(selectedDate)
+                  ) {
+                      td.classList.add("selected");
+                      td.setAttribute("aria-selected", "true");
+                  } else {
+                      td.setAttribute("aria-selected", "false");
+                  }
+
+                  // *** PERBAIKAN PENTING DI SINI ***
+                  // Gunakan string tanggal YYYY-MM-DD dari objek Date (UTC)
+                  const dateStringForLookup = getDateStringFromDateObject(dayObj.date);
+
+                  if (bookedDatesSet.has(dateStringForLookup)) {
+                      td.classList.add("blocked-date");
+                      td.setAttribute("aria-label", `Tanggal ${dayObj.day} sudah terisi`);
+                      // tooltip dan sweetalert sudah dihapus di iterasi sebelumnya
+                      td.classList.remove("sunday"); // Pastikan kelas sunday tidak menimpa blocked-date
+                  } else if (dayIndex === 6) { // Minggu (0-6, Minggu adalah 6 jika Senin = 0)
+                      td.classList.add("sunday");
+                  }
+
+                  if (!td.classList.contains("blocked-date")) {
+                      td.addEventListener("click", () => {
+                          selectedDate = dayObj.date; // Simpan objek Date (UTC)
+                          renderCalendar(currentYear, currentMonth); // Render ulang untuk menandai terpilih
+                          Swal.fire({
+                              title: `Tanggal dipilih: ${selectedDate.getUTCDate()} ${
+                                  monthNames[selectedDate.getUTCMonth()]
+                              } ${selectedDate.getUTCFullYear()}`,
+                              text: "Belum dipesan, yuk rencanakan fotografimu untuk tanggal ini!",
+                              icon: "info",
+                              confirmButtonText: "Oke",
+                              customClass: {
+                                  popup: 'my-swal-popup',
+                                  title: 'my-swal-title',
+                                  content: 'my-swal-content',
+                                  confirmButton: 'my-swal-confirm-button'
+                              }
+                          });
+                      });
+
+                      td.addEventListener("keydown", (e) => {
+                          if (e.key === "Enter" || e.key === " ") {
+                              e.preventDefault();
+                              td.click();
+                          }
+                      });
+                  }
+
+                  tr.appendChild(td);
+              }
+              calendarBody.appendChild(tr);
+          }
+      }
+
+      // Navigasi bulan sebelumnya
+      prevMonthBtn.addEventListener("click", () => {
+          currentMonth--;
+          if (currentMonth < 0) {
+              currentMonth = 11;
+              currentYear--;
+          }
+          selectedDate = null;
+          renderCalendar(currentYear, currentMonth);
+      });
+
+      // Navigasi bulan berikutnya
+      nextMonthBtn.addEventListener("click", () => {
+          currentMonth++;
+          if (currentMonth > 11) {
+              currentMonth = 0;
+              currentYear++;
+          }
+          selectedDate = null;
+          renderCalendar(currentYear, currentMonth);
+      });
+
+      // Inisialisasi kalender saat pertama kali dimuat
+      renderCalendar(currentYear, currentMonth);
+  })();
+</script>
+
+<script>
+  //layanan
   document.addEventListener("DOMContentLoaded", function () {
     // --- SKRIP UNTUK TOGGLE PAKET ---
     const toggleButtons = document.querySelectorAll(".toggle-packages-btn");

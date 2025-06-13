@@ -1,0 +1,200 @@
+{% extends "user/base_user.html" %}{% block content %}
+<!-- Header -->
+<header class="header">
+  <div class="header-content text-center">
+    <h1>Riwayat Pemesanan</h1>
+    <p>Tinjau semua pesanan kamu sebelumnya di halaman ini</p>
+  </div>
+</header>
+
+<!--Navigation-->
+<nav class="riwayat-nav" role="navigation" aria-label="Riwayat navigation">
+  <a href="{{ url_for('ripe_menunggu_konfirmasi') }}" class="riwayat-link"
+    >Menunggu Konfirmasi</a
+  >
+  <a href="{{ url_for('riwayat_pemesanan') }}" class="riwayat-link"
+    >Telah Dikonfirmasi</a
+  >
+  <a href="{{ url_for('ripe_diproses') }}" class="riwayat-link">Diproses</a>
+  <a href="{{ url_for('ripe_selesai') }}" class="riwayat-link">Selesai</a>
+  <a
+    href="{{ url_for('ripe_dibatalkan') }}"
+    class="riwayat-link riwayat-active"
+    aria-current="page"
+    >Dibatalkan</a
+  >
+</nav>
+
+<!-- Isi-->
+<div class="subutama-container">
+  {% for p in pesanan %}
+  <main
+    class="riwayatpemesanan-container"
+    role="main"
+    aria-label="Riwayat Pemesanan"
+  >
+    <header class="riwayat-header">
+      <!-- Judul paket -->
+      <div class="riwayat-header-left">
+        <h2>
+          Layanan Fotografi
+          <span class="riwayat-blue">{{ p.layanan }}</span>
+        </h2>
+        <div class="riwayat-paket-pcgk" aria-label="Riwayat Paket Diamond">
+          Paket {{ p.paket }}
+        </div>
+      </div>
+      <div
+        class="riwayat-status"
+        style="color: #dc3545"
+        aria-label="Riwayat status Belum Bayar Deposit"
+      >
+        <div
+          class="riwayat-status-dot"
+          style="background-color: #dc3545"
+          aria-hidden="true"
+        ></div>
+        {{ p.status_pesanan }}
+      </div>
+    </header>
+
+    <!-- Rincian pesanan -->
+    <section>
+      <h2
+        class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
+        tabindex="0"
+        aria-expanded="true"
+        aria-controls="riwayatpemesanan-pesanan-details"
+        id="riwayatpemesanan-pesanan-label"
+      >
+        Rincian Pesanan
+        <i
+          class="bi bi-caret-up-fill riwayatpemesanan-arrow"
+          aria-hidden="true"
+        ></i>
+      </h2>
+      <div
+        class="riwayatpemesanan-details"
+        id="riwayatpemesanan-pesanan-details"
+        aria-labelledby="riwayatpemesanan-pesanan-label"
+      >
+        <div class="riwayatpemesanan-info-block">
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-person-fill"></i>Nama Klien
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.nama_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-people-fill"></i>Nama Orang Tua
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.nama_orang_tua }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-envelope-fill"></i>Email
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.email_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-telephone-fill"></i>Nomor Telepon Aktif/WhatsApp
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.telepon_klien }}</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-instagram"></i>Instagram
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.instagram_klien if p.instagram_klien else '-' }}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-facebook"></i>Facebook
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.facebook_klien if p.facebook_klien else '-' }}
+          </p>
+        </div>
+
+        <div class="riwayatpemesanan-info-block"></div>
+
+        <div class="riwayatpemesanan-info-block">
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-clock-fill"></i>Jam Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.jam_acara }} WIB</p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-calendar-event-fill"></i>Tanggal Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{p.tanggal_mulai_acara_formatted}} -
+            {{p.tanggal_selesai_acara_formatted}}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Lokasi Acara berada di luar <br />
+            Kab. Labuhanbatu Selatan
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {% if p.lokasi_luar_labuhanbatu %}Ya{% else %}Tidak{% endif %}
+          </p>
+
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Lokasi Acara/Pemotretan
+          </div>
+          <p class="riwayatpemesanan-value-bold">{{ p.lokasi }}</p>
+          <div class="riwayatpemesanan-label">
+            <i class="bi bi-geo-alt-fill"></i>Alamat Lokasi
+          </div>
+          <p class="riwayatpemesanan-value-bold">
+            {{ p.alamat_lokasi_acara }} ({% if p.link_maps_acara %}
+            <a
+              href="{{ p.link_maps_acara }}"
+              target="_blank"
+              rel="noopener noreferrer"
+              style="color: black; text-decoration: underline"
+            >
+              Link Maps
+            </a>
+            {% else %} - {% endif %})
+          </p>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  {% endfor %}
+</div>
+
+<script>
+  // Interactive arrow toggle for sections
+  document
+    .querySelectorAll("h2.riwayatpemesanan-section-title")
+    .forEach((header) => {
+      header.addEventListener("click", () => {
+        const expanded = header.getAttribute("aria-expanded") === "true";
+        const controls = header.getAttribute("aria-controls");
+        const content = document.getElementById(controls);
+        if (!content) return;
+
+        if (expanded) {
+          header.setAttribute("aria-expanded", "false");
+          header.classList.remove("riwayatpemesanan-expanded");
+          content.style.display = "none";
+        } else {
+          header.setAttribute("aria-expanded", "true");
+          header.classList.add("riwayatpemesanan-expanded");
+          content.style.display = "";
+        }
+      });
+
+      // Keyboard accessibility: toggle on Enter or Space
+      header.addEventListener("keydown", (e) => {
+        if (e.key === "Enter" || e.key === " ") {
+          e.preventDefault();
+          header.click();
+        }
+      });
+    });
+</script>
+
+{% endblock %}
