@@ -1,7 +1,6 @@
 {% extends "user/base_user.html" %} {% block title %} Login | Oval Photo
 {%endblock %} {% block content %}
 
-
 <div class="container-login">
   <div class="login-logo">
     <img src="{{ url_for('static', filename='img/logo.png') }}" alt="Logo" />
@@ -61,7 +60,6 @@
   </div>
 </div>
 
-
 <script>
   const usernameInput = document.getElementById("username");
   const passwordInput = document.getElementById("password");
@@ -111,8 +109,8 @@
 
       if (data.success) {
         // --- PERUBAHAN UTAMA DI SINI ---
-        localStorage.setItem('isLoggedIn', 'true'); // Simpan status login di localStorage
-        localStorage.setItem('username', username); // Simpan username juga
+        localStorage.setItem("isLoggedIn", "true"); // Simpan status login di localStorage
+        localStorage.setItem("username", username); // Simpan username juga
         // --- AKHIR PERUBAHAN ---
 
         Swal.fire({

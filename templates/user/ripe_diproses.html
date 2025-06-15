@@ -1,5 +1,4 @@
 {% extends "user/base_user.html" %}{% block content %}
-<!-- Header -->
 <header class="header">
   <div class="header-content text-center">
     <h1>Riwayat Pemesanan</h1>
@@ -24,7 +23,6 @@
   <a href="{{ url_for('ripe_dibatalkan') }}" class="riwayat-link">Dibatalkan</a>
 </nav>
 
-<!-- Isi-->
 <div class="subutama-container">
   {% for p in pesanan %}
   <main
@@ -33,7 +31,6 @@
     aria-label="Riwayat Pemesanan"
   >
     <header class="riwayat-header">
-      <!-- Judul paket -->
       <div class="riwayat-header-left">
         <h2>
           Layanan Fotografi
@@ -57,7 +54,6 @@
       </div>
     </header>
 
-    <!-- Rincian pesanan -->
     <section>
       <h2
         class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
@@ -159,7 +155,6 @@
         </div>
       </div>
     </section>
-    <!-- Rincian Pembayaran -->
     <section>
       <h2
         class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
@@ -204,17 +199,23 @@
           <span class="riwayatpemesanan-bold">{{p.total_harga|rupiah}}</span>
         </div>
         <div class="riwayatpemesanan-payment-row">
-          <span>Sudah Bayar Deposit</span>
-          <span class="riwayatpemesanan-bold">{{p.deposit|rupiah}}</span>
+          <span>Deposit</span>
+          <span class="riwayatpemesanan-bold" id="status-deposit-{{ p._id }}"
+            >{{ p.deposit | rupiah}} ({{ p.status_pembayaran_deposit |
+            default('Belum Bayar') }})</span
+          >
         </div>
-        <div class="riwayatpemesanan-payment-row riwayatpemesanan-sisa">
-          <span>Sisa Pembayaran</span>
-          <span class="riwayatpemesanan-bold">{{p.sisa_bayar|rupiah}}</span>
+        <div class="riwayatpemesanan-payment-row">
+          <span>Sudah Bayar Sebesar</span>
+          {% set sudah_bayar = (p.last_pelunasan_attempt_amount or 0) + (p.last_sisa_bayar_attempt_amount or 0) + (p.last_deposit_attempt_amount or 0) %}
+          <span class="riwayatpemesanan-bold" id="status-deposit-{{ p._id }}"
+            >{{ sudah_bayar | rupiah}}</span
+          >
         </div>
+        
       </div>
     </section>
 
-    <!-- surat izin -->
     <section class="riwayatpemesanan-file-sesction">
       <h2
         class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
@@ -230,16 +231,16 @@
         <div
           id="file-display-container-wrapper"
           style="
-        display: inline-flex;
-        justify-content: center;
-        align-items: center;
-        gap: 8px;
-        border: 1px solid #4da6ff;
-        border-radius: 8px;
-        padding: 10px;
-        max-width: 100%;
-        {% if p.surat_izin_lokasi %}cursor: default;{% else %}cursor: pointer;{% endif %}
-      "
+            display: inline-flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid #4da6ff;
+            border-radius: 8px;
+            padding: 10px;
+            max-width: 100%;
+            {% if p.surat_izin_lokasi %}cursor: default;{% else %}cursor: pointer;{% endif %}
+          "
           {%
           if
           p.surat_izin_lokasi
@@ -278,7 +279,6 @@
       </div>
     </section>
 
-    <!-- Container untuk ubah jadwal dan pelunasan -->
     <div
       style="
         display: flex;
@@ -288,7 +288,6 @@
         gap: 16px;
       "
     >
-      <!-- Ubah Jadwal -->
       <div>
         <section
           class="riwayatpemesanan-buttons"
@@ -305,20 +304,19 @@
         </section>
       </div>
 
-      <!-- Bayar Pelunasan -->
       <div>
         <section
           class="riwayatpemesanan-balance-section"
           aria-label="Bayar Pelunasan"
         >
           <div>
-            <p class="riwayatpemesanan-balance-label">Bayar Pelunasan</p>
+            <p class="riwayatpemesanan-balance-label">Sisa Pembayaran</p>
             <p
               class="riwayatpemesanan-balance-amount"
               aria-live="polite"
               aria-atomic="true"
             >
-              <span>{{p.total_harga|rupiah}}</span>
+              <span>{{ p.sisa_bayar | rupiah }}</span>
             </p>
           </div>
         </section>
@@ -328,14 +326,22 @@
           aria-label="Bayar Pelunasan"
         >
           <div class="riwayatpemesanan-left-buttons"></div>
-          <button class="riwayatpemesanan-btn-primary" type="button">
-            Bayar Pelunasan
+          <button
+            class="riwayatpemesanan-btn-primary bayar-sisa-btn"
+            type="button"
+            data-pesanan-id="{{ p._id }}"
+            data-payment-type="sisa_bayar"
+            data-sisa-pembayaran="{{ p.sisa_bayar }}"
+            id="sisa-bayar-button-{{ p._id }}" 
+            {% if p.sisa_bayar == 0 %} disabled {% endif %}
+          >
+            {% if p.sisa_bayar == 0 %} Lunas {% else %}
+            Bayar Sisa Pembayaran {% endif %}
           </button>
         </section>
       </div>
     </div>
 
-    <!-- Catatan-->
     <section
       class="riwayatpemesanan-notes"
       aria-live="polite"
@@ -346,6 +352,10 @@
   </main>
   {% endfor %}
 
+  <script
+    src="https://app.sandbox.midtrans.com/snap/snap.js"
+    data-client-key="{{ MIDTRANS_CLIENT_KEY }}"
+  ></script>
   <script>
     // --- START: Added JavaScript for "Ubah Jadwal" button ---
     document.querySelectorAll(".ubah-jadwal-btn").forEach((button) => {
@@ -385,6 +395,123 @@
           }
         });
       });
+
+
+  // Logika untuk tombol Bayar Sisa Pembayaran 
+  document.querySelectorAll(".bayar-sisa-btn").forEach((button) => {
+    button.addEventListener("click", async function () { // Added async keyword
+      const pesananId = this.getAttribute("data-pesanan-id"); // Changed to data-pesanan-id
+      const paymentType = this.getAttribute("data-payment-type"); // New payment type 'sisa_bayar'
+      const sisaPembayaranValue = parseFloat(this.getAttribute("data-sisa-pembayaran"));
+
+      if (sisaPembayaranValue === 0) {
+        Swal.fire({
+          icon: "info",
+          title: "Pembayaran Lunas",
+          text: "Pembayaran pelunasan untuk pesanan ini sudah lunas.",
+        });
+        return; // Stop execution if already paid
+      }
+
+      // Disable the button immediately to prevent double clicks
+      button.disabled = true;
+
+      try {
+        const response = await fetch("/api/create_midtrans_transaction", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pesanan_id: pesananId,
+            payment_type: paymentType,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (data.success) {
+          snap.pay(data.token, {
+            onSuccess: async function (result) {
+              console.log("Payment success:", result);
+              // Send explicit update to backend after successful payment
+              const updateResponse = await fetch("/api/update_payment_status", {
+                method: "POST",
+                headers: {
+                  "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                  pesanan_id: pesananId,
+                  payment_type: paymentType,
+                  transaction_status: result.transaction_status,
+                  fraud_status: result.fraud_status,
+                }),
+              });
+              const updateData = await updateResponse.json();
+
+              if (updateData.success) {
+                console.log("Backend updated successfully:", updateData.message);
+                Swal.fire({
+                  icon: "success",
+                  title: "Pembayaran Berhasil!",
+                  text: "Terima kasih, pembayaran pelunasan Anda telah berhasil.",
+                }).then(() => {
+                  window.location.reload();
+                });
+              } else {
+                console.error("Failed to update backend:", updateData.message);
+                Swal.fire(
+                  "Error",
+                  "Gagal memperbarui status pembayaran di server.",
+                  "error"
+                );
+                button.disabled = false; // Re-enable button on backend update failure
+              }
+            },
+            onPending: function (result) {
+              console.log("Payment pending:", result);
+              Swal.fire({
+                icon: "info",
+                title: "Pembayaran Menunggu",
+                text: "Pembayaran Anda sedang menunggu konfirmasi. Silakan selesaikan pembayaran Anda.",
+              });
+              button.disabled = false; // Re-enable button on pending
+            },
+            onError: function (result) {
+              console.log("Payment error:", result);
+              Swal.fire({
+                icon: "error",
+                title: "Pembayaran Gagal",
+                text: "Terjadi kesalahan saat memproses pembayaran Anda.",
+              });
+              button.disabled = false; // Re-enable button on error
+            },
+            onClose: function () {
+              console.log("Pembayaran ditutup tanpa menyelesaikan transaksi");
+              Swal.fire({
+                icon: "warning",
+                title: "Pembayaran Dibatalkan",
+                text: "Anda menutup jendela pembayaran. Transaksi tidak selesai.",
+              });
+              button.disabled = false; // Re-enable button on close
+            },
+          });
+        } else {
+          Swal.fire("Error", data.message, "error");
+          button.disabled = false; // Re-enable button on initial API call failure
+        }
+      } catch (error) {
+        console.error("Error initiating Midtrans transaction:", error);
+        Swal.fire(
+          "Error",
+          "Terjadi kesalahan jaringan saat memulai pembayaran.",
+          "error"
+        );
+        button.disabled = false; // Re-enable button on fetch error
+      }
+    });
+  });
+
   </script>
 </div>
 

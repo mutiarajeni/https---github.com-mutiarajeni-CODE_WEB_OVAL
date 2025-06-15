@@ -1,5 +1,6 @@
-{% extends "admin/base_admin.html" %} {% block title %} Dashboard Admin | Oval
-Photo {% endblock %} {% block content %}
+{% extends "admin/base_admin.html" %}
+{% block title %} Dashboard Admin | Oval Photo {% endblock %}
+{% block content %}
 <div class="row">
   <div class="col-12">
     <div class="card my-4">
@@ -10,7 +11,7 @@ Photo {% endblock %} {% block content %}
       </div>
 
       {% for p in pesanan %}
-      <section class="bg-white rounded mt-4 p-3 px-md-5 d-flex flex-column gap-3">
+      <section class="bg-white rounded mt-4 p-3 px-md-5 d-flex flex-column gap-3" data-pesanan-id="{{ p._id }}">
         <div
           class="d-flex flex-column flex-md-row justify-content-md-end gap-3 gap-md-6 fw-bold text-dark me-4"
         >
@@ -210,7 +211,7 @@ Photo {% endblock %} {% block content %}
                   class="bi bi-file-earmark-pdf-fill text-danger me-2 fs-5"
                 ></i>
                 <a
-                  href="{{ url_for('static', filename='suratIzin/' ~ p.surat_izin_lokasi) }}"
+                  href="{{ url_for('static', filename='suratIzin/' + p.surat_izin_lokasi) }}"
                   target="_blank"
                   class="text-decoration-underline"
                   >{{ p.surat_izin_lokasi }}</a
@@ -227,11 +228,7 @@ Photo {% endblock %} {% block content %}
                 Tambah Hari
               </label>
               <input
-                id="biaya_tambah_hari"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                oninput="formatNumberInput(event)"
+                type="number"
                 class="form-control form-control-sm"
                 style="
                   border-radius: 5px;
@@ -239,7 +236,7 @@ Photo {% endblock %} {% block content %}
                   font-size: 12px;
                 "
                 name="biaya_tambah_hari"
-                value="{{ '{:,.0f}'.format(p.biaya_tambah_hari) if p.biaya_tambah_hari is not none else '0' }}"
+                value="{{ p.biaya_tambah_hari if p.biaya_tambah_hari is not none and p.biaya_tambah_hari != 0 else '' }}"
                 form="updateOrderForm-{{ p._id }}"
               />
             </div>
@@ -250,11 +247,7 @@ Photo {% endblock %} {% block content %}
                 Lokasi
               </label>
               <input
-                id="biaya_lokasi"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                oninput="formatNumberInput(event)"
+                type="number"
                 class="form-control form-control-sm"
                 style="
                   border-radius: 5px;
@@ -262,7 +255,7 @@ Photo {% endblock %} {% block content %}
                   font-size: 12px;
                 "
                 name="biaya_lokasi"
-                value="{{ '{:,.0f}'.format(p.biaya_lokasi) if p.biaya_lokasi is not none else '0' }}"
+                value="{{ p.biaya_lokasi if p.biaya_lokasi is not none and p.biaya_lokasi != 0 else '' }}"
                 form="updateOrderForm-{{ p._id }}"
               />
             </div>
@@ -273,11 +266,7 @@ Photo {% endblock %} {% block content %}
                 Transportasi & Akomodasi
               </label>
               <input
-                id="biaya-transportasi"
-                type="text"
-                inputmode="numeric"
-                pattern="[0-9]*"
-                oninput="formatNumberInput(event)"
+                type="number"
                 class="form-control form-control-sm"
                 style="
                   border-radius: 5px;
@@ -285,7 +274,7 @@ Photo {% endblock %} {% block content %}
                   font-size: 12px;
                 "
                 name="biaya_transportasi"
-                value="{{ '{:,.0f}'.format(p.biaya_transportasi_akomodasi) if p.biaya_transportasi_akomodasi is not none else '0' }}"
+                value="{{ p.biaya_transportasi_akomodasi if p.biaya_transportasi_akomodasi is not none and p.biaya_transportasi_akomodasi != 0 else '' }}"
                 form="updateOrderForm-{{ p._id }}"
               />
             </div>
@@ -372,41 +361,28 @@ Photo {% endblock %} {% block content %}
 </style>
 
 <script>
-  function formatNumberInput(e) {
-    const input = e.target;
-    let value = input.value.replace(/\D/g, "");
-    if (value === "") {
-      input.value = "";
-      return;
-    }
-    value = parseInt(value, 10).toLocaleString("id-ID");
-    input.value = value;
-
-    // Trigger check changes after formatting
-    checkChanges(input);
-  }
-
-  // Function untuk cek apakah ada perubahan
-  function checkChanges(inputElement) {
-    const section = inputElement.closest("section");
-    const pesananId = section.querySelector("form").id.replace("updateOrderForm-", "");
+  // Function to check for changes and enable/disable the save button
+  function checkChanges(section) {
+    const pesananId = section.getAttribute("data-pesanan-id");
     const saveButton = document.getElementById("saveButton-" + pesananId);
 
     const statusSelect = section.querySelector('select[name="status_pesanan"]');
-    const biayaTambahHari = section.querySelector('input[name="biaya_tambah_hari"]');
-    const biayaLokasi = section.querySelector('input[name="biaya_lokasi"]');
-    const biayaTransportasi = section.querySelector('input[name="biaya_transportasi"]');
-    const catatan = section.querySelector('textarea[name="catatan"]');
-    const linkGoogleDrive = section.querySelector('textarea[name="link_google_drive"]');
+    const biayaTambahHariInput = section.querySelector('input[name="biaya_tambah_hari"]');
+    const biayaLokasiInput = section.querySelector('input[name="biaya_lokasi"]');
+    const biayaTransportasiInput = section.querySelector('input[name="biaya_transportasi"]');
+    const catatanInput = section.querySelector('textarea[name="catatan"]');
+    const linkGoogleDriveInput = section.querySelector('textarea[name="link_google_drive"]');
 
     const initialData = JSON.parse(section.getAttribute("data-initial"));
 
     let statusChanged = statusSelect.value !== initialData.status;
-    let biayaTambahHariChanged = biayaTambahHari.value.replace(/\./g, "") !== initialData.biaya_tambah_hari;
-    let biayaLokasiChanged = biayaLokasi.value.replace(/\./g, "") !== initialData.biaya_lokasi;
-    let biayaTransportasiChanged = biayaTransportasi.value.replace(/\./g, "") !== initialData.biaya_transportasi;
-    let catatanChanged = catatan.value.trim() !== initialData.catatan.trim();
-    let linkChanged = linkGoogleDrive.value.trim() !== initialData.link_google_drive.trim();
+
+    // For number inputs, treat empty string as 0 for initial comparison, but store empty string if initial value was 0 or null
+    let biayaTambahHariChanged = (parseInt(biayaTambahHariInput.value) || 0) !== (parseInt(initialData.biaya_tambah_hari) || 0);
+    let biayaLokasiChanged = (parseInt(biayaLokasiInput.value) || 0) !== (parseInt(initialData.biaya_lokasi) || 0);
+    let biayaTransportasiChanged = (parseInt(biayaTransportasiInput.value) || 0) !== (parseInt(initialData.biaya_transportasi) || 0);
+    let catatanChanged = catatanInput.value.trim() !== initialData.catatan.trim();
+    let linkChanged = linkGoogleDriveInput.value.trim() !== initialData.link_google_drive.trim();
 
     if (
       statusChanged ||
@@ -422,46 +398,38 @@ Photo {% endblock %} {% block content %}
     }
   }
 
-  // Inisialisasi event listener
-  document.querySelectorAll("section").forEach((section) => {
-    const pesananId = section.querySelector("form").id.replace("updateOrderForm-", "");
-
+  // Initialize event listeners for each order section
+  document.querySelectorAll("section[data-pesanan-id]").forEach((section) => {
     const statusSelect = section.querySelector('select[name="status_pesanan"]');
-    const biayaTambahHari = section.querySelector('input[name="biaya_tambah_hari"]');
-    const biayaLokasi = section.querySelector('input[name="biaya_lokasi"]');
-    const biayaTransportasi = section.querySelector('input[name="biaya_transportasi"]');
-    const catatan = section.querySelector('textarea[name="catatan"]');
-    const linkGoogleDrive = section.querySelector('textarea[name="link_google_drive"]');
+    const biayaTambahHariInput = section.querySelector('input[name="biaya_tambah_hari"]');
+    const biayaLokasiInput = section.querySelector('input[name="biaya_lokasi"]');
+    const biayaTransportasiInput = section.querySelector('input[name="biaya_transportasi"]');
+    const catatanInput = section.querySelector('textarea[name="catatan"]');
+    const linkGoogleDriveInput = section.querySelector('textarea[name="link_google_drive"]');
 
-    // Simpan data awal di attribute
+    // Store initial data in a data attribute for comparison
     section.setAttribute(
       "data-initial",
       JSON.stringify({
         status: statusSelect.value,
-        biaya_tambah_hari: biayaTambahHari.value.replace(/\./g, ""),
-        biaya_lokasi: biayaLokasi.value.replace(/\./g, ""),
-        biaya_transportasi: biayaTransportasi.value.replace(/\./g, ""),
-        catatan: catatan.value.trim(),
-        link_google_drive: linkGoogleDrive.value.trim(),
+        biaya_tambah_hari: biayaTambahHariInput.value || null, // Store as null if empty for consistent comparison
+        biaya_lokasi: biayaLokasiInput.value || null,
+        biaya_transportasi: biayaTransportasiInput.value || null,
+        catatan: catatanInput.value.trim(),
+        link_google_drive: linkGoogleDriveInput.value.trim(),
       })
     );
 
-    // Tambahkan event listener
-    statusSelect.addEventListener("change", () => checkChanges(statusSelect));
-    biayaTambahHari.addEventListener("input", () =>
-      checkChanges(biayaTambahHari)
-    );
-    biayaLokasi.addEventListener("input", () => checkChanges(biayaLokasi));
-    biayaTransportasi.addEventListener("input", () =>
-      checkChanges(biayaTransportasi)
-    );
-    catatan.addEventListener("input", () => checkChanges(catatan));
-    linkGoogleDrive.addEventListener("input", () =>
-      checkChanges(linkGoogleDrive)
-    );
+    // Add event listeners to trigger checkChanges on input/change
+    statusSelect.addEventListener("change", () => checkChanges(section));
+    biayaTambahHariInput.addEventListener("input", () => checkChanges(section));
+    biayaLokasiInput.addEventListener("input", () => checkChanges(section));
+    biayaTransportasiInput.addEventListener("input", () => checkChanges(section));
+    catatanInput.addEventListener("input", () => checkChanges(section));
+    linkGoogleDriveInput.addEventListener("input", () => checkChanges(section));
   });
 
-  // Event untuk SweetAlert tetap sama seperti yang sudah kamu buat
+  // Event for SweetAlert remains the same
   document.querySelectorAll('[id^="saveButton-"]').forEach((button) => {
     button.addEventListener("click", function () {
       const pesananId = this.id.replace("saveButton-", "");
@@ -493,5 +461,4 @@ Photo {% endblock %} {% block content %}
     });
   });
 </script>
-
 {% endblock %}

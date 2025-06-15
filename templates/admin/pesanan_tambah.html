@@ -1,6 +1,5 @@
 {% extends "admin/base_admin.html" %} {% block title %} Dashboard Admin | Oval
 Photo {% endblock %} {% block content %}
-
 <div class="row">
   <div class="col-12">
     <div class="card my-4">
@@ -41,7 +40,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td><label for="layananSelect">Layanan</label></td>
                       <td>
@@ -66,7 +64,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td><label for="paketSelect">Paket</label></td>
                       <td>
@@ -90,10 +87,15 @@ Photo {% endblock %} {% block content %}
                             >Harga paket:
                             <span id="hargaPaket">Rp 0</span></small
                           >
+                          <input
+                            type="hidden"
+                            id="hiddenHargaPaket"
+                            name="harga_paket_dasar"
+                            value="0"
+                          />
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td><label for="nama_klien">Nama Klien</label></td>
                       <td>
@@ -111,7 +113,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="nama_orang_tua">Nama Orang Tua</label>
@@ -131,7 +132,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td><label for="email_klien">Alamat Email</label></td>
                       <td>
@@ -149,7 +149,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="telepon_klien"
@@ -171,7 +170,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="instagram_klien"
@@ -194,7 +192,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="facebook_klien"
@@ -240,7 +237,6 @@ Photo {% endblock %} {% block content %}
                               width: 90px;
                             "
                           />
-
                           <div
                             style="
                               display: flex;
@@ -262,12 +258,8 @@ Photo {% endblock %} {% block content %}
                                 width: 140px;
                               "
                               placeholder="Tanggal Mulai"
-                              onchange=" checkFormValidity(); validateDateRange();"
-                              oninput="checkFormValidity(); validateDateRange();"
                             />
-
                             <span>-</span>
-
                             <input
                               type="date"
                               class="form-control"
@@ -281,14 +273,23 @@ Photo {% endblock %} {% block content %}
                                 width: 140px;
                               "
                               placeholder="Tanggal Selesai"
-                              onchange=" checkFormValidity(); validateDateRange();"
-                              oninput="checkFormValidity(); validateDateRange();"
                             />
                           </div>
                         </div>
+                        <div
+                          id="date-range-error"
+                          class="text-danger"
+                          style="
+                            display: none;
+                            font-size: 0.9em;
+                            margin-top: 8px;
+                          "
+                        >
+                          Tanggal atau rentang tanggal yang dipilih sudah tidak
+                          tersedia. Silakan pilih tanggal lain.
+                        </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label
@@ -300,26 +301,26 @@ Photo {% endblock %} {% block content %}
                         <div
                           style="display: flex; gap: 20px; align-items: center"
                         >
-                          <label>
-                            <input
+                          <label
+                            ><input
                               type="radio"
                               name="lokasi_luar"
                               value="iya"
                               onchange="handleLokasiLuarChange();"
                               required
                             />
-                            Iya, berada di luar
-                          </label>
-                          <label>
-                            <input
+                            Iya, berada di luar</label
+                          >
+                          <label
+                            ><input
                               type="radio"
                               name="lokasi_luar"
                               value="tidak"
                               onchange="handleLokasiLuarChange();"
                               required
                             />
-                            Tidak
-                          </label>
+                            Tidak</label
+                          >
                         </div>
                       </td>
                     </tr>
@@ -362,7 +363,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr id="alamatLokasiManualRow">
                       <td>
                         <label for="alamat_lokasi_manual">Alamat Lokasi</label>
@@ -382,7 +382,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr id="linkMapsManualRow">
                       <td>
                         <label for="link_maps_manual"
@@ -405,13 +404,13 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
-                        <label for="surat_izin_lokasi">
-                          Surat Izin Lokasi<br />
-                          <small style="color: orange">(Opsional)</small>
-                        </label>
+                        <label for="surat_izin_lokasi"
+                          >Surat Izin Lokasi<br /><small style="color: orange"
+                            >(Opsional)</small
+                          ></label
+                        >
                       </td>
                       <td>
                         <div style="max-width: 100%">
@@ -439,8 +438,7 @@ Photo {% endblock %} {% block content %}
                             <span
                               id="file-icon"
                               onclick="document.getElementById('surat_izin_lokasi_input').click();"
-                            >
-                              <svg
+                              ><svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="20"
                                 height="20"
@@ -452,9 +450,8 @@ Photo {% endblock %} {% block content %}
                                 />
                                 <path
                                   d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
-                                />
-                              </svg>
-                            </span>
+                                /></svg
+                            ></span>
                             <span
                               id="file-name"
                               onclick="document.getElementById('surat_izin_lokasi_input').click();"
@@ -468,8 +465,7 @@ Photo {% endblock %} {% block content %}
                                 margin-left: auto;
                               "
                               onclick="clearFileSelection(event);"
-                            >
-                              <svg
+                              ><svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="16"
                                 height="16"
@@ -479,14 +475,12 @@ Photo {% endblock %} {% block content %}
                               >
                                 <path
                                   d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
-                                />
-                              </svg>
-                            </span>
+                                /></svg
+                            ></span>
                           </div>
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="biayaTambahHari"
@@ -511,7 +505,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="biayaLokasi"
@@ -536,7 +529,6 @@ Photo {% endblock %} {% block content %}
                         </div>
                       </td>
                     </tr>
-
                     <tr>
                       <td>
                         <label for="biaya_transportasi"
@@ -590,7 +582,6 @@ Photo {% endblock %} {% block content %}
                         />
                       </td>
                     </tr>
-
                     <tr>
                       <td><label>Sisa Bayar</label></td>
                       <td>
@@ -637,64 +628,60 @@ Photo {% endblock %} {% block content %}
 </div>
 
 <script>
-  // Global variable to store paket data for easy lookup
   let allPaketData = [];
   let allLokasiData = [];
 
-  document.addEventListener("DOMContentLoaded", function () {
-    fetch("/api/all_paket")
-      .then((response) => response.json())
-      .then((data) => {
-        allPaketData = data;
+  const bookedRanges = {{ booked_date_ranges|tojson|safe }};
+
+  function validateDateRange() {
+    const startDateInput = document.getElementById('tanggal_mulai_acara');
+    const endDateInput = document.getElementById('tanggal_selesai_acara');
+    const errorDiv = document.getElementById('date-range-error');
+    const startDateValue = startDateInput.value;
+    const endDateValue = endDateInput.value;
+
+    errorDiv.style.display = 'none';
+
+    if (startDateValue && endDateValue) {
+      const startDate = new Date(startDateValue);
+      const endDate = new Date(endDateValue);
+
+      if (endDate < startDate) {
+        errorDiv.innerText = 'Tanggal akhir tidak boleh sebelum tanggal mulai.';
+        errorDiv.style.display = 'block';
         checkFormValidity();
-      });
+        return;
+      }
 
-    fetch("/api/all_lokasi")
-      .then((response) => response.json())
-      .then((data) => {
-        allLokasiData = data;
-        displayLokasiPrice();
-        checkFormValidity();
-      });
+      let isOverlap = false;
+      for (const range of bookedRanges) {
+        const bookedStart = new Date(range.start);
+        const bookedEnd = new Date(range.end);
+        if (startDate <= bookedEnd && endDate >= bookedStart) {
+          isOverlap = true;
+          break;
+        }
+      }
 
-    const today = new Date();
-    document.getElementById("tanggal_pemesanan").value = today
-      .toISOString()
-      .split("T")[0];
-
-    const form = document.getElementById("tambahPesananForm");
-    const relevantInputs = form.querySelectorAll(
-      "input:not([type='file']), select, textarea"
-    );
-    relevantInputs.forEach((input) => {
-      input.addEventListener("input", () => {
-        checkFormValidity();
-        updateTotalDanSisaBayar();
-      });
-      input.addEventListener("change", () => {
-        checkFormValidity();
-        updateTotalDanSisaBayar();
-      });
-    });
-
-    document
-      .getElementById("biaya_transportasi")
-      .addEventListener("input", updateTotalDanSisaBayar);
-
-    // Initial call to display file name (in case there's a pre-selected file, though not typical for a new form)
-    displayFileName();
-  });
+      if (isOverlap) {
+        errorDiv.innerText = 'Tanggal atau rentang tanggal yang dipilih sudah tidak tersedia. Silakan pilih tanggal lain.';
+        errorDiv.style.display = 'block';
+      }
+    }
+    checkFormValidity();
+  }
 
   function fetchPaketByLayanan() {
     const layananId = document.getElementById("layananSelect").value;
     const paketSelect = document.getElementById("paketSelect");
     paketSelect.innerHTML = '<option value="">Pilih Paket</option>';
     document.getElementById("hargaPaket").innerText = "Rp 0";
+    document.getElementById("hiddenHargaPaket").value = "0"; // Reset hidden price
+    document.getElementById("depositPaketDisplay").innerText = "Rp 0"; // Reset deposit display
+    document.getElementById("hiddenDepositPaket").value = "0"; // Reset hidden deposit
 
     if (layananId) {
-      const filteredPaket = allPaketData.filter(
-        (paket) => paket.layanan_id === layananId
-      );
+      const filteredPaket = allPaketData.filter((paket) => paket.layanan_id === layananId);
       filteredPaket.forEach((paket) => {
         const option = document.createElement("option");
         option.value = paket._id;
@@ -709,12 +696,22 @@ Photo {% endblock %} {% block content %}
   function displayPaketPrice() {
     const paketId = document.getElementById("paketSelect").value;
     const hargaPaketSpan = document.getElementById("hargaPaket");
+    const hiddenHargaPaketInput = document.getElementById("hiddenHargaPaket");
+    const depositPaketDisplay = document.getElementById("depositPaketDisplay");
+    const hiddenDepositPaketInput = document.getElementById("hiddenDepositPaket");
+
     const selectedPaket = allPaketData.find((paket) => paket._id === paketId);
 
     if (selectedPaket) {
       hargaPaketSpan.innerText = formatRupiah(selectedPaket.harga);
+      hiddenHargaPaketInput.value = selectedPaket.harga; // Set hidden input value
+      depositPaketDisplay.innerText = formatRupiah(selectedPaket.deposit);
+      hiddenDepositPaketInput.value = selectedPaket.deposit; // Set hidden input value
     } else {
       hargaPaketSpan.innerText = "Rp 0";
+      hiddenHargaPaketInput.value = "0"; // Reset hidden price
+      depositPaketDisplay.innerText = "Rp 0";
+      hiddenDepositPaketInput.value = "0"; // Reset hidden deposit
     }
     updateTotalDanSisaBayar();
     checkFormValidity();
@@ -742,53 +739,20 @@ Photo {% endblock %} {% block content %}
     checkFormValidity();
   }
 
-  function calculateAdditionalDayCost() {
-    const start = new Date(
-      document.getElementById("tanggal_mulai_acara").value
-    );
-    const end = new Date(
-      document.getElementById("tanggal_selesai_acara").value
-    );
-    const biayaSpan = document.getElementById("biayaTambahHari");
-    let additionalCost = 0;
-
-    if (start && end && end > start) {
-      const diffDays = Math.ceil((end - start) / (1000 * 60 * 60 * 24));
-      additionalCost = diffDays * ADDITIONAL_DAY_COST_PER_DAY;
-    }
-    biayaSpan.innerText = formatRupiah(additionalCost);
-    updateTotalDanSisaBayar();
-    checkFormValidity();
-  }
-
   function updateTotalDanSisaBayar() {
-    const paketId = document.getElementById("paketSelect").value;
+    // Get values from hidden inputs, not display spans
+    const hargaPaket = parseInt(document.getElementById("hiddenHargaPaket").value || "0");
+    const deposit = parseInt(document.getElementById("hiddenDepositPaket").value || "0");
 
-    const biayaLokasi = parseInt(
-      document.getElementById("biayaLokasi").value || "0"
-    );
-    const biayaTambahHari = parseInt(
-      document.getElementById("biayaTambahHari").value || "0"
-    );
-    const biayaTransport = parseInt(
-      document.getElementById("biaya_transportasi").value || "0"
-    );
-
-    let hargaPaket = 0;
-    let deposit = 0;
-
-    const selectedPaket = allPaketData.find((paket) => paket._id === paketId);
-    if (selectedPaket) {
-      hargaPaket = parseInt(selectedPaket.harga || 0);
-      deposit = parseInt(selectedPaket.deposit || 0);
-    }
+    const biayaLokasi = parseInt(document.getElementById("biayaLokasi").value || "0");
+    const biayaTambahHari = parseInt(document.getElementById("biayaTambahHari").value || "0");
+    const biayaTransport = parseInt(document.getElementById("biaya_transportasi").value || "0");
 
     const total = hargaPaket + biayaTambahHari + biayaLokasi + biayaTransport;
     const sisa = total - deposit;
 
     document.getElementById("totalPembayaran").innerText = formatRupiah(total);
-    document.getElementById("depositPaketDisplay").innerText =
-      formatRupiah(deposit);
+    document.getElementById("depositPaketDisplay").innerText = formatRupiah(deposit); // This line is correct for displaying
     document.getElementById("sisaBayar").innerText = formatRupiah(sisa);
 
     document.getElementById("hiddenTotalHarga").value = total;
@@ -797,14 +761,9 @@ Photo {% endblock %} {% block content %}
   }
 
   function formatRupiah(amount) {
-    return new Intl.NumberFormat("id-ID", {
-      style: "currency",
-      currency: "IDR",
-      minimumFractionDigits: 0,
-    }).format(amount);
+    return new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR", minimumFractionDigits: 0 }).format(amount);
   }
 
-  // --- New function to display selected file name and toggle clear button ---
   function displayFileName() {
     const fileInput = document.getElementById("surat_izin_lokasi_input");
     const fileNameSpan = document.getElementById("file-name");
@@ -813,32 +772,20 @@ Photo {% endblock %} {% block content %}
 
     if (fileInput.files.length > 0) {
       fileNameSpan.textContent = fileInput.files[0].name;
-      clearFileBtn.style.display = "inline-block"; // Show the 'x' button
-      // You can change the icon here based on file type if needed
-      // For now, let's keep the upload icon or a generic document icon
-      fileIcon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"/>
-        </svg>
-      `; // Generic document icon
+      clearFileBtn.style.display = "inline-block";
+      fileIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16"><path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"/></svg>`;
     } else {
       fileNameSpan.textContent = "Upload Surat Izin";
-      clearFileBtn.style.display = "none"; // Hide the 'x' button
-      fileIcon.innerHTML = `
-        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-            <path d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"/>
-            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-        </svg>
-      `; // Original upload icon
+      clearFileBtn.style.display = "none";
+      fileIcon.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16"><path d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"/><path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/></svg>`;
     }
   }
 
-  // --- New function to clear selected file ---
   function clearFileSelection() {
     const fileInput = document.getElementById("surat_izin_lokasi_input");
-    fileInput.value = ""; // Clear the file input
-    displayFileName(); // Update the display
-    checkFormValidity(); // Re-check form validity
+    fileInput.value = "";
+    displayFileName();
+    checkFormValidity();
   }
 
   function checkFormValidity() {
@@ -846,51 +793,132 @@ Photo {% endblock %} {% block content %}
     const submitButton = document.getElementById("submitButton");
     const inputs = form.querySelectorAll("[required]");
     let valid = true;
-    inputs.forEach((input) => {
-      if (input.type === "radio") {
-        const radios = form.querySelectorAll(`input[name="${input.name}"]`);
-        if (![...radios].some((r) => r.checked)) valid = false;
-      } else if (!input.value.trim()) {
-        valid = false;
-      }
-    });
+
+    // Tambahan dari pesanan 1
+    const isDateErrorVisible = document.getElementById('date-range-error').style.display !== 'none';
+    if (isDateErrorVisible) {
+      valid = false;
+    }
+
+    // Logic asli dari pesanan 2
+    if (valid) {
+      inputs.forEach((input) => {
+        if (input.type === "radio") {
+          const radios = form.querySelectorAll(`input[name="${input.name}"]`);
+          if (![...radios].some((r) => r.checked)) {
+            valid = false;
+          }
+        } else if (!input.value.trim()) {
+          valid = false;
+        }
+      });
+    }
+
     submitButton.disabled = !valid;
   }
 
-  document
-    .getElementById("tambahPesananForm")
-    .addEventListener("submit", function (event) {
-      event.preventDefault();
-      var form = this;
+  document.addEventListener("DOMContentLoaded", function () {
+    fetch("/api/all_paket")
+      .then((response) => response.json())
+      .then((data) => {
+        allPaketData = data;
+        checkFormValidity();
+      });
 
-      if (!form.checkValidity()) {
-        form.reportValidity();
-        return;
-      }
+    fetch("/api/all_lokasi")
+      .then((response) => response.json())
+      .then((data) => {
+        allLokasiData = data;
+        displayLokasiPrice();
+        checkFormValidity();
+      });
 
-      Swal.fire({
-        title: "Apakah kamu yakin?",
-        text: "Pesanan akan disimpan.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, simpan!",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          Swal.fire({
-            title: "Berhasil!",
-            text: "Pesanan berhasil disimpan.",
-            icon: "success",
-            timer: 2000,
-            timerProgressBar: true,
-            willClose: () => {
-              form.submit();
-            },
-          });
+    // logic untuk tanggal acara
+    const startDateInput = document.getElementById('tanggal_mulai_acara');
+    const endDateInput = document.getElementById('tanggal_selesai_acara');
+    const todayString = new Date().toISOString().split('T')[0];
+
+    startDateInput.min = todayString;
+    endDateInput.min = todayString;
+
+    startDateInput.addEventListener('change', function() {
+      if (startDateInput.value) {
+        endDateInput.min = startDateInput.value;
+        if (endDateInput.value && endDateInput.value < startDateInput.value) {
+          endDateInput.value = '';
         }
+      }
+      // Panggil validasi setelah diubah
+      validateDateRange();
+    });
+
+    endDateInput.addEventListener('change', validateDateRange);
+
+    // logic untuk tanggal pemesanan
+    const pemesananInput = document.getElementById("tanggal_pemesanan");
+    pemesananInput.value = todayString; // Set nilai default ke hari ini
+    pemesananInput.min = todayString;    // Set tanggal minimum ke hari ini
+
+
+    const form = document.getElementById("tambahPesananForm");
+    const relevantInputs = form.querySelectorAll("input:not([type='file']), select, textarea");
+    relevantInputs.forEach((input) => {
+      input.addEventListener("input", () => {
+        checkFormValidity();
+        updateTotalDanSisaBayar();
+      });
+      input.addEventListener("change", () => {
+        checkFormValidity();
+        updateTotalDanSisaBayar();
       });
     });
+
+    document.getElementById("biaya_transportasi").addEventListener("input", updateTotalDanSisaBayar);
+    displayFileName();
+  });
+
+  // untuk menambahkan validasi tanggal
+  document.getElementById("tambahPesananForm").addEventListener("submit", function (event) {
+    event.preventDefault();
+    var form = this;
+
+    // Panggil validasi tanggal sebelum submit
+    validateDateRange();
+
+    // Pengecekan validitas ditambah dengan pengecekan error tanggal
+    if (!form.checkValidity() || document.getElementById('date-range-error').style.display !== 'none') {
+      Swal.fire({
+        icon: 'error',
+        title: 'Oops...',
+        text: 'Harap periksa kembali semua isian yang wajib dan pastikan tanggal yang dipilih tersedia.',
+      });
+      return;
+    }
+
+    // message
+    Swal.fire({
+      title: "Apakah kamu yakin?",
+      text: "Pesanan akan disimpan.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#3085d6",
+      cancelButtonColor: "#d33",
+      confirmButtonText: "Ya, simpan!",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        Swal.fire({
+          title: "Berhasil!",
+          text: "Pesanan berhasil disimpan.",
+          icon: "success",
+          timer: 2000,
+          timerProgressBar: true,
+          willClose: () => {
+            form.submit();
+          },
+        });
+      }
+    });
+  });
 </script>
 
 {% endblock %}

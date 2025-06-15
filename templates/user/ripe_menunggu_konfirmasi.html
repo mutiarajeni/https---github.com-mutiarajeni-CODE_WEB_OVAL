@@ -57,8 +57,8 @@
         class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
         tabindex="0"
         aria-expanded="true"
-        aria-controls="riwayatpemesanan-pesanan-details"
-        id="riwayatpemesanan-pesanan-label"
+        aria-controls="riwayatpemesanan-pesanan-details-{{ p._id }}"
+        id="riwayatpemesanan-pesanan-label-{{ p._id }}"
       >
         Rincian Pesanan
         <i
@@ -68,8 +68,8 @@
       </h2>
       <div
         class="riwayatpemesanan-details"
-        id="riwayatpemesanan-pesanan-details"
-        aria-labelledby="riwayatpemesanan-pesanan-label"
+        id="riwayatpemesanan-pesanan-details-{{ p._id }}"
+        aria-labelledby="riwayatpemesanan-pesanan-label-{{ p._id }}"
       >
         <div class="riwayatpemesanan-info-block">
           <div class="riwayatpemesanan-label">
@@ -159,85 +159,123 @@
         class="riwayatpemesanan-section-title riwayatpemesanan-expanded"
         tabindex="0"
         aria-expanded="true"
-        aria-controls="riwayatpemesanan-pembayaran-details"
-        id="riwayatpemesanan-pembayaran-label"
+        aria-controls="riwayatpemesanan-pembayaran-details-{{ p._id }}"
+        id="riwayatpemesanan-pembayaran-label-{{ p._id }}"
       >
         Surat perizinan lokasi kamu
       </h2>
 
-      <div>
-        <div
-          id="file-display-container-wrapper"
-          style="
-            display: inline-flex;
-            justify-content: center;
-            align-items: center;
-            gap: 8px;
-            border: 1px solid #4da6ff;
-            border-radius: 8px;
-            padding: 10px;
-            cursor: pointer;
-            max-width: 100%;
-          "
+      {% if p.surat_izin_lokasi %}
+      <div id="file-uploaded-info-{{ p._id }}">
+        <p style="margin-top: 0.5rem; margin-bottom: 0.5rem">
+          <i class="bi bi-check-circle-fill" style="color: green"></i>
+          Surat Izin Telah Diunggah:
+          <a
+            href="{{ url_for('static', filename='suratIzin/' + p.surat_izin_lokasi) }}"
+            target="_blank"
+            rel="noopener noreferrer"
+            style="color: black; text-decoration: underline"
+          >
+            {{ p.surat_izin_lokasi }}
+          </a>
+        </p>
+        <button
+          class="riwayatpemesanan-btn-outline change-file-btn"
+          data-id="{{ p._id }}"
+          type="button"
         >
-          <input
-            type="file"
-            id="surat_izin_lokasi_input"
-            name="surat_izin_lokasi"
-            style="display: none"
-            accept=".doc,.docx,.pdf,image/jpeg,image/jpg,image/png"
-            onchange="displayFileName(); checkFormValidity();"
-          />
-          <span
-            id="file-icon"
-            onclick="document.getElementById('surat_izin_lokasi_input').click();"
-            style="font-size: 14px; color: #4da6ff"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="20"
-              height="20"
-              fill="currentColor"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"
-              />
-              <path
-                d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
-              />
-            </svg>
-          </span>
-          <span
-            id="file-name"
-            onclick="document.getElementById('surat_izin_lokasi_input').click();"
-            style="font-size: 14px; color: #4da6ff"
-          >
-            Tambahkan surat perizinan lokasi kamu di sini
-          </span>
-          <span
-            id="clear-file-btn"
-            style="cursor: pointer; display: none; margin-left: auto"
-            onclick="clearFileSelection(event);"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="16"
-              height="16"
-              fill="currentColor"
-              class="bi bi-x-circle-fill"
-              viewBox="0 0 16 16"
-            >
-              <path
-                d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
-              />
-            </svg>
-          </span>
-        </div>
+          Ubah File
+        </button>
       </div>
-      <p class="formlayanan-text-xs" style="margin-top: 0.25rem">
-        Upload 1 file yang didukung: doc, docx, pdf, gambar (JPEG, JPG dan PNG)
-      </p>
+      {% endif %}
+
+      <div
+        id="upload-form-{{ p._id }}"
+        style="{% if p.surat_izin_lokasi %}display: none;{% else %}display: block;{% endif %}"
+      >
+        <div style="display: flex; align-items: center; margin-top: 0.5rem">
+          <div
+            id="file-display-container-wrapper-{{ p._id }}"
+            style="
+              display: inline-flex;
+              justify-content: center;
+              align-items: center;
+              gap: 8px;
+              border: 1px solid #4da6ff;
+              border-radius: 8px;
+              padding: 10px;
+              cursor: pointer;
+              max-width: 100%;
+            "
+          >
+            <input
+              type="file"
+              id="surat_izin_lokasi_input_{{ p._id }}"
+              name="surat_izin_lokasi"
+              style="display: none"
+              accept=".doc,.docx,.pdf,image/jpeg,image/jpg,image/png"
+              onchange="displayFileName('{{ p._id }}')"
+            />
+            <span
+              id="file-icon-{{ p._id }}"
+              onclick="document.getElementById('surat_izin_lokasi_input_{{ p._id }}').click();"
+              style="font-size: 14px; color: #4da6ff"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="20"
+                height="20"
+                fill="currentColor"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"
+                />
+                <path
+                  d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"
+                />
+              </svg>
+            </span>
+            <span
+              id="file-name-{{ p._id }}"
+              onclick="document.getElementById('surat_izin_lokasi_input_{{ p._id }}').click();"
+              style="font-size: 14px; color: #4da6ff"
+            >
+              Tambahkan surat perizinan lokasi kamu di sini
+            </span>
+            <span
+              id="clear-file-btn-{{ p._id }}"
+              style="cursor: pointer; display: none; margin-left: auto"
+              onclick="clearFileSelection(event, '{{ p._id }}');"
+            >
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="16"
+                height="16"
+                fill="currentColor"
+                class="bi bi-x-circle-fill"
+                viewBox="0 0 16 16"
+              >
+                <path
+                  d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zM5.354 4.646a.5.5 0 1 0-.708.708L7.293 8l-2.647 2.646a.5.5 0 0 0 .708.708L8 8.707l2.646 2.647a.5.5 0 0 0 .708-.708L8.707 8l2.647-2.646a.5.5 0 0 0-.708-.708L8 7.293 5.354 4.646z"
+                />
+              </svg>
+            </span>
+          </div>
+          <button
+            class="riwayatpemesanan-btn-primary upload-surat-btn"
+            type="button"
+            data-id="{{ p._id }}"
+            style="margin-left: 10px"
+          >
+            Simpan Surat
+          </button>
+        </div>
+        <p class="formlayanan-text-xs" style="margin-top: 0.25rem">
+          Upload 1 file yang didukung: doc, docx, pdf, gambar (JPEG, JPG dan
+          PNG)
+        </p>
+      </div>
     </section>
 
     <section
@@ -271,131 +309,194 @@
       Catatan: {{ p.catatan }}
     </section>
   </main>
-
   {% endfor %}
 </div>
 
 <script>
-  function displayFileName() {
-    const fileInput = document.getElementById("surat_izin_lokasi_input");
-    const fileNameSpan = document.getElementById("file-name");
-    const clearFileBtn = document.getElementById("clear-file-btn");
-    const fileIcon = document.getElementById("file-icon");
+  function displayFileName(pesananId) {
+    const fileInput = document.getElementById(
+      `surat_izin_lokasi_input_${pesananId}`
+    );
+    const fileNameSpan = document.getElementById(`file-name-${pesananId}`);
+    const clearFileBtn = document.getElementById(`clear-file-btn-${pesananId}`);
+    const fileIcon = document.getElementById(`file-icon-${pesananId}`);
 
     if (fileInput.files.length > 0) {
       fileNameSpan.textContent = fileInput.files[0].name;
       clearFileBtn.style.display = "inline-block";
       fileIcon.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
-                <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"/>
-            </svg>
-        `;
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-3z"/>
+        </svg>
+      `;
     } else {
       fileNameSpan.textContent =
         "Tambahkan surat perizinan lokasi kamu di sini";
       clearFileBtn.style.display = "none";
       fileIcon.innerHTML = `
-            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
-                <path d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"/>
-                <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
-            </svg>
-        `;
+        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" viewBox="0 0 16 16">
+            <path d="M.5 9.9V14a1 1 0 0 0 1 1h13a1 1 0 0 0 1-1V9.9a.5.5 0 0 0-1 0V14a.5.5 0 0 1-.5.5H1.5a.5.5 0 0 1-.5-.5V9.9a.5.5 0 0 0-1 0z"/>
+            <path d="M7.646 1.146a.5.5 0 0 1 .708 0l3 3a.5.5 0 1 1-.708.708L8.5 2.707V10.5a.5.5 0 0 1-1 0V2.707L5.354 4.854a.5.5 0 1 1-.708-.708l3-3z"/>
+        </svg>
+      `;
     }
   }
 
-  function clearFileSelection(event) {
-    event.stopPropagation(); // Prevent triggering the input click
-    const fileInput = document.getElementById("surat_izin_lokasi_input");
+  function clearFileSelection(event, pesananId) {
+    event.stopPropagation();
+    const fileInput = document.getElementById(
+      `surat_izin_lokasi_input_${pesananId}`
+    );
     fileInput.value = "";
-    displayFileName();
-    checkFormValidity();
+    displayFileName(pesananId);
   }
 
-  // Interactive arrow toggle for sections
-  document
-    .querySelectorAll("h2.riwayatpemesanan-section-title")
-    .forEach((header) => {
-      header.addEventListener("click", () => {
-        const expanded = header.getAttribute("aria-expanded") === "true";
-        const controls = header.getAttribute("aria-controls");
-        const content = document.getElementById(controls);
-        if (!content) return;
+  document.addEventListener("DOMContentLoaded", function () {
+    document
+      .querySelectorAll("h2.riwayatpemesanan-section-title")
+      .forEach((header) => {
+        header.addEventListener("click", () => {
+          const expanded = header.getAttribute("aria-expanded") === "true";
+          const controls = header.getAttribute("aria-controls");
+          const content = document.getElementById(controls);
+          if (!content) return;
 
-        if (expanded) {
-          header.setAttribute("aria-expanded", "false");
-          header.classList.remove("riwayatpemesanan-expanded");
-          content.style.display = "none";
-        } else {
-          header.setAttribute("aria-expanded", "true");
-          header.classList.add("riwayatpemesanan-expanded");
-          content.style.display = "";
-        }
+          if (expanded) {
+            header.setAttribute("aria-expanded", "false");
+            header.classList.remove("riwayatpemesanan-expanded");
+            content.style.display = "none";
+          } else {
+            header.setAttribute("aria-expanded", "true");
+            header.classList.add("riwayatpemesanan-expanded");
+            content.style.display = "";
+          }
+        });
+        header.addEventListener("keydown", (e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            header.click();
+          }
+        });
       });
 
-      // Keyboard accessibility: toggle on Enter or Space
-      header.addEventListener("keydown", (e) => {
-        if (e.key === "Enter" || e.key === " ") {
-          e.preventDefault();
-          header.click();
-        }
+    document.querySelectorAll(".ubah-pesanan-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const pesananId = this.getAttribute("data-id");
+        window.location.href = `/booking/ubah/${pesananId}`;
       });
     });
 
-  // --- START: Added JavaScript for "Ubah Pesanan" button ---
-  document.querySelectorAll(".ubah-pesanan-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      const pesananId = this.getAttribute("data-id");
-      window.location.href = `/booking/ubah/${pesananId}`; // Navigate to the edit page
-    });
-  });
-  // --- END: Added JavaScript for "Ubah Pesanan" button ---
-
-  document.querySelectorAll(".batalkan-btn").forEach((button) => {
-    button.addEventListener("click", function () {
-      const pesananId = this.getAttribute("data-id");
-
-      Swal.fire({
-        title: "Batalkan Pesanan?",
-        text: "Apakah kamu yakin ingin membatalkan pesanan ini?",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonColor: "#3085d6",
-        cancelButtonColor: "#d33",
-        confirmButtonText: "Ya, batalkan!",
-        cancelButtonText: "Batal",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          fetch(`/batalkan_pesanan/${pesananId}`, {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-          })
-            .then((response) => response.json())
-            .then((data) => {
-              if (data.success) {
-                Swal.fire(
-                  "Dibatalkan!",
-                  "Pesanan berhasil dibatalkan.",
-                  "success"
-                ).then(() => {
-                  location.reload(); // Reload halaman untuk memperbarui status
-                });
-              } else {
-                Swal.fire(
-                  "Gagal!",
-                  "Pesanan tidak ditemukan atau terjadi kesalahan.",
-                  "error"
-                );
-              }
+    document.querySelectorAll(".batalkan-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const pesananId = this.getAttribute("data-id");
+        Swal.fire({
+          title: "Batalkan Pesanan?",
+          text: "Apakah kamu yakin ingin membatalkan pesanan ini?",
+          icon: "warning",
+          showCancelButton: true,
+          confirmButtonColor: "#3085d6",
+          cancelButtonColor: "#d33",
+          confirmButtonText: "Ya, batalkan!",
+          cancelButtonText: "Batal",
+        }).then((result) => {
+          if (result.isConfirmed) {
+            fetch(`/batalkan_pesanan/${pesananId}`, {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
             })
-            .catch((error) => {
-              Swal.fire("Gagal!", "Terjadi kesalahan pada server.", "error");
-            });
+              .then((response) => response.json())
+              .then((data) => {
+                if (data.success) {
+                  Swal.fire(
+                    "Dibatalkan!",
+                    "Pesanan berhasil dibatalkan.",
+                    "success"
+                  ).then(() => {
+                    location.reload();
+                  });
+                } else {
+                  Swal.fire(
+                    "Gagal!",
+                    "Pesanan tidak ditemukan atau terjadi kesalahan.",
+                    "error"
+                  );
+                }
+              })
+              .catch((error) => {
+                Swal.fire("Gagal!", "Terjadi kesalahan pada server.", "error");
+              });
+          }
+        });
+      });
+    });
+
+    document.querySelectorAll(".change-file-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const pesananId = this.getAttribute("data-id");
+        document.getElementById(
+          `file-uploaded-info-${pesananId}`
+        ).style.display = "none";
+        document.getElementById(`upload-form-${pesananId}`).style.display =
+          "block";
+      });
+    });
+
+    document.querySelectorAll(".upload-surat-btn").forEach((button) => {
+      button.addEventListener("click", function () {
+        const pesananId = this.getAttribute("data-id");
+        const fileInput = document.getElementById(
+          `surat_izin_lokasi_input_${pesananId}`
+        );
+        const file = fileInput.files[0];
+
+        if (!file) {
+          Swal.fire(
+            "Peringatan",
+            "Silakan pilih file untuk diunggah terlebih dahulu.",
+            "warning"
+          );
+          return;
         }
+
+        const formData = new FormData();
+        formData.append("surat_izin_lokasi", file);
+
+        Swal.fire({
+          title: "Mengunggah...",
+          text: "Mohon tunggu sebentar.",
+          allowOutsideClick: false,
+          didOpen: () => {
+            Swal.showLoading();
+          },
+        });
+
+        fetch(`/upload_surat_izin/${pesananId}`, {
+          method: "POST",
+          body: formData,
+        })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              Swal.fire({
+                title: "Berhasil!",
+                text: data.message,
+                icon: "success",
+              }).then(() => {
+                location.reload();
+              });
+            } else {
+              Swal.fire(
+                "Gagal!",
+                data.message || "Terjadi kesalahan saat mengunggah.",
+                "error"
+              );
+            }
+          })
+          .catch((error) => {
+            Swal.fire("Error!", "Tidak dapat terhubung ke server.", "error");
+          });
       });
     });
   });
 </script>
-
 {% endblock %}

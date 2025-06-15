@@ -13,7 +13,7 @@
   <a href="{{ url_for('riwayat_pemesanan') }}" class="riwayat-link riwayat-active" aria-current="page">Telah Dikonfirmasi</a>
   <a href="{{ url_for('ripe_diproses') }}" class="riwayat-link">Diproses</a>
   <a href="{{ url_for('ripe_selesai') }}" class="riwayat-link">Selesai</a>
-  <a href="{{ url_for('ripe_dibatalkan') }}" class="riwayat-link">Dibatalkan</a> 
+  <a href="{{ url_for('ripe_dibatalkan') }}" class="riwayat-link">Dibatalkan</a>
 </nav>
 
 <div class="subutama-container">
@@ -185,20 +185,6 @@
         <div class="riwayatpemesanan-payment-row riwayatpemesanan-total">
           <span>Total</span>
           <span class="riwayatpemesanan-bold">{{p.total_harga|rupiah}}</span>
-        </div>
-        <div class="riwayatpemesanan-payment-row">
-          <span>Status Pembayaran Deposit</span>
-          <span class="riwayatpemesanan-bold" id="status-deposit-{{ p._id }}"
-            >{{ p.status_pembayaran_deposit | default('Belum Bayar') }}</span
-          >
-        </div>
-        <div class="riwayatpemesanan-payment-row">
-          <span>Status Pembayaran Pelunasan</span>
-          <span
-            class="riwayatpemesanan-bold"
-            id="status-pelunasan-{{ p._id }}"
-            >{{ p.status_pembayaran_pelunasan | default('Belum Bayar') }}</span
-          >
         </div>
       </div>
     </section>
@@ -392,73 +378,170 @@
       });
 
     // Midtrans Integration
-    document.querySelectorAll(".bayar-button").forEach((button) => {
-      button.addEventListener("click", async () => {
-        const pesananId = button.dataset.pesananId;
-        const paymentType = button.dataset.paymentType; // 'deposit' or 'pelunasan'
+  document.querySelectorAll(".bayar-button").forEach((button) => {
+    button.addEventListener("click", async () => {
+      const pesananId = button.dataset.pesananId;
+      const paymentType = button.dataset.paymentType; // 'deposit' or 'pelunasan'
 
-        try {
-          const response = await fetch("/api/create_midtrans_transaction", {
-            method: "POST",
-            headers: {
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              pesanan_id: pesananId,
-              payment_type: paymentType,
-            }),
-          });
+      // Disable the button immediately to prevent double clicks
+      button.disabled = true;
 
-          const data = await response.json();
+      try {
+        const response = await fetch("/api/create_midtrans_transaction", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            pesanan_id: pesananId,
+            payment_type: paymentType,
+          }),
+        });
 
-          if (data.success) {
-            snap.pay(data.token, {
-              onSuccess: function (result) {
-                console.log(result);
-                // Update button and status immediately
-                const targetButton = document.getElementById(`${paymentType}-button-${pesananId}`);
+        const data = await response.json();
+
+        if (data.success) {
+          snap.pay(data.token, {
+            onSuccess: async function (result) {
+              console.log(result);
+              // Send explicit update to backend after successful payment
+              const updateResponse = await fetch('/api/update_payment_status', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({
+                  pesanan_id: pesananId,
+                  payment_type: paymentType,
+                  transaction_status: result.transaction_status,
+                  fraud_status: result.fraud_status // Pass fraud status if available
+                })
+              });
+              const updateData = await updateResponse.json();
+
+              if (updateData.success) {
+                const targetButton = document.getElementById(
+                  `${paymentType}-button-${pesananId}`
+                );
                 if (targetButton) {
-                    targetButton.disabled = true;
-                    targetButton.innerText = "Lunas"; // Atau teks lain yang sesuai
+                  targetButton.disabled = true;
+                  targetButton.innerText = "Lunas";
                 }
-                const statusElement = document.getElementById(`status-${paymentType}-${pesananId}`);
+                const statusElement = document.getElementById(
+                  `status-${paymentType}-${pesananId}`
+                );
                 if (statusElement) {
-                    statusElement.innerText = "Lunas";
+                  statusElement.innerText = "Lunas";
+                  statusElement.style.color = "#28A745"; // Set to green for success
                 }
-                // Optionally, you might want to refresh the page or update the overall status as well
-                // window.location.reload();
-              },
-              onPending: function (result) {
-                /* You may add your own implementation here */
-                alert("Pembayaran Anda sedang menunggu konfirmasi!");
-                console.log(result);
-                // For pending, the status on the UI might not change immediately to "Lunas"
-                // It will be updated by the webhook when payment is actually settled.
-                // You might update the UI to "Pending" if you wish.
-                const statusElement = document.getElementById(`status-${paymentType}-${pesananId}`);
-                if (statusElement) {
-                    statusElement.innerText = "Pending";
+                // Also update the main order status if the backend signals a change
+                const orderStatusElement = document.querySelector(`.riwayatpemesanan-container [aria-label="Riwayat status Belum Bayar Deposit"]`); // Adjust selector if needed
+                if (orderStatusElement && updateData.new_order_status) {
+                  orderStatusElement.innerText = updateData.new_order_status;
+                  orderStatusElement.style.color = '#28A745'; // Assuming green for confirmed/pre-photoshoot
                 }
-              },
-              onError: function (result) {
-                /* You may add your own implementation here */
-                alert("Pembayaran Gagal!");
-                console.log(result);
-              },
-              onClose: function () {
-                /* You may add your own implementation here */
-                alert("Anda menutup pop-up tanpa menyelesaikan pembayaran");
-              },
-            });
-          } else {
-            alert("Error: " + data.message);
-          }
-        } catch (error) {
-          console.error("Fetch error:", error);
-          alert("Terjadi kesalahan saat memproses pembayaran. Silakan coba lagi.");
+                Swal.fire({
+                  icon: "success",
+                  title: "Pembayaran Berhasil!",
+                  text: "Transaksi Anda telah berhasil dikonfirmasi dan status pesanan diperbarui.",
+                }).then(() => {
+                  window.location.reload(); // Refresh the page to reflect all changes, including order status
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: "Pembayaran Berhasil, Tapi Update Gagal!",
+                  text: "Transaksi Anda berhasil, tetapi ada masalah saat memperbarui status di sistem kami. Mohon hubungi admin. " + updateData.message,
+                }).then(() => {
+                  window.location.reload(); // Still refresh to reflect potential partial updates
+                });
+              }
+            },
+            onPending: function (result) {
+              console.log(result);
+              // For pending, update status to "Pending" and keep button disabled
+              const targetButton = document.getElementById(
+                `${paymentType}-button-${pesananId}`
+              );
+              if (targetButton) {
+                targetButton.disabled = true;
+                targetButton.innerText = "Pending";
+              }
+              const statusElement = document.getElementById(
+                `status-${paymentType}-${pesananId}`
+              );
+              if (statusElement) {
+                statusElement.innerText = "Pending";
+                statusElement.style.color = "#ffc107"; // Set to yellow for pending
+              }
+              Swal.fire({
+                icon: "info",
+                title: "Pembayaran Anda Sedang Menunggu!",
+                text: "Harap selesaikan pembayaran Anda melalui metode yang dipilih.",
+              });
+            },
+            onError: function (result) {
+              console.log(result);
+              // On error, enable the button again and update status to "Gagal"
+              const targetButton = document.getElementById(
+                `${paymentType}-button-${pesananId}`
+              );
+              if (targetButton) {
+                targetButton.disabled = false; // Enable button to allow retry
+              }
+              const statusElement = document.getElementById(
+                `status-${paymentType}-${pesananId}`
+              );
+              if (statusElement) {
+                statusElement.innerText = "Gagal";
+                statusElement.style.color = "#dc3545"; // Set to red for error
+              }
+              Swal.fire({
+                icon: "error",
+                title: "Pembayaran Gagal!",
+                text: "Terjadi kesalahan saat memproses pembayaran Anda. Silakan coba lagi.",
+              });
+            },
+            onClose: function () {
+              // If user closes the popup, re-enable the button
+              const targetButton = document.getElementById(
+                `${paymentType}-button-${pesananId}`
+              );
+              if (targetButton) {
+                targetButton.disabled = false;
+              }
+              Swal.fire({
+                icon: "warning",
+                title: "Pembayaran Dibatalkan!",
+                text: "Anda menutup pop-up tanpa menyelesaikan pembayaran.",
+              });
+            },
+          });
+        } else {
+          // If the backend API call to create transaction fails
+          Swal.fire({
+            icon: "error",
+            title: "Error!",
+            text: "Gagal membuat transaksi: " + data.message,
+          }).then(() => {
+            // Re-enable button on backend error too
+            button.disabled = false;
+          });
         }
-      });
+      } catch (error) {
+        console.error("Fetch error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Terjadi kesalahan jaringan atau server. Silakan coba lagi.",
+        }).then(() => {
+          // Re-enable button on network error
+          button.disabled = false;
+        });
+      }
     });
+  });
+    
   </script>
 </div>
 {% endblock %}
