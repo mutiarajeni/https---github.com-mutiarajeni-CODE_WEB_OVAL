@@ -1,7 +1,5 @@
-{% extends "pemilik/base_pemilik.html" %}
-{% block title %}Pengguna{% endblock %}
-
-{% block content %}
+{% extends "pemilik/base_pemilik.html" %} {% block title %}Pengguna{% endblock
+%} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="card my-4">
@@ -15,7 +13,9 @@
               <div
                 class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
               >
-                <div class="position-relative w-100 w-sm-auto mb-2 mb-sm-0">
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
                   <i
                     class="bi bi-search position-absolute start-0 ms-3"
                     style="
@@ -26,7 +26,7 @@
                   ></i>
                   <input
                     type="text"
-                    class="form-control ps-5 py-4"
+                    class="form-control ps-5 fs-6"
                     placeholder="Cari di sini"
                     id="searchInput"
                     style="background-color: white; font-size: 12px"
@@ -34,11 +34,11 @@
                 </div>
 
                 <a
-                  class="btn btn-light text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
                   href="{{ url_for('pemilik_tambah_pengguna_page') }}"
                 >
-                  <i class="material-icons me-1 fs-4">add</i>
-                  &nbsp;&nbsp;Tambah Pengguna
+                  <i class="material-icons text-dark me-1 fs-4">add</i>
+                  Tambah Pengguna
                 </a>
               </div>
             </div>
@@ -55,9 +55,7 @@
                   style="width: 50px"
                 ></th>
                 <th class="text-center fs-7 fw-bold">Nama</th>
-                <th class="text-center fs-7 fw-bold">
-                  Nama Pengguna
-                </th>
+                <th class="text-center fs-7 fw-bold">Nama Pengguna</th>
                 <th class="text-center fs-7 fw-bold">Peran</th>
                 <th class="text-center fs-7 fw-bold">Aksi</th>
               </tr>
@@ -69,21 +67,41 @@
                   <p class="text-base mb-0">{{ loop.index }}.</p>
                 </td>
                 <td class="align-middle user-name-cell">
-                  <i class="bi bi-person-fill fs-4 ms-2"></i> <span class="text-base mb-0 ms-2">{{ user.full_name }}</span>
+                  <i class="bi bi-person-fill fs-4 ms-2"></i>
+                  <span class="text-base mb-0 ms-2">{{ user.full_name }}</span>
                 </td>
                 <td class="align-middle text-center">
                   <p class="text-base fw-normal mb-0">{{ user.username }}</p>
                 </td>
                 <td class="align-middle text-center">
-                  <p class="text-base fw-normal mb-0 text-capitalize">{{ user.role }}</p>
+                  <p class="text-base fw-normal mb-0 text-capitalize">
+                    {{ user.role }}
+                  </p>
                 </td>
                 <td class="align-middle text-center text-base">
-                  <a href="{{ url_for('pemilik_ubah_pengguna', user_id=user._id) }}" class="text-base" data-toggle="tooltip" data-original-title="Edit user">
+                  <a
+                    href="{{ url_for('pemilik_ubah_pengguna', user_id=user._id) }}"
+                    class="text-base"
+                    data-toggle="tooltip"
+                    data-original-title="Edit user"
+                  >
                     <i class="material-icons me-1">edit</i>Ubah
                   </a>
                   {% if user.username != 'pemilik_riyan' %}
-                  <a href="#" class="ms-3 delete-user-btn" data-user-id="{{ user._id }}" data-username="{{ user.username }}" data-toggle="tooltip" data-original-title="Delete user" style="color: #dc3545 !important;">
-                    <i class="material-icons me-1" style="color: #dc3545 !important;">delete</i>Hapus
+                  <a
+                    href="#"
+                    class="ms-3 delete-user-btn"
+                    data-user-id="{{ user._id }}"
+                    data-username="{{ user.username }}"
+                    data-toggle="tooltip"
+                    data-original-title="Delete user"
+                    style="color: #dc3545 !important"
+                  >
+                    <i
+                      class="material-icons me-1"
+                      style="color: #dc3545 !important"
+                      >delete</i
+                    >Hapus
                   </a>
                   {% endif %}
                 </td>
@@ -105,7 +123,7 @@
       title: title,
       text: text,
       showConfirmButton: true,
-      confirmButtonText: 'Oke'
+      confirmButtonText: "Oke",
     }).then((result) => {
       if (result.isConfirmed && redirectUrl) {
         window.location.href = redirectUrl;
@@ -115,69 +133,86 @@
     });
   }
 
-  document.addEventListener('DOMContentLoaded', function() {
-    const deleteButtons = document.querySelectorAll('.delete-user-btn');
-    const searchInput = document.getElementById('searchInput');
-    const dataTable = document.getElementById('dataTable');
-    const tableRows = dataTable.querySelectorAll('tbody tr');
+  document.addEventListener("DOMContentLoaded", function () {
+    const deleteButtons = document.querySelectorAll(".delete-user-btn");
+    const searchInput = document.getElementById("searchInput");
+    const dataTable = document.getElementById("dataTable");
+    const tableRows = dataTable.querySelectorAll("tbody tr");
 
     // Fungsionalitas Pencarian
-    searchInput.addEventListener('keyup', function() {
+    searchInput.addEventListener("keyup", function () {
       const searchTerm = searchInput.value.toLowerCase();
-      tableRows.forEach(row => {
+      tableRows.forEach((row) => {
         let found = false;
-        // Cari di kolom Nama (indeks 1) dan Nama Pengguna (indeks 2)
-        const nameCell = row.children[1];
-        const usernameCell = row.children[2];
+        // Ambil teks dari kolom Nama (indeks 1), Nama Pengguna (indeks 2), dan Peran (indeks 3)
+        const nameText = row.children[1].textContent.toLowerCase();
+        const usernameText = row.children[2].textContent.toLowerCase();
+        const roleText = row.children[3].textContent.toLowerCase(); // Menambahkan kolom Peran
 
-        if (nameCell && usernameCell) {
-          const nameText = nameCell.textContent.toLowerCase();
-          const usernameText = usernameCell.textContent.toLowerCase();
-
-          if (nameText.includes(searchTerm) || usernameText.includes(searchTerm)) {
-            found = true;
-          }
+        if (
+          nameText.includes(searchTerm) ||
+          usernameText.includes(searchTerm) ||
+          roleText.includes(searchTerm) // Sertakan peran dalam pencarian
+        ) {
+          found = true;
         }
-        row.style.display = found ? '' : 'none';
+        row.style.display = found ? "" : "none";
       });
     });
 
     // Fungsionalitas Hapus Pengguna (sudah ada, tidak diubah)
-    deleteButtons.forEach(button => {
-      button.addEventListener('click', function(event) {
+    deleteButtons.forEach((button) => {
+      button.addEventListener("click", function (event) {
         event.preventDefault();
         const userId = this.dataset.userId;
         const username = this.dataset.username;
 
         Swal.fire({
-          title: 'Apakah Anda yakin?',
+          title: "Apakah Anda yakin?",
           text: `Anda tidak akan dapat mengembalikan pengguna ${username} ini!`,
-          icon: 'warning',
+          icon: "warning",
           showCancelButton: true,
-          confirmButtonColor: '#d33',
-          cancelButtonColor: '#6c757d',
-          confirmButtonText: 'Ya, hapus!',
-          cancelButtonText: 'Batal'
+          confirmButtonColor: "#d33",
+          cancelButtonColor: "#6c757d",
+          confirmButtonText: "Ya, hapus!",
+          cancelButtonText: "Batal",
         }).then(async (result) => {
           if (result.isConfirmed) {
             try {
-              const response = await fetch(`/api/pemilik_hapus_pengguna/${userId}`, {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json'
+              const response = await fetch(
+                `/api/pemilik_hapus_pengguna/${userId}`,
+                {
+                  method: "DELETE",
+                  headers: {
+                    "Content-Type": "application/json",
+                  },
                 }
-              });
+              );
 
               const apiResult = await response.json();
 
               if (response.ok && apiResult.success) {
-                showAlert('success', 'Berhasil!', apiResult.message, '{{ url_for("pemilik_pengguna") }}');
+                showAlert(
+                  "success",
+                  "Berhasil!",
+                  apiResult.message,
+                  '{{ url_for("pemilik_pengguna") }}'
+                );
               } else {
-                showAlert('error', 'Gagal!', apiResult.message || 'Terjadi kesalahan saat menghapus pengguna.');
+                showAlert(
+                  "error",
+                  "Gagal!",
+                  apiResult.message ||
+                    "Terjadi kesalahan saat menghapus pengguna."
+                );
               }
             } catch (error) {
-              console.error('Error:', error);
-              showAlert('error', 'Error!', 'Terjadi kesalahan jaringan atau server saat menghapus pengguna.');
+              console.error("Error:", error);
+              showAlert(
+                "error",
+                "Error!",
+                "Terjadi kesalahan jaringan atau server saat menghapus pengguna."
+              );
             }
           }
         });

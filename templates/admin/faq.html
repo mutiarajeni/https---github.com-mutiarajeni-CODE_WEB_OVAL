@@ -12,47 +12,84 @@
               </h5>
             </div>
             <div class="col-6 text-end">
-              <a
-                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
-                href="/admin_faq_tambah"
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
               >
-                <i class="material-icons text-dark me-1 fs-4">add</i
-                >&nbsp;&nbsp;Tambah Pertanyaan
-              </a>
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white"
+                  />
+                </div>
+
+                <a
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  href="/admin_faq_tambah"
+                >
+                  <i class="material-icons text-dark me-1 fs-4">add</i
+                  >&nbsp;&nbsp;Tambah Pertanyaan
+                </a>
+              </div>
             </div>
           </div>
         </div>
       </div>
       <div class="card-body px-0 pb-2">
-        {# HAPUS BLOK get_flashed_messages() INI SECARA KESELURUHAN #}
-        {# {% with messages = get_flashed_messages(with_categories=true) %} {% if #}
-        {# messages %} {% for category, message in messages %} #}
-        {# <div #}
-        {# class="alert alert-{{ category }} alert-dismissible text-white" #}
-        {# role="alert" #}
-        {# > #}
-        {# {{ message }} #}
-        {# <button #}
-        {# type="button" #}
-        {# class="btn-close text-lg py-3 opacity-10" #}
-        {# data-bs-dismiss="alert" #}
-        {# aria-label="Close" #}
-        {# > #}
-        {# <span aria-hidden="true">×</span> #}
-        {# </button> #}
-        {# </div> #}
-        {# {% endfor %} {% endif %} {% endwith %} #}
+        {# HAPUS BLOK get_flashed_messages() INI SECARA KESELURUHAN #} {# {%
+        with messages = get_flashed_messages(with_categories=true) %} {% if #}
+        {# messages %} {% for category, message in messages %} #} {#
+        <div
+          #}
+          {#
+          class="alert alert-{{ category }} alert-dismissible text-white"
+          #}
+          {#
+          role="alert"
+          #}
+          {#
+        >
+          #} {# {{ message }} #} {#
+          <button
+            #}
+            {#
+            type="button"
+            #}
+            {#
+            class="btn-close text-lg py-3 opacity-10"
+            #}
+            {#
+            data-bs-dismiss="alert"
+            #}
+            {#
+            aria-label="Close"
+            #}
+            {#
+          >
+            #} {# <span aria-hidden="true">×</span> #} {#
+          </button>
+          #} {#
+        </div>
+        #} {# {% endfor %} {% endif %} {% endwith %} #}
 
         <table id="dataTable" class="table align-items-center mb-0">
           <thead>
             <tr>
               <th class="text-center fs-7 fw-bold ms-2"></th>
-              <th class="text-center fs-7 fw-bold">
-                Nama Pengirim
-              </th>
-              <th class="text-center fs-7 fw-bold">
-                Email Pengirim
-              </th>
+              <th class="text-center fs-7 fw-bold">Nama Pengirim</th>
+              <th class="text-center fs-7 fw-bold">Email Pengirim</th>
               <th class="text-center fs-7 fw-bold">Pertanyaan</th>
               <th class="text-center fs-7 fw-bold">Jawaban</th>
               <th class="text-center fs-7 fw-bold">Status</th>
@@ -78,17 +115,13 @@
                 >
               </td>
               <td class="align-middle text-center text-sm">
-                <span
-                  class="text-normal"
-                  title="{{ faq.pertanyaan }}"
+                <span class="text-normal" title="{{ faq.pertanyaan }}"
                   >{{ faq.pertanyaan[:20] }}{% if faq.pertanyaan|length > 20
                   %}...{% endif %}</span
                 >
               </td>
               <td class="align-middle text-center text-sm">
-                <span
-                  class="text-normal"
-                  title="{{ faq.jawaban }}"
+                <span class="text-normal" title="{{ faq.jawaban }}"
                   >{{ faq.jawaban[:15] }}{% if faq.jawaban|length > 20 %}...{%
                   endif %}</span
                 >
@@ -97,8 +130,7 @@
                 <span
                   class="badge badge-sm {% if faq.status == 'pending' %}bg-gradient-warning{% else %}bg-gradient-success{% endif %}"
                 >
-                  {{ 'Pending' if faq.status == 'pending' else 'Diterbitkan'
-                  }}
+                  {{ 'Pending' if faq.status == 'pending' else 'Diterbitkan' }}
                 </span>
               </td>
               <td class="align-middle text-center">
@@ -119,12 +151,8 @@
                     />
                     <span class="slider round"></span>
                   </label>
-                  <span
-                    class="status-text me-3"
-                    id="statusText_{{ faq._id }}"
-                  >
-                    {% if faq.is_active %}Aktif{% else %}Tidak Aktif{% endif
-                    %}
+                  <span class="status-text me-3" id="statusText_{{ faq._id }}">
+                    {% if faq.is_active %}Aktif{% else %}Tidak Aktif{% endif %}
                   </span>
 
                   <a
@@ -135,7 +163,7 @@
                       text-transform: none;
                       font-size: 12px;
                       line-height: 1;
-                      font-weight: normal
+                      font-weight: normal;
                     "
                   >
                     <i class="material-icons text-normal me-2">edit</i>Ubah
@@ -240,33 +268,66 @@
   document.addEventListener("DOMContentLoaded", function () {
     // --- SweetAlert Handler dari URL Parameters (GLOBAL FOR ALL ADMIN PAGES) ---
     const urlParams = new URLSearchParams(window.location.search);
-    const saStatus = urlParams.get('_sa_status');
-    const saMessage = urlParams.get('_sa_message');
+    const saStatus = urlParams.get("_sa_status");
+    const saMessage = urlParams.get("_sa_message");
 
     if (saStatus && saMessage) {
-      let icon = 'info'; // Default
-      if (saStatus === 'success') {
-        icon = 'success';
-      } else if (saStatus === 'error' || saStatus === 'danger') { // danger is also mapped to error icon
-        icon = 'error';
-      } else if (saStatus === 'warning') {
-        icon = 'warning';
+      let icon = "info"; // Default
+      if (saStatus === "success") {
+        icon = "success";
+      } else if (saStatus === "error" || saStatus === "danger") {
+        // danger is also mapped to error icon
+        icon = "error";
+      } else if (saStatus === "warning") {
+        icon = "warning";
       }
 
       Swal.fire({
         title: saStatus.charAt(0).toUpperCase() + saStatus.slice(1), // Capitalize first letter (e.g., "Success")
         text: saMessage,
         icon: icon,
-        confirmButtonText: 'Oke'
+        confirmButtonText: "Oke",
       }).then(() => {
         // Hapus parameter SweetAlert dari URL setelah ditampilkan untuk mencegah re-trigger
-        urlParams.delete('_sa_status');
-        urlParams.delete('_sa_message');
-        const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
+        urlParams.delete("_sa_status");
+        urlParams.delete("_sa_message");
+        const newUrl =
+          window.location.pathname +
+          (urlParams.toString() ? "?" + urlParams.toString() : "");
         window.history.replaceState({}, document.title, newUrl);
       });
     }
     // --- Akhir SweetAlert Handler ---
+
+    // --- KODE BARU UNTUK FUNGSI PENCARIAN ---
+    const searchInput = document.getElementById("searchInput");
+    const dataTable = document.getElementById("dataTable");
+    const tableRows = dataTable
+      .getElementsByTagName("tbody")[0]
+      .getElementsByTagName("tr");
+
+    searchInput.addEventListener("keyup", function () {
+      const filter = searchInput.value.toLowerCase();
+
+      for (let i = 0; i < tableRows.length; i++) {
+        const row = tableRows[i];
+        const cells = row.getElementsByTagName("td");
+        let textContent = "";
+
+        // Gabungkan teks dari semua sel dalam satu baris
+        for (let j = 0; j < cells.length; j++) {
+          textContent += cells[j].textContent || cells[j].innerText;
+        }
+
+        // Periksa apakah teks baris mengandung filter pencarian
+        if (textContent.toLowerCase().indexOf(filter) > -1) {
+          row.style.display = ""; // Tampilkan baris jika cocok
+        } else {
+          row.style.display = "none"; // Sembunyikan baris jika tidak cocok
+        }
+      }
+    });
+    // --- AKHIR KODE BARU ---
 
     const toggleSwitches = document.querySelectorAll(
       '.switch input[type="checkbox"]'
@@ -305,10 +366,13 @@
             })
               .then((response) => {
                 if (!response.ok) {
-                    return response.json().then(errData => {
-                        let errorMessage = (errData && errData.message) ? errData.message : `HTTP error! Status: ${response.status}`;
-                        throw new Error(errorMessage);
-                    });
+                  return response.json().then((errData) => {
+                    let errorMessage =
+                      errData && errData.message
+                        ? errData.message
+                        : `HTTP error! Status: ${response.status}`;
+                    throw new Error(errorMessage);
+                  });
                 }
                 return response.json();
               })
@@ -323,9 +387,10 @@
                   }
                   Swal.fire(
                     "Berhasil!",
-                    data.message || `Status FAQ berhasil diubah menjadi ${
-                      data.new_is_active ? "Aktif" : "Tidak Aktif"
-                    }.`,
+                    data.message ||
+                      `Status FAQ berhasil diubah menjadi ${
+                        data.new_is_active ? "Aktif" : "Tidak Aktif"
+                      }.`,
                     "success"
                   );
                 } else {
@@ -342,7 +407,8 @@
                 console.error("Error:", error);
                 Swal.fire(
                   "Error!",
-                  "Terjadi kesalahan saat berkomunikasi dengan server: " + error.message,
+                  "Terjadi kesalahan saat berkomunikasi dengan server: " +
+                    error.message,
                   "error"
                 );
                 switchElement.checked = !newIsActive; // Revert switch if network/server error

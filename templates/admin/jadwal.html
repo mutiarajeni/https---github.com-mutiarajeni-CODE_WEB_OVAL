@@ -9,6 +9,31 @@ block content %}
             <div class="col-6 d-flex align-items-center">
               <h5 class="text-white text-capitalize ps-3">Jadwal</h5>
             </div>
+            <div class="col-6 text-end">
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
+              >
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -81,4 +106,31 @@ block content %}
     </div>
   </div>
 </div>
+
+<script>
+  // Menambahkan event listener ke input pencarian dengan id "searchInput"
+  document.getElementById("searchInput").addEventListener("keyup", function () {
+    // 1. Mengambil teks yang diketik dan mengubahnya menjadi huruf kecil
+    let filter = this.value.toLowerCase();
+
+    // 2. Mengambil tabel dan semua baris (tr) di dalam tbody
+    let table = document.getElementById("dataTable");
+    let tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+    // 3. Melakukan perulangan pada setiap baris tabel
+    for (let i = 0; i < tr.length; i++) {
+      // Mengambil seluruh konten teks dari satu baris
+      let rowText = tr[i].textContent || tr[i].innerText;
+
+      // 4. Memeriksa apakah teks baris mengandung kata kunci pencarian
+      if (rowText.toLowerCase().indexOf(filter) > -1) {
+        // Jika cocok, baris akan ditampilkan
+        tr[i].style.display = "";
+      } else {
+        // Jika tidak cocok, baris akan disembunyikan
+        tr[i].style.display = "none";
+      }
+    }
+  });
+</script>
 {% endblock %}

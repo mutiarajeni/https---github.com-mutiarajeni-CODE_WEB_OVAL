@@ -10,13 +10,37 @@
               <h5 class="text-white text-capitalize ps-3">Lokasi</h5>
             </div>
             <div class="col-6 text-end">
-              <a
-                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
-                href="{{ url_for('admin_lokasi_tambah') }}"
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
               >
-                <i class="material-icons text-dark me-1 fs-4">add</i
-                >&nbsp;&nbsp;Tambah Lokasi
-              </a>
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white"
+                  />
+                </div>
+
+                <a
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  href="{{ url_for('admin_lokasi_tambah') }}"
+                >
+                  <i class="material-icons text-dark me-1 fs-4">add</i
+                  >&nbsp;&nbsp;Tambah Lokasi
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -178,6 +202,32 @@
 
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
+  // kode pencarian
+  document.getElementById("searchInput").addEventListener("keyup", function () {
+    // 1. Mengambil nilai input dan mengubahnya menjadi huruf kecil
+    let filter = this.value.toLowerCase();
+
+    // 2. Mengambil tabel dan semua baris (tr) di dalam tbody
+    let table = document.getElementById("dataTable");
+    let tr = table.getElementsByTagName("tbody")[0].getElementsByTagName("tr");
+
+    // 3. Looping melalui semua baris tabel
+    for (let i = 0; i < tr.length; i++) {
+      // Mengambil seluruh teks dari satu baris
+      let rowText = tr[i].textContent || tr[i].innerText;
+
+      // 4. Memeriksa apakah teks baris mengandung kata kunci pencarian
+      if (rowText.toLowerCase().indexOf(filter) > -1) {
+        // Jika cocok, tampilkan baris
+        tr[i].style.display = "";
+      } else {
+        // Jika tidak cocok, sembunyikan baris
+        tr[i].style.display = "none";
+      }
+    }
+  });
+  // akhir code pencarian
+
   function konfirmasiStatus(lokasiId, statusBaru) {
     const toggle = document.getElementById(`toggleAktif${lokasiId}`);
     const label = document.getElementById(`statusLabel${lokasiId}`);

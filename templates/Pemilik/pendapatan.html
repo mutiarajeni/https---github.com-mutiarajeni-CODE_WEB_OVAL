@@ -13,7 +13,6 @@
               <div
                 class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
               >
-                <!-- Search Bar -->
                 <div class="position-relative w-100 w-sm-auto mb-2 mb-sm-0">
                   <i
                     class="bi bi-search position-absolute start-0 ms-3"
@@ -25,16 +24,14 @@
                   ></i>
                   <input
                     type="text"
-                    class="form-control ps-5 py-4"
+                    class="form-control ps-5 fs-6"
                     placeholder="Cari di sini"
                     id="searchInput"
                     style="background-color: white; font-size: 12px"
                   />
                 </div>
-
-                <!-- Tombol Cetak -->
                 <button
-                  class="btn btn-light mb-2 mb-sm-0"
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
                   id="printBtn"
                   style="
                     height: 35px;
@@ -56,11 +53,10 @@
         <section class="flex-grow-1 p-4 overflow-auto">
           <form
             id="filterForm"
-            class="d-flex flex-wrap align-items-center gap-3 small text-secondary mb-4 user-select-none"
+            class="d-flex flex-wrap align-items-center justify-content-center gap-3 small text-secondary mb-4 user-select-none"
             autocomplete="off"
           >
-            <!-- Radio Button -->
-            <div class="form-check d-flex align-items-center gap-1 ms-4">
+            <div class="form-check d-flex align-items-center gap-1">
               <input
                 class="form-check-input"
                 type="radio"
@@ -73,7 +69,6 @@
               </label>
             </div>
 
-            <!-- Radio Button -->
             <div class="form-check d-flex align-items-center gap-1">
               <input
                 class="form-check-input"
@@ -87,9 +82,8 @@
               </label>
             </div>
 
-            <!-- Date -->
             <div
-              class="input-group border ms-4"
+              class="input-group border"
               style="
                 width: 150px;
                 overflow: hidden;
@@ -108,7 +102,6 @@
 
             <span class="whitespace-nowrap">-</span>
 
-            <!-- Date -->
             <div
               class="input-group border"
               style="
@@ -127,7 +120,6 @@
               />
             </div>
 
-            <!-- Button Filter-->
             <button
               class="btn btn-dark px-5 text-white"
               type="submit"
@@ -136,13 +128,12 @@
                 text-transform: none;
                 font-weight: 400;
                 font-size: 12px;
-                margin-top: 10px;
+                margin-top: 0; /* Ubah margin-top menjadi 0 karena flexbox akan mengatur perataan */
               "
             >
               Filter
             </button>
 
-            <!-- Button Riset-->
             <button
               class="btn btn-outline-dark px-5"
               type="button"
@@ -151,7 +142,7 @@
                 text-transform: none;
                 font-weight: 400;
                 font-size: 12px;
-                margin-top: 10px;
+                margin-top: 0; /* Ubah margin-top menjadi 0 karena flexbox akan mengatur perataan */
               "
             >
               Riset
@@ -190,7 +181,153 @@
                 </tr>
               </thead>
 
-              <tbody id="tableBody"></tbody>
+              <tbody id="tableBody">
+                {% for item in pesanan %}
+                <tr class="bg-white rounded-3 shadow-sm">
+                  <td
+                    class="ps-1 py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ loop.index }}.
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.nama_klien }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.layanan }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.paket }}<br />
+                    <span class="text-muted" style="font-size: 10px"
+                      >({{ item.harga_paket | rupiah }})</span
+                    >
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.biaya_lokasi | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.biaya_tambah_hari | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.biaya_transportasi_akomodasi | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.total_harga | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.deposit | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.tanggal_pembayaran_deposit_formatted if
+                    item.tanggal_pembayaran_deposit else 'Belum Bayar' }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.sisa_bayar | rupiah }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ item.tanggal_pembayaran_pelunasan_formatted if
+                    item.tanggal_pembayaran_pelunasan else 'Belum Bayar' }}
+                  </td>
+                  <td
+                    class="py-2 text-center"
+                    style="
+                      font-size: 12px;
+                      border-bottom: 0.2px solid #ebebeb;
+                      vertical-align: middle;
+                    "
+                  >
+                    {{ 'Sudah' if item.sisa_bayar <= 0 else 'Belum' }}
+                  </td>
+                </tr>
+                {% else %}
+                <tr>
+                  <td colspan="13" class="text-center py-4 text-muted">
+                    Tidak ada data pendapatan yang ditemukan.
+                  </td>
+                </tr>
+                {% endfor %}
+              </tbody>
             </table>
           </div>
         </section>
@@ -201,73 +338,26 @@
 
 <script>
   (() => {
-    // Data Contoh: Array objek yang merepresentasikan data pendapatan
-    const data = [
+    // Data kini diambil dari Jinja, bukan dari script hardcoded
+    const initialData = [
+      {% for item in pesanan %}
       {
-        no: 1,
-        nama: "Aira Sofia",
-        layanan: "Wedding",
-        paket: "Silver",
-        paketHarga: "Rp3.299.000",
-        lokasi: "Rp0",
-        tambahHari: "Rp0",
-        transportasi: "Rp600.000",
-        total: "Rp3.899.000",
-        deposit: "Rp500.000",
-        tanggalDeposit: "16 Mei 2025",
-        sisaBayar: "Rp3.399.000",
-        tanggalPelunasan: "16 Mei 2025",
-        lunas: "Sudah",
+        no: {{ loop.index }},
+        nama: "{{ item.nama_klien }}",
+        layanan: "{{ item.layanan }}",
+        paket: "{{ item.paket }}",
+        paketHarga: "{{ item.harga_paket | rupiah }}",
+        lokasi: "{{ item.biaya_lokasi | rupiah }}",
+        tambahHari: "{{ item.biaya_tambah_hari | rupiah }}",
+        transportasi: "{{ item.biaya_transportasi_akomodasi | rupiah }}",
+        total: "{{ item.total_harga | rupiah }}",
+        deposit: "{{ item.deposit | rupiah }}",
+        tanggalDeposit: "{{ item.tanggal_pembayaran_deposit_formatted if item.tanggal_pembayaran_deposit else 'Belum Bayar' }}", // Pastikan selalu string
+        sisaBayar: "{{ item.sisa_bayar | rupiah }}",
+        tanggalPelunasan: "{{ item.tanggal_pembayaran_pelunasan_formatted if item.tanggal_pembayaran_pelunasan else 'Belum Bayar' }}", // Pastikan selalu string
+        lunas: "{{ 'Sudah' if item.sisa_bayar <= 0 else 'Belum' }}",
       },
-      {
-        no: 2,
-        nama: "Nurha Putri",
-        layanan: "Prewedding",
-        paket: "Indoor (Studio)",
-        paketHarga: "Rp2.000.000",
-        lokasi: "Rp0",
-        tambahHari: "Rp0",
-        transportasi: "Rp0",
-        total: "Rp2.000.000",
-        deposit: "Rp500.000",
-        tanggalDeposit: "10 Juni 2025",
-        sisaBayar: "Rp1.500.000",
-        tanggalPelunasan: "10 Juni 2025",
-        lunas: "Sudah",
-      },
-      {
-        no: 3,
-        nama: "Farina Rida",
-        layanan: "Prewedding",
-        paket: "Outdoor",
-        paketHarga: "Rp2.200.000",
-        lokasi: "Rp100.000",
-        tambahHari: "Rp0",
-        transportasi: "Rp300.000",
-        total: "Rp2.600.000",
-        deposit: "Rp500.000",
-        tanggalDeposit: "21 Juni 2025",
-        sisaBayar: "Rp2.100.000",
-        tanggalPelunasan: "21 Juni 2025",
-        lunas: "Sudah",
-      },
-      {
-        no: 4,
-        nama: "Mika Malik",
-        layanan: "Engagement",
-        paket: "Engagement II",
-        paketHarga: "Rp700.000",
-        lokasi: "Rp0",
-        tambahHari: "Rp0",
-        transportasi: "Rp0",
-        total: "Rp700.000",
-        deposit: "Rp200.000",
-        tanggalDeposit: "12 Juli 2025",
-        sisaBayar: "Rp500.000",
-        tanggalPelunasan: "12 Juli 2025",
-        lunas: "Belum",
-      },
-  
+      {% endfor %}
     ];
 
     // Mengambil referensi elemen DOM
@@ -280,8 +370,9 @@
     const printBtn = document.getElementById("printBtn");
 
     // Fungsi Pembantu: Mengubah format tanggal Indonesia ke objek Date
+    // Menambahkan penanganan untuk 'Belum Bayar' dan input kosong
     function parseIndoDate(dateStr) {
-      if (!dateStr) return null;
+      if (!dateStr || dateStr.toLowerCase() === 'belum bayar') return null;
       const months = {
         Januari: 0,
         Februari: 1,
@@ -302,29 +393,23 @@
       const month = months[parts[1]];
       const year = parseInt(parts[2], 10);
       if (isNaN(day) || month === undefined || isNaN(year)) return null;
-      return new Date(year, month, day);
+      return new Date(year, month, day); // Ini membuat objek Date pada 00:00:00 waktu lokal
     }
 
-    // Fungsi Pembantu: Mengubah format tanggal (yyyy-mm-dd) ke format Indonesia
-    function formatDateIndo(date) {
-      if (!date) return "";
-      const months = [
-        "Januari",
-        "Februari",
-        "Maret",
-        "April",
-        "Mei",
-        "Juni",
-        "Juli",
-        "Agustus",
-        "September",
-        "Oktober",
-        "November",
-        "Desember",
-      ];
-      const d = new Date(date);
-      if (isNaN(d)) return "";
-      return `${d.getDate()} ${months[d.getMonth()]} ${d.getFullYear()}`;
+    // Fungsi Pembantu: Menormalisasi objek Date ke awal hari (00:00:00.000)
+    function normalizeDateToStartOfDay(date) {
+        if (!date) return null;
+        const d = new Date(date);
+        d.setHours(0, 0, 0, 0);
+        return d;
+    }
+
+    // Fungsi Pembantu: Menormalisasi objek Date ke akhir hari (23:59:59.999)
+    function normalizeDateToEndOfDay(date) {
+        if (!date) return null;
+        const d = new Date(date);
+        d.setHours(23, 59, 59, 999);
+        return d;
     }
 
     // Fungsi Utama: Merender data ke dalam tabel HTML
@@ -338,48 +423,48 @@
       dataToRender.forEach((item, idx) => {
         const tr = document.createElement("tr");
         // Kelas Bootstrap untuk styling baris tabel (tanpa border antar sel)
-        tr.className = "bg-white rounded-3 shadow-sm mb-2";
+        tr.className = "bg-white rounded-3 shadow-sm";
         tr.innerHTML = `
-            <td class="ps-1 py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="ps-1 py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               idx + 1
             }.</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.nama
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.layanan
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">
-              ${item.paket}<br />
-              <span class="text-muted" style="font-size: 10px;">(${
-                item.paketHarga
-              })</span>
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">
+                ${item.paket}<br />
+                <span class="text-muted" style="font-size: 10px;">(${
+                  item.paketHarga
+                })</span>
             </td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.lokasi
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.tambahHari
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.transportasi
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.total
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.deposit
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.tanggalDeposit
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.sisaBayar
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.tanggalPelunasan
             }</td>
-            <td class="py-4 align-top text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb;">${
+            <td class="py-2 text-center" style="font-size: 12px; border-bottom: 0.2px solid #ebebeb; vertical-align: middle;">${
               item.lunas
             }</td>
           `;
@@ -391,12 +476,15 @@
     function filterData() {
       const searchTerm = searchInput.value.trim().toLowerCase();
       const tanggalFilter = filterForm.tanggal.value; // 'deposit' atau 'pelunasan'
-      const dateStart = dateStartInput.value
-        ? new Date(dateStartInput.value)
-        : null;
-      const dateEnd = dateEndInput.value ? new Date(dateEndInput.value) : null;
 
-      let filtered = data.filter((item) => {
+      // Mengambil tanggal dari input HTML dan menormalisasi
+      const rawStartDate = dateStartInput.value ? new Date(dateStartInput.value) : null;
+      const rawEndDate = dateEndInput.value ? new Date(dateEndInput.value) : null;
+
+      const startDate = normalizeDateToStartOfDay(rawStartDate);
+      const endDate = normalizeDateToEndOfDay(rawEndDate);
+
+      let filtered = initialData.filter((item) => {
         // Filter Pencarian: Cocokkan istilah pencarian dengan berbagai bidang data
         const searchableFields = [
           item.nama,
@@ -419,19 +507,23 @@
         if (!matchesSearch) return false;
 
         // Filter Tanggal: Terapkan filter berdasarkan tanggal deposit atau pelunasan
-        if (tanggalFilter === "deposit") {
-          if (dateStart || dateEnd) {
-            const tglDeposit = parseIndoDate(item.tanggalDeposit);
-            if (!tglDeposit) return false; // Jika tanggal tidak valid, jangan tampilkan
-            if (dateStart && tglDeposit < dateStart) return false;
-            if (dateEnd && tglDeposit > dateEnd) return false;
+        if (tanggalFilter) { // Hanya terapkan filter tanggal jika radio button dipilih
+          let targetDateString;
+          if (tanggalFilter === "deposit") {
+            targetDateString = item.tanggalDeposit;
+          } else if (tanggalFilter === "pelunasan") {
+            targetDateString = item.tanggalPelunasan;
           }
-        } else if (tanggalFilter === "pelunasan") {
-          if (dateStart || dateEnd) {
-            const tglPelunasan = parseIndoDate(item.tanggalPelunasan);
-            if (!tglPelunasan) return false; // Jika tanggal tidak valid, jangan tampilkan
-            if (dateStart && tglPelunasan < dateStart) return false;
-            if (dateEnd && tglPelunasan > dateEnd) return false;
+
+          const actualDate = normalizeDateToStartOfDay(parseIndoDate(targetDateString));
+
+          // Jika rentang tanggal dipilih, dan actualDate tidak valid atau di luar rentang, filter keluar.
+          // Bandingkan timestamp (milidetik sejak epoch) untuk pemeriksaan rentang tanggal yang andal.
+          if (startDate || endDate) {
+            if (!actualDate) return false; // Jika tanggal target tidak diset atau tidak valid, tidak bisa difilter berdasarkan rentang
+
+            if (startDate && actualDate.getTime() < startDate.getTime()) return false;
+            if (endDate && actualDate.getTime() > endDate.getTime()) return false;
           }
         }
         return true; // Jika semua filter lolos, sertakan item ini
@@ -443,10 +535,12 @@
     // Fungsi Reset Filter: Mengembalikan semua filter ke kondisi awal
     function resetFilters() {
       searchInput.value = "";
-      filterForm.tanggal.value = ""; // Menghapus pilihan radio
+      // Hapus pilihan radio button dengan mengatur checked = false
+      document.getElementById("radioDeposit").checked = false;
+      document.getElementById("radioPelunasan").checked = false;
       dateStartInput.value = "";
       dateEndInput.value = "";
-      renderTable(data); // Render semua data asli
+      renderTable(initialData); // Render semua data asli
     }
 
     // Fungsi Cetak Tabel (disesuaikan agar versi cetak tetap ada bordernya dan rata tengah)
@@ -454,23 +548,23 @@
       const printWindow = window.open("", "", "width=900,height=600");
       // Gaya minimal untuk cetak, menggunakan kelas tabel Bootstrap dasar
       const style = `
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-        <style>
-          body { font-family: 'Inter', sans-serif; padding: 20px; }
-          .table { width: 100%; margin-bottom: 1rem; color: #212529; border-collapse: collapse; }
-          .table th, .table td { padding: 0.75rem; vertical-align: top; }
-          .table thead th { vertical-align: bottom; }
-          .table-bordered th,
-          .table-bordered td { border: 1px solid #dee2e6 !important; } /* Menambahkan border untuk cetak */
-          .text-center { text-align: center !important; } /* Rata tengah untuk cetak */
-        </style>
-      `;
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" xintegrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+            <style>
+                body { font-family: 'Inter', sans-serif; padding: 20px; }
+                .table { width: 100%; margin-bottom: 1rem; color: #212529; border-collapse: collapse; }
+                .table th, .table td { padding: 0.75rem; vertical-align: top; }
+                .table thead th { vertical-align: bottom; }
+                .table-bordered th,
+                .table-bordered td { border: 1px solid #dee2e6 !important; } /* Menambahkan border untuk cetak */
+                .text-center { text-align: center !important; } /* Rata tengah untuk cetak */
+            </style>
+        `;
       // Mengambil innerHTML dari tabel dan membungkusnya dengan tabel baru yang ada border dan rata tengah
       const tableHTML = `<table class="table table-bordered text-center small text-secondary">${
         document.getElementById("dataTable").innerHTML
       }</table>`;
       printWindow.document.write(
-        `<html><head><title>Print Pendapatan</title>${style}</head><body><h2 class="mb-3 text-center">Data Pendapatan Oval Photo</h2>${tableHTML}</body></html>`
+        `<html><head><title>&nbsp;</title>${style}</head><body><h2 class="mb-3 text-center">Data Pendapatan Oval Photo</h2>${tableHTML}</body></html>`
       );
       printWindow.document.close();
       printWindow.print(); // Membuka dialog cetak
@@ -487,7 +581,7 @@
     printBtn.addEventListener("click", printTable); // Saat tombol cetak diklik
 
     // Inisialisasi: Render tabel saat halaman pertama kali dimuat
-    renderTable(data);
+    renderTable(initialData);
   })();
 </script>
 

@@ -3,7 +3,22 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Oval Photo - {{ title }}</title>
+
+    <meta property="og:title" content="Oval Photo" />
+    <meta
+      property="og:description"
+      content="Abadikan Momen Kamu Bersama Oval Photo"
+    />
+    <meta
+      property="og:image"
+      content="{{ url_for('static', filename='images/ogimage.png') }}"
+    />
+
+    <link
+      rel="shortcut icon"
+      href="{{ url_for('static', filename='images/favicon.png') }}"
+    />
+    <title>Oval Photo</title>
 
     <!-- CSS -->
     <link

@@ -19,10 +19,13 @@
     <title>
       {% if request.path == '/login' %} Login | Oval Photo {% elif request.path
       == '/register' %} Mendaftar di Oval Photo {% elif request.path ==
-      '/loginAdmin' %} Login Admin | Oval Photo {% else %} Admin Oval Photo {%
+      '/loginAdmin' %} Login Admin | Oval Photo {% else %} Pemilik Oval Photo {%
       endif %}
     </title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/admin.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/admin.css') }}"
+    />
 
     <link
       rel="stylesheet"
@@ -44,8 +47,14 @@
       href="https://fonts.googleapis.com/css2?family=Noto+Serif+Display:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap"
       rel="stylesheet"
     />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nucleo-icons.css') }}" />
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/nucleo-svg.css') }}" />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/nucleo-icons.css') }}"
+    />
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='css/nucleo-svg.css') }}"
+    />
     <script
       src="https://kit.fontawesome.com/42d5adcbca.js"
       crossorigin="anonymous"
@@ -59,8 +68,7 @@
       href="{{ url_for('static', filename='css/material-dashboard.css') }}"
       rel="stylesheet"
     />
-
-    </head>
+  </head>
 
   <body class="g-sidenav-show bg-gray-200">
     {% if request.path != '/loginAdmin' and request.path != '/login' and
@@ -71,16 +79,10 @@
     >
       {% if request.path in ['/dashboard', '/product','/supplier', '/stock',
       '/user','/pembelian','/penjualan'] %} {% include 'admin/navbar_admin.html'
-      %} {% endif %}
-
-      {% if request.path != '/loginAdmin' and request.path != '/login' and
-      request.path != '/register' %}
+      %} {% endif %} {% if request.path != '/loginAdmin' and request.path !=
+      '/login' and request.path != '/register' %}
       <div class="container-fluid py-4">
-        {% endif %} 
-        
-        {% block content %}{% endblock %} 
-        
-        {% if request.path !=
+        {% endif %} {% block content %}{% endblock %} {% if request.path !=
         '/loginAdmin' and request.path != '/login' and request.path !=
         '/register' %} {% include 'admin/footer_admin.html' %} {% endif %}
       </div>
@@ -91,9 +93,8 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script async defer src="https://buttons.github.io/buttons.js"></script>
-    <script src="{{ url_for('static', filename='assets/assets/js/material-dashboard.min.js') }}"></script> {# Hapus ?v=3.0.0 jika tidak ada #}
-    
-    {% if request.path == '/dashboard'%}
+    <script src="{{ url_for('static', filename='assets/assets/js/material-dashboard.min.js') }}"></script>
+    {# Hapus ?v=3.0.0 jika tidak ada #} {% if request.path == '/dashboard'%}
     <script>
       // ... (kode chart yang sangat panjang, saya biarkan utuh) ...
     </script>

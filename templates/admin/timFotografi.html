@@ -11,13 +11,37 @@ endblock %} {% block content %}
             </div>
 
             <div class="col-6 text-end">
-              <a
-                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
-                href="/admin_timFotografi_tambah"
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
               >
-                <i class="material-icons text-dark me-1 fs-4">add</i
-                >&nbsp;&nbsp;Tambah Tim
-              </a>
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white"
+                  />
+                </div>
+
+                <a
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  href="/admin_timFotografi_tambah"
+                >
+                  <i class="material-icons text-dark me-1 fs-4">add</i
+                  >&nbsp;&nbsp;Tambah Tim
+                </a>
+              </div>
             </div>
           </div>
         </div>
@@ -247,5 +271,30 @@ endblock %} {% block content %}
       }
     });
   }
+
+  // ===== KODE BARU UNTUK FUNGSI PENCARIAN DIMULAI DI SINI =====
+  document.addEventListener("DOMContentLoaded", function () {
+    const searchInput = document.getElementById("searchInput");
+    const dataTable = document.getElementById("dataTable");
+    const tableBody = dataTable.getElementsByTagName("tbody")[0];
+    const rows = tableBody.getElementsByTagName("tr");
+
+    searchInput.addEventListener("keyup", function () {
+      const filter = searchInput.value.toLowerCase();
+
+      for (let i = 0; i < rows.length; i++) {
+        let row = rows[i];
+        // Mengambil seluruh teks dari satu baris (tr) untuk pencarian
+        let rowText = row.textContent || row.innerText;
+
+        if (rowText.toLowerCase().indexOf(filter) > -1) {
+          row.style.display = ""; // Tampilkan baris jika cocok
+        } else {
+          row.style.display = "none"; // Sembunyikan baris jika tidak cocok
+        }
+      }
+    });
+  });
+  // ===== KODE BARU UNTUK FUNGSI PENCARIAN SELESAI DI SINI =====
 </script>
 {% endblock %}

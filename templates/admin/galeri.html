@@ -1,345 +1,492 @@
-{% extends "admin/base_admin.html" %}
-{% block title %} Daftar Galeri Foto {% endblock %}
-
-{% block content %}
+{% extends "admin/base_admin.html" %} {% block title %} Daftar Galeri Foto {%
+endblock %} {% block content %}
 <div class="row">
-    <div class="col-12">
-        <div class="card my-4">
-            <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
-                <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
-                    <div class="row">
-                        <div class="col-md-6 d-flex align-items-center">
-                            <h5 class="text-white text-capitalize ps-3">Daftar Galeri Foto</h5>
-                        </div>
-                        <div class="col-md-6 text-end pe-3">
-                            <a
-                                class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
-                                href="{{ url_for('admin_galeri_tambah') }}"
-                            >
-                                <i class="material-icons text-dark me-1 fs-4">add</i>
-                                &nbsp;&nbsp;Tambah Galeri
-                            </a>
-                        </div>
-                    </div>
-                </div>
+  <div class="col-12">
+    <div class="card my-4">
+      <div class="card-header p-0 position-relative mt-n4 mx-3 z-index-2">
+        <div class="bg-admin shadow-dark border-radius-lg pt-4 pb-3">
+          <div class="row">
+            <div class="col-md-6 d-flex align-items-center">
+              <h5 class="text-white text-capitalize ps-3">
+                Daftar Galeri Foto
+              </h5>
             </div>
-
-            <div class="card-body px-0 pb-2">
-                <div class="table-responsive p-0">
-                    <table id="dataTableGaleri" class="table align-items-center mb-0">
-                        <thead>
-                            <tr>
-                                <th class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7" style="width: 5%;"></th> 
-                                <th class="text-center text-normal font-weight-bolder" style="width: 15%;">Thumbnail</th>
-                                <th class="text-center text-normal font-weight-bolder">Kategori</th>
-                                <th class="text-center text-normal font-weight-bolder">Layanan</th>
-                                <th class="text-center text-normal font-weight-bolder">Lokasi</th>
-                                <th class="text-center text-normal font-weight-bolder" style="width: 20%;">Aksi</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% if galeri_items %}
-                                {% for item in galeri_items %}
-                                <tr id="row-galeri-{{ item._id }}">
-                                    <td class="text-center align-middle">
-                                        <p class="text-normal mb-0 ms-3">{{ loop.index }}</p>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        {% if item.thumbnail %}
-                                        <img
-                                            src="{{ url_for('static', filename='images/imgGaleri/' ~ item.thumbnail) }}"
-                                            style="width: 80px; height: 60px; object-fit: cover; border-radius: .375rem;"
-                                            alt="thumbnail galeri"
-                                        />
-                                        {% else %}
-                                        <span class="text-normal mb-0">N/A</span>
-                                        {% endif %}
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <span class="text-normal">
-                                            {{ item.kategori | capitalize if item.kategori else '-' }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <span class="text-normal">
-                                            {{ item.nama_layanan_display }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <span class="text-normal">
-                                            {{ item.nama_lokasi_display }}
-                                        </span>
-                                    </td>
-                                    <td class="text-center align-middle">
-                                        <div class="d-inline-flex align-items-center me-3" style="min-width: 90px;">
-                                            {# Menggunakan switch Anda #}
-                                            <label class="switch">
-                                                <input
-                                                    type="checkbox"
-                                                    id="toggleStatusGaleri{{ item._id }}"
-                                                    {% if item.status %}checked{% endif %}
-                                                    onchange="konfirmasiUbahStatusGaleri('{{ item._id }}', this.checked)"
-                                                />
-                                                <span class="slider round"></span>
-                                            </label>
-                                            <label class="status-text mb-0 ms-1" for="toggleStatusGaleri{{ item._id }}" id="labelStatusGaleri{{ item._id }}">
-                                                {{ "Aktif" if item.status else "Nonaktif" }}
-                                            </label>
-                                        </div>
-
-                                        <a
-                                            href="{{ url_for('admin_galeri_ubah', item_id=item._id) }}"
-                                            class="btn btn-link text-dark px-3 mb-0 admin-ubah-btn" {# Menambahkan kelas baru di sini #}
-                                            data-bs-toggle="tooltip" data-bs-placement="top" title="Ubah Galeri"
-                                        >
-                                            <i class="material-icons opacity-10 me-1">edit</i>Ubah {# Menambahkan teks "Ubah" ke sini #}
-                                        </a>
-
-                                    </td>
-                                </tr>
-                                {% endfor %}
-                            {% else %}
-                            <tr>
-                                <td colspan="6" class="text-center text-muted py-4">Belum ada data galeri untuk ditampilkan.</td>
-                            </tr>
-                            {% endif %}
-                        </tbody>
-                    </table>
+            <div class="col-md-6 text-end pe-3">
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
+              >
+                <div
+                  class="position-relative w-100 w-sm-auto mb-2 mb-sm-0 fs-6"
+                >
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white"
+                  />
                 </div>
+
+                <a
+                  class="btn btn-light btn-sm text-capitalize mb-0 me-4 fs-6 fw-normal"
+                  href="{{ url_for('admin_galeri_tambah') }}"
+                >
+                  <i class="material-icons text-dark me-1 fs-4">add</i>
+                  &nbsp;&nbsp;Tambah Galeri
+                </a>
+              </div>
             </div>
+          </div>
         </div>
+      </div>
+
+      <div class="card-body px-0 pb-2">
+        <div class="table-responsive p-0">
+          <table id="dataTableGaleri" class="table align-items-center mb-0">
+            <thead>
+              <tr>
+                <th
+                  class="text-center text-uppercase text-secondary text-xxs font-weight-bolder opacity-7"
+                  style="width: 5%"
+                ></th>
+                <th
+                  class="text-center text-normal font-weight-bolder"
+                  style="width: 15%"
+                >
+                  Thumbnail
+                </th>
+                <th class="text-center text-normal font-weight-bolder">
+                  Kategori
+                </th>
+                <th class="text-center text-normal font-weight-bolder">
+                  Layanan
+                </th>
+                <th class="text-center text-normal font-weight-bolder">
+                  Lokasi
+                </th>
+                <th
+                  class="text-center text-normal font-weight-bolder"
+                  style="width: 20%"
+                >
+                  Aksi
+                </th>
+              </tr>
+            </thead>
+            <tbody>
+              {% if galeri_items %} {% for item in galeri_items %}
+              <tr id="row-galeri-{{ item._id }}">
+                <td class="text-center align-middle">
+                  <p class="text-normal mb-0 ms-3">{{ loop.index }}.</p>
+                </td>
+                <td class="text-center align-middle">
+                  {% if item.thumbnail %}
+                  <img
+                    src="{{ url_for('static', filename='images/imgGaleri/' ~ item.thumbnail) }}"
+                    style="
+                      width: 80px;
+                      height: 60px;
+                      object-fit: cover;
+                      border-radius: 0.375rem;
+                    "
+                    alt="thumbnail galeri"
+                  />
+                  {% else %}
+                  <span class="text-normal mb-0">N/A</span>
+                  {% endif %}
+                </td>
+                <td class="text-center align-middle">
+                  <span class="text-normal">
+                    {{ item.kategori | capitalize if item.kategori else '-' }}
+                  </span>
+                </td>
+                <td class="text-center align-middle">
+                  <span class="text-normal">
+                    {{ item.nama_layanan_display }}
+                  </span>
+                </td>
+                <td class="text-center align-middle">
+                  <span class="text-normal">
+                    {{ item.nama_lokasi_display }}
+                  </span>
+                </td>
+                <td class="text-center align-middle">
+                  <div
+                    class="d-inline-flex align-items-center me-3"
+                    style="min-width: 90px"
+                  >
+                    {# Menggunakan switch Anda #}
+                    <label class="switch">
+                      <input
+                        type="checkbox"
+                        id="toggleStatusGaleri{{ item._id }}"
+                        {%
+                        if
+                        item.status
+                        %}checked{%
+                        endif
+                        %}
+                        onchange="konfirmasiUbahStatusGaleri('{{ item._id }}', this.checked)"
+                      />
+                      <span class="slider round"></span>
+                    </label>
+                    <label
+                      class="status-text mb-0 ms-1"
+                      for="toggleStatusGaleri{{ item._id }}"
+                      id="labelStatusGaleri{{ item._id }}"
+                    >
+                      {{ "Aktif" if item.status else "Nonaktif" }}
+                    </label>
+                  </div>
+
+                  <a
+                    href="{{ url_for('admin_galeri_ubah', item_id=item._id) }}"
+                    class="btn btn-link text-dark px-3 mb-0 admin-ubah-btn"
+                    {#
+                    Menambahkan
+                    kelas
+                    baru
+                    di
+                    sini
+                    #}
+                    data-bs-toggle="tooltip"
+                    data-bs-placement="top"
+                    title="Ubah Galeri"
+                  >
+                    <i class="material-icons opacity-10 me-1">edit</i>Ubah {#
+                    Menambahkan teks "Ubah" ke sini #}
+                  </a>
+                </td>
+              </tr>
+              {% endfor %} {% else %}
+              <tr>
+                <td colspan="6" class="text-center text-muted py-4">
+                  Belum ada data galeri untuk ditampilkan.
+                </td>
+              </tr>
+              {% endif %}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </div>
+  </div>
 </div>
 
 <style>
-    /* Global table alignment for consistency if not in base_admin.html */
-    .table td, .table th {
-        vertical-align: middle !important;
-    }
+  /* Global table alignment for consistency if not in base_admin.html */
+  .table td,
+  .table th {
+    vertical-align: middle !important;
+  }
 
-    /* Tooltip cursor */
-    [data-bs-toggle="tooltip"] {
-        cursor: pointer;
-    }
+  /* Tooltip cursor */
+  [data-bs-toggle="tooltip"] {
+    cursor: pointer;
+  }
 
-    /* Style untuk toggle switch */
-    .switch {
-        position: relative;
-        display: inline-block;
-        width: 40px;
-        height: 20px;
-        vertical-align: middle;
-    }
+  /* Style untuk toggle switch */
+  .switch {
+    position: relative;
+    display: inline-block;
+    width: 40px;
+    height: 20px;
+    vertical-align: middle;
+  }
 
-    .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-    }
+  .switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+  }
 
-    .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #ccc;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-        border-radius: 34px; /* Dari style yang Anda berikan */
-    }
+  .slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 34px; /* Dari style yang Anda berikan */
+  }
 
-    .slider:before {
-        position: absolute;
-        content: "";
-        height: 16px;
-        width: 16px;
-        left: 2px;
-        bottom: 2px;
-        background-color: white;
-        -webkit-transition: 0.4s;
-        transition: 0.4s;
-        border-radius: 50%; /* Dari style yang Anda berikan */
-    }
+  .slider:before {
+    position: absolute;
+    content: "";
+    height: 16px;
+    width: 16px;
+    left: 2px;
+    bottom: 2px;
+    background-color: white;
+    -webkit-transition: 0.4s;
+    transition: 0.4s;
+    border-radius: 50%; /* Dari style yang Anda berikan */
+  }
 
-    input:checked + .slider {
-        background-color: #4caf50;
-    }
+  input:checked + .slider {
+    background-color: #4caf50;
+  }
 
-    input:focus + .slider {
-        box-shadow: 0 0 1px #4caf50;
-    }
+  input:focus + .slider {
+    box-shadow: 0 0 1px #4caf50;
+  }
 
-    input:checked + .slider:before {
-        transform: translateX(20px);
-    }
+  input:checked + .slider:before {
+    transform: translateX(20px);
+  }
 
-    /* Redundant if .slider already has border-radius: 34px, but keeping from your input */
-    .slider.round {
-        border-radius: 34px;
-    }
+  /* Redundant if .slider already has border-radius: 34px, but keeping from your input */
+  .slider.round {
+    border-radius: 34px;
+  }
 
-    /* Redundant if .slider:before already has border-radius: 50%, but keeping from your input */
-    .slider.round:before {
-        border-radius: 50%;
-    }
+  /* Redundant if .slider:before already has border-radius: 50%, but keeping from your input */
+  .slider.round:before {
+    border-radius: 50%;
+  }
 
-    /* Style untuk teks status Aktif/Nonaktif */
-    .status-text {
-        font-size: 12px;
-        font-weight: 500; /* Ini mungkin membuat teks aktif/nonaktif bold */
-        color: #494949;
-        white-space: nowrap;
-    }
+  /* Style untuk teks status Aktif/Nonaktif */
+  .status-text {
+    font-size: 12px;
+    font-weight: 500; /* Ini mungkin membuat teks aktif/nonaktif bold */
+    color: #494949;
+    white-space: nowrap;
+  }
 
-    /* Mengubah tombol Ubah agar tidak bold */
-    .admin-ubah-btn {
-        font-weight: normal !important; /* Gunakan !important untuk menimpa gaya Material Dashboard */
-        text-transform: none !important; /* Pastikan tidak uppercase */
-        font-size: 0.875rem !important;
-        line-height: 1 !important;
-        padding: 0.375rem 0.75rem !important; /* Menjaga padding yang Anda inginkan */
-    }
+  /* Mengubah tombol Ubah agar tidak bold */
+  .admin-ubah-btn {
+    font-weight: normal !important; /* Gunakan !important untuk menimpa gaya Material Dashboard */
+    text-transform: none !important; /* Pastikan tidak uppercase */
+    font-size: 0.875rem !important;
+    line-height: 1 !important;
+    padding: 0.375rem 0.75rem !important; /* Menjaga padding yang Anda inginkan */
+  }
 
-    /* Optional: Jika teks header tabel juga ingin tidak bold */
-    .table th.text-normal.font-weight-bolder {
-        font-weight: normal !important;
-    }
+  /* Optional: Jika teks header tabel juga ingin tidak bold */
+  .table th.text-normal.font-weight-bolder {
+    font-weight: normal !important;
+  }
 
-    /* General table alignment (repeated from your code) */
-    td.align-middle.text-center {
-        vertical-align: middle !important;
-        text-align: center !important;
-    }
+  /* General table alignment (repeated from your code) */
+  td.align-middle.text-center {
+    vertical-align: middle !important;
+    text-align: center !important;
+  }
 
-    .btn-link {
-        text-decoration: none !important; /* Hapus garis bawah */
-        box-shadow: none !important; /* Hapus shadow jika ada */
-    }
+  .btn-link {
+    text-decoration: none !important; /* Hapus garis bawah */
+    box-shadow: none !important; /* Hapus shadow jika ada */
+  }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
+  document.addEventListener("DOMContentLoaded", function () {
     // --- SweetAlert Handler dari URL Parameters ---
     const urlParams = new URLSearchParams(window.location.search);
-    const saStatus = urlParams.get('_sa_status');
-    const saMessage = urlParams.get('_sa_message');
+    const saStatus = urlParams.get("_sa_status");
+    const saMessage = urlParams.get("_sa_message");
 
     if (saStatus && saMessage) {
-        let icon = 'info'; // Default icon
-        if (saStatus === 'success') {
-            icon = 'success';
-        } else if (saStatus === 'error' || saStatus === 'danger') {
-            icon = 'error';
-        } else if (saStatus === 'warning') {
-            icon = 'warning';
-        }
+      let icon = "info"; // Default icon
+      if (saStatus === "success") {
+        icon = "success";
+      } else if (saStatus === "error" || saStatus === "danger") {
+        icon = "error";
+      } else if (saStatus === "warning") {
+        icon = "warning";
+      }
 
-        Swal.fire({
-            title: saStatus.charAt(0).toUpperCase() + saStatus.slice(1), // Capitalize first letter of status (e.g., "Success")
-            text: saMessage,
-            icon: icon,
-            confirmButtonText: 'Oke'
-        }).then(() => {
-            // Remove SweetAlert parameters from URL after displaying to prevent re-trigger on refresh
-            urlParams.delete('_sa_status');
-            urlParams.delete('_sa_message');
-            const newUrl = window.location.pathname + (urlParams.toString() ? '?' + urlParams.toString() : '');
-            window.history.replaceState({}, document.title, newUrl);
-        });
+      Swal.fire({
+        title: saStatus.charAt(0).toUpperCase() + saStatus.slice(1), // Capitalize first letter of status (e.g., "Success")
+        text: saMessage,
+        icon: icon,
+        confirmButtonText: "Oke",
+      }).then(() => {
+        // Remove SweetAlert parameters from URL after displaying to prevent re-trigger on refresh
+        urlParams.delete("_sa_status");
+        urlParams.delete("_sa_message");
+        const newUrl =
+          window.location.pathname +
+          (urlParams.toString() ? "?" + urlParams.toString() : "");
+        window.history.replaceState({}, document.title, newUrl);
+      });
     }
     // --- Akhir SweetAlert Handler ---
 
+    // =======================================================================
+    // MULAI: Kode untuk Fungsi Pencarian (Search) - Tambahkan kode di bawah ini
+    // =======================================================================
+
+    // 1. Dapatkan elemen input pencarian dan tabel
+    const searchInput = document.getElementById("searchInput");
+    const dataTable = document.getElementById("dataTableGaleri");
+    const tableRows = dataTable
+      .getElementsByTagName("tbody")[0]
+      .getElementsByTagName("tr");
+
+    // Cek apakah ada baris data atau tidak.
+    // Jika ada pesan "Belum ada data", maka kita tidak perlu menjalankan fungsi search.
+    const noDataRow = dataTable.querySelector('tbody td[colspan="6"]');
+
+    if (!noDataRow) {
+      // 2. Tambahkan event listener 'keyup' pada input pencarian
+      searchInput.addEventListener("keyup", function () {
+        // Ambil teks yang diketik, ubah ke huruf kecil untuk pencarian case-insensitive
+        const filterText = searchInput.value.toLowerCase();
+
+        // 3. Loop melalui setiap baris (tr) di dalam tbody
+        for (let i = 0; i < tableRows.length; i++) {
+          const row = tableRows[i];
+          // Ambil semua sel (td) di dalam baris tersebut
+          const cells = row.getElementsByTagName("td");
+          let rowText = "";
+
+          // 4. Gabungkan teks dari semua sel yang relevan (Kategori, Layanan, Lokasi)
+          // Indeks sel: [2] = Kategori, [3] = Layanan, [4] = Lokasi
+          if (cells.length > 4) {
+            // Pastikan baris memiliki cukup sel
+            rowText =
+              (cells[2].textContent || cells[2].innerText) +
+              " " +
+              (cells[3].textContent || cells[3].innerText) +
+              " " +
+              (cells[4].textContent || cells[4].innerText);
+          }
+
+          // 5. Periksa apakah teks baris mengandung teks pencarian
+          if (rowText.toLowerCase().indexOf(filterText) > -1) {
+            // Jika cocok, tampilkan barisnya
+            row.style.display = "";
+          } else {
+            // Jika tidak cocok, sembunyikan barisnya
+            row.style.display = "none";
+          }
+        }
+      });
+    }
+
+    // =======================================================================
+    // SELESAI: Kode untuk Fungsi Pencarian (Search)
+    // =======================================================================
 
     // Initialize tooltips (if using Bootstrap JS)
-    var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'))
-    var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+    var tooltipTriggerList = [].slice.call(
+      document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    );
+    var tooltipList = tooltipTriggerList
+      .map(function (tooltipTriggerEl) {
         // Check if Bootstrap's Tooltip is available
-        if (typeof bootstrap !== 'undefined' && typeof bootstrap.Tooltip === 'function') {
-            return new bootstrap.Tooltip(tooltipTriggerEl);
+        if (
+          typeof bootstrap !== "undefined" &&
+          typeof bootstrap.Tooltip === "function"
+        ) {
+          return new bootstrap.Tooltip(tooltipTriggerEl);
         }
         return null; // Return null if Bootstrap's Tooltip is not loaded
-    }).filter(Boolean); // Filter out null values
-
+      })
+      .filter(Boolean); // Filter out null values
 
     // Function to handle status change confirmation
-    window.konfirmasiUbahStatusGaleri = function(itemId, statusBaru) {
-        const toggle = document.getElementById("toggleStatusGaleri" + itemId);
-        const label = document.getElementById("labelStatusGaleri" + itemId);
+    window.konfirmasiUbahStatusGaleri = function (itemId, statusBaru) {
+      const toggle = document.getElementById("toggleStatusGaleri" + itemId);
+      const label = document.getElementById("labelStatusGaleri" + itemId);
 
-        // Temporarily revert the toggle's state for visual feedback during confirmation
-        if (toggle) {
-            toggle.checked = !statusBaru; 
-        }
+      // Temporarily revert the toggle's state for visual feedback during confirmation
+      if (toggle) {
+        toggle.checked = !statusBaru;
+      }
 
-        Swal.fire({
-            title: statusBaru ? "Aktifkan item galeri?" : "Nonaktifkan item galeri?",
-            text: statusBaru
-                ? "Item galeri ini akan bisa ditampilkan di bagian user."
-                : "Item galeri ini tidak akan bisa ditampilkan di bagian user.",
-            icon: "question",
-            showCancelButton: true,
-            confirmButtonColor: statusBaru ? "#4CAF50" : "#f44336", // Green for activate, Red for deactivate
-            cancelButtonColor: "#7b809a", // Grey
-            confirmButtonText: "Ya, lanjutkan!",
-            cancelButtonText: "Batal",
-        }).then((result) => {
-            if (result.isConfirmed) {
-                // If confirmed, send AJAX request to backend
-                fetch(`/admin_galeri_toggle_status/${itemId}`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ status: statusBaru }),
-                })
-                .then(response => {
-                    if (!response.ok) {
-                        // If response is not OK (e.g., 404, 500), parse error message from JSON
-                        return response.json().then(errData => {
-                            let errorMessage = (errData && errData.message) ? errData.message : `HTTP error! Status: ${response.status}`;
-                            throw new Error(errorMessage);
-                        });
-                    }
-                    return response.json(); // Parse successful JSON response
-                })
-                .then(data => {
-                    if (data.success) {
-                        // Update UI if successful
-                        if (toggle) toggle.checked = statusBaru; // Set toggle to new status
-                        if (label) label.textContent = statusBaru ? "Aktif" : "Nonaktif"; // Update label text
-                        Swal.fire({
-                            icon: "success", 
-                            title: "Berhasil!",
-                            text: data.message || (statusBaru ? "Status galeri diaktifkan." : "Status galeri dinonaktifkan."),
-                            timer: 1500, // Auto close after 1.5 seconds
-                            showConfirmButton: false, // No confirm button
-                        });
-                    } else {
-                        // If backend reports failure
-                        if (toggle) toggle.checked = !statusBaru; // Revert toggle state
-                        Swal.fire({ 
-                            icon: "error", 
-                            title: "Gagal", 
-                            text: data.message || "Gagal mengubah status." 
-                        });
-                    }
-                })
-                .catch(error => {
-                    // Handle network errors or errors thrown from previous .then()
-                    console.error("Error saat mengubah status galeri:", error);
-                    if (toggle) toggle.checked = !statusBaru; // Revert toggle state
-                    Swal.fire({ icon: "error", title: "Error", text: "Terjadi kesalahan: " + error.message });
+      Swal.fire({
+        title: statusBaru
+          ? "Aktifkan item galeri?"
+          : "Nonaktifkan item galeri?",
+        text: statusBaru
+          ? "Item galeri ini akan bisa ditampilkan di bagian user."
+          : "Item galeri ini tidak akan bisa ditampilkan di bagian user.",
+        icon: "question",
+        showCancelButton: true,
+        confirmButtonColor: statusBaru ? "#4CAF50" : "#f44336", // Green for activate, Red for deactivate
+        cancelButtonColor: "#7b809a", // Grey
+        confirmButtonText: "Ya, lanjutkan!",
+        cancelButtonText: "Batal",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          // If confirmed, send AJAX request to backend
+          fetch(`/admin_galeri_toggle_status/${itemId}`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ status: statusBaru }),
+          })
+            .then((response) => {
+              if (!response.ok) {
+                // If response is not OK (e.g., 404, 500), parse error message from JSON
+                return response.json().then((errData) => {
+                  let errorMessage =
+                    errData && errData.message
+                      ? errData.message
+                      : `HTTP error! Status: ${response.status}`;
+                  throw new Error(errorMessage);
                 });
-            } else {
-                // If user cancels the SweetAlert confirmation, revert the toggle's state
-                if (toggle) {
-                    toggle.checked = !statusBaru; 
-                }
-            }
-        });
-    }
-});
+              }
+              return response.json(); // Parse successful JSON response
+            })
+            .then((data) => {
+              if (data.success) {
+                // Update UI if successful
+                if (toggle) toggle.checked = statusBaru; // Set toggle to new status
+                if (label)
+                  label.textContent = statusBaru ? "Aktif" : "Nonaktif"; // Update label text
+                Swal.fire({
+                  icon: "success",
+                  title: "Berhasil!",
+                  text:
+                    data.message ||
+                    (statusBaru
+                      ? "Status galeri diaktifkan."
+                      : "Status galeri dinonaktifkan."),
+                  timer: 1500, // Auto close after 1.5 seconds
+                  showConfirmButton: false, // No confirm button
+                });
+              } else {
+                // If backend reports failure
+                if (toggle) toggle.checked = !statusBaru; // Revert toggle state
+                Swal.fire({
+                  icon: "error",
+                  title: "Gagal",
+                  text: data.message || "Gagal mengubah status.",
+                });
+              }
+            })
+            .catch((error) => {
+              // Handle network errors or errors thrown from previous .then()
+              console.error("Error saat mengubah status galeri:", error);
+              if (toggle) toggle.checked = !statusBaru; // Revert toggle state
+              Swal.fire({
+                icon: "error",
+                title: "Error",
+                text: "Terjadi kesalahan: " + error.message,
+              });
+            });
+        } else {
+          // If user cancels the SweetAlert confirmation, revert the toggle's state
+          if (toggle) {
+            toggle.checked = !statusBaru;
+          }
+        }
+      });
+    };
+  });
 </script>
 
 {% endblock %}

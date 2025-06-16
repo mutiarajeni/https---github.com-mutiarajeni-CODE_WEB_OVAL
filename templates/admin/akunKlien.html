@@ -1,6 +1,5 @@
-{% extends "admin/base_admin.html" %}
-{% block title %} Daftar Akun Klien {% endblock %}
-{% block content %}
+{% extends "admin/base_admin.html" %} {% block title %} Daftar Akun Klien {%
+endblock %} {% block content %}
 <div class="row">
   <div class="col-12">
     <div class="card my-4">
@@ -11,7 +10,28 @@
               <h5 class="text-white text-capitalize ps-3">Daftar Akun Klien</h5>
             </div>
             <div class="col-6 text-end">
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
+              >
+                <div class="position-relative w-100 w-sm-auto mb-2 mb-sm-0">
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white; font-size: 12px"
+                  />
+                </div>
               </div>
+            </div>
           </div>
         </div>
       </div>
@@ -21,37 +41,20 @@
             <thead>
               <tr>
                 <th class="text-center fs-7 fw-bold"></th>
-                <th class="text-center fs-7 fw-bold">Klien</th> <th class="text-center text-dark fs-7 fw-bold">Nama Pengguna</th>
+                <th class="text-center fs-7 fw-bold">Nama Klien</th>
+                <th class="text-center text-dark fs-7 fw-bold">
+                  Nama Pengguna
+                </th>
                 <th class="text-center fs-7 fw-bold">Alamat Email</th>
               </tr>
             </thead>
-            <tbody>
-              {% for user in users %}
+            <tbody id="tableBody">
+              {# Data akan dirender di sini oleh JavaScript #}
               <tr>
-                <td class="text-center text-normal">
-                  <h6 class="mb-0 text-normal">{{ loop.index }}.</h6> </td>
-                <td>
-                  <div class="d-flex px-2 py-1">
-                    <div>
-                      <img
-                        src="{{ user.profile_picture_url }}"
-                        alt="Foto Profil Klien"
-                        style="width: 40px; height: 40px; border-radius: 50%; object-fit: cover; object-position: center;"
-                      />
-                    </div>
-                    <div class="d-flex flex-column justify-content-center">
-                      <h6 class="ms-4 mb-0 text-normal">{{ user.full_name }}</h6>
-                    </div>
-                  </div>
-                </td>
-                <td class="align-middle text-center text-normal">
-                  <span class="text-normal">{{ user.username }}</span>
-                </td>
-                <td class="align-middle text-center text-normal">
-                  <span class="text-normal">{{ user.email }}</span>
+                <td colspan="5" class="text-center py-4 text-muted">
+                  Memuat data...
                 </td>
               </tr>
-              {% endfor %}
             </tbody>
           </table>
         </div>
@@ -61,31 +64,130 @@
 </div>
 
 <script>
-  function konfirmasiHapus(userId, userName) {
-    if (confirm(`Apakah Anda yakin ingin menghapus akun klien ${userName}?`)) {
-      fetch(`/api/admin/hapus_klien/${userId}`, {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json',
-          // Tambahkan header otentikasi admin jika diperlukan
-          // 'Authorization': 'Bearer <ADMIN_TOKEN>'
-        }
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          alert(data.message);
-          location.reload(); // Muat ulang halaman untuk menampilkan data terbaru
-        } else {
-          alert('Gagal menghapus klien: ' + data.message);
-        }
-      })
-      .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan saat menghubungi server.');
+  (() => {
+    // Ambil data awal dari Jinja
+    const initialData = [
+      {% for user in users %}
+      {
+        _id: "{{ user._id }}", // Tambahkan ID untuk aksi seperti hapus
+        full_name: "{{ user.full_name }}",
+        username: "{{ user.username }}",
+        email: "{{ user.email }}",
+        profile_picture_url: "{{ user.profile_picture_url }}"
+      },
+      {% endfor %}
+    ];
+
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+
+    // Fungsi untuk merender ulang tabel
+    function renderTable(dataToRender) {
+      tableBody.innerHTML = ""; // Bersihkan isi tabel
+      if (dataToRender.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="5" class="text-center py-4 text-muted">
+              Tidak ada data klien yang ditemukan.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      dataToRender.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="text-center text-normal">
+            <h6 class="mb-0 text-normal">${index + 1}.</h6>
+          </td>
+          <td>
+            <div class="d-flex px-2 py-1">
+              <div>
+                <img
+                  src="${item.profile_picture_url}"
+                  alt="Foto Profil Klien"
+                  style="
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%;
+                    object-fit: cover;
+                    object-position: center;
+                  "
+                />
+              </div>
+              <div class="d-flex flex-column justify-content-center">
+                <h6 class="ms-4 mb-0 text-normal">
+                  ${item.full_name}
+                </h6>
+              </div>
+            </div>
+          </td>
+          <td class="align-middle text-center text-normal">
+            <span class="text-normal">${item.username}</span>
+          </td>
+          <td class="align-middle text-center text-normal">
+            <span class="text-normal">${item.email}</span>
+          </td>
+          <td class="align-middle text-center text-normal">
+            <div class="d-flex justify-content-center gap-4">
+              </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
       });
     }
-  }
-</script>
 
+    // Fungsi untuk memfilter data
+    function filterData() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      const filteredData = initialData.filter(item => {
+        // Cek Nama Klien
+        const matchesFullName = item.full_name.toLowerCase().includes(searchTerm);
+        // Cek Nama Pengguna
+        const matchesUsername = item.username.toLowerCase().includes(searchTerm);
+        // Cek Alamat Email
+        const matchesEmail = item.email.toLowerCase().includes(searchTerm);
+
+        return matchesFullName || matchesUsername || matchesEmail;
+      });
+
+      renderTable(filteredData);
+    }
+
+    // Event listener untuk input pencarian
+    searchInput.addEventListener("keyup", filterData);
+
+    // Render tabel saat halaman pertama kali dimuat
+    renderTable(initialData);
+
+    // Fungsi konfirmasiHapus (dipertahankan dari kode sebelumnya)
+    window.konfirmasiHapus = function(userId, userName) { // Menggunakan window. agar bisa diakses global
+      if (confirm(`Apakah Anda yakin ingin menghapus akun klien ${userName}?`)) {
+        fetch(`/api/admin/hapus_klien/${userId}`, {
+            method: "DELETE",
+            headers: {
+              "Content-Type": "application/json",
+              // Tambahkan header otentikasi admin jika diperlukan
+              // 'Authorization': 'Bearer <ADMIN_TOKEN>'
+            },
+          })
+          .then((response) => response.json())
+          .then((data) => {
+            if (data.success) {
+              alert(data.message);
+              location.reload(); // Muat ulang halaman untuk menampilkan data terbaru
+            } else {
+              alert("Gagal menghapus klien: " + data.message);
+            }
+          })
+          .catch((error) => {
+            console.error("Error:", error);
+            alert("Terjadi kesalahan saat menghubungi server.");
+          });
+      }
+    };
+  })();
+</script>
 {% endblock %}

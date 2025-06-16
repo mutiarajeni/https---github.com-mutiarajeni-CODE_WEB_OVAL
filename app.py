@@ -1624,6 +1624,7 @@ def admin_pesanan_tambah():
                 'total_harga': recalculated_total_harga,
                 'sisa_bayar': recalculated_sisa_bayar,
                 'status_pesanan': 'Menunggu Konfirmasi',
+                'tanggal_pembayaran_deposit': datetime.utcnow(),
                 'created_at': datetime.utcnow()
             }
 
@@ -1805,6 +1806,14 @@ def admin_pesanan_update(pesanan_id):
     update_data['total_harga'] = recalculated_total_harga
     update_data['sisa_bayar'] = recalculated_sisa_bayar
 
+
+    if status == 'Selesai':
+        # Jika status pesanan diubah menjadi 'Selesai',
+        # atur sisa_bayar menjadi 0 dan catat tanggal pelunasan
+        recalculated_sisa_bayar = 0
+        update_data['sisa_bayar'] = recalculated_sisa_bayar
+        update_data['tanggal_pembayaran_pelunasan'] = datetime.utcnow()
+
     try:
         db.pesanan.update_one({'_id': ObjectId(pesanan_id)}, {'$set': update_data})
         flash("Data pesanan berhasil diperbarui!", "success")
@@ -1833,13 +1842,45 @@ def admin_kirim_pengingat():
     nama = request.form['nama_klien']
     pesanan_id_for_redirect = request.form.get('pesanan_id_for_redirect')
 
+    # Ambil data pesanan dari database
+    pesanan = db.pesanan.find_one({"_id": ObjectId(pesanan_id_for_redirect)})
+    if not pesanan:
+        flash("Pesanan tidak ditemukan.", "danger")
+        return redirect(url_for('admin_pesanan'))
+
+    # Ambil detail layanan dan paket
+    layanan_data = db.layanan.find_one({"_id": pesanan['layanan_id']})
+    paket_data = db.paket.find_one({"_id": pesanan['paket_id']})
+
+    nama_layanan = layanan_data.get('nama', 'Layanan') if layanan_data else 'Layanan'
+    nama_paket = paket_data.get('nama', 'Paket') if paket_data else 'Paket'
+
+    jam_acara = pesanan.get('jam_acara', 'Jam belum ditentukan')
+
+    tanggal_mulai = pesanan.get('tanggal_mulai_acara')
+    tanggal_selesai = pesanan.get('tanggal_selesai_acara')
+
+    if tanggal_mulai and tanggal_selesai:
+        if tanggal_mulai == tanggal_selesai:
+            tanggal_acara = tanggal_mulai.strftime('%d-%m-%Y')
+        else:
+            tanggal_acara = f"{tanggal_mulai.strftime('%d-%m-%Y')} s.d. {tanggal_selesai.strftime('%d-%m-%Y')}"
+    else:
+        tanggal_acara = 'Tanggal belum ditentukan'
+
     # Format isi pesan
     if status == 'Belum Pemotretan':
-        pesan = f"Halo {nama}, ini adalah pengingat untuk jadwal pemotretan Anda bersama Oval Photo."
+        pesan = (
+            f"Halo {nama}, ini adalah pengingat untuk jadwal pemotretan layanan fotografi {nama_layanan} ({nama_paket}) kamu bersama Oval Photo pada {jam_acara}, {tanggal_acara}. Terima kasih telah memilih kami!"
+        )
     elif status == 'Sudah Pemotretan':
-        pesan = f"Halo {nama}, mohon melakukan pelunasan pembayaran untuk layanan fotografi Oval Photo."
+        pesan = (
+            f"Halo {nama}, mohon segera melakukan pelunasan pembayaran untuk layanan fotografi {nama_layanan} ({nama_paket}) kamu bersama Oval Photo yang telah dilakukan pada {jam_acara}, {tanggal_acara}. Terima kasih!"
+        )
     elif status == 'Sudah Kirim File & Album':
-        pesan = f"Halo {nama}, semoga Anda puas. Silakan beri ulasan mengenai layanan kami di Oval Photo :)"
+        pesan = (
+            f"Halo {nama}, album dan hasil foto kamu sudah kami kirim, semoga kamu puas dengan hasilnya ya! Silahkan beri ulasan mengenai layanan kami di website Oval Photo. Terima Kasih!"
+        )
     else:
         pesan = f"Halo {nama}, status pesanan Anda saat ini: {status}. Tidak ada pengingat spesifik."
 
@@ -1852,6 +1893,10 @@ def admin_kirim_pengingat():
         return redirect(url_for('admin_pesanan', pesanan_id=pesanan_id_for_redirect))
     else:
         return redirect(url_for('admin_pesanan'))
+    
+
+
+
 
 # User - Pemesanan (GET request - tampilan form)
 @app.route("/booking", methods=["GET"])
@@ -3052,15 +3097,17 @@ def admin_faq():
 
 
 @app.route("/admin_faq_tambah", methods=["GET", "POST"])
-@role_required(['admin', 'pemilik'])
 def admin_faq_tambah():
-    """Menampilkan dan memproses formulir tambah FAQ manual oleh admin."""
+    """
+    Menampilkan dan memproses formulir tambah FAQ manual oleh admin.
+    """
     if request.method == "POST":
         pertanyaan = request.form["pertanyaan"].strip()
         jawaban = request.form["jawaban"].strip()
 
+        # 1. Validasi Input Kosong
         if not pertanyaan or not jawaban:
-            # Menggunakan parameter URL untuk SweetAlert
+            # Mengarahkan kembali ke halaman tambah dengan pesan error via parameter URL
             return redirect(url_for(
                 "admin_faq_tambah",
                 _sa_status='error',
@@ -3070,21 +3117,22 @@ def admin_faq_tambah():
                 jawaban_input=jawaban
             ))
 
-        # Cek apakah pertanyaan sudah ada untuk menghindari duplikasi
+        # 2. Cek apakah pertanyaan sudah ada untuk menghindari duplikasi
         faq_sudah_ada = koleksi_faqs.find_one(
-            {"pertanyaan": {"$regex": pertanyaan, "$options": "i"}}
+            {"pertanyaan": {"$regex": f"^{pertanyaan}$", "$options": "i"}}
         )
         if faq_sudah_ada:
-            # Menggunakan parameter URL untuk SweetAlert
+            # Mengarahkan kembali dengan pesan peringatan
             return redirect(url_for(
                 "admin_faq_tambah",
-                _sa_status='warning', # Ganti ke 'warning' untuk duplikasi
-                _sa_message="Pertanyaan ini sudah ada.",
+                _sa_status='warning',
+                _sa_message="Pertanyaan ini sudah ada di dalam database.",
                 # Teruskan kembali input
                 pertanyaan_input=pertanyaan,
                 jawaban_input=jawaban
             ))
 
+        # 3. Siapkan dokumen untuk dimasukkan ke database
         dokumen_faq_baru = {
             "nama_pengaju": "Admin",
             "email_pengaju": "",
@@ -3095,9 +3143,11 @@ def admin_faq_tambah():
             "tanggal_diajukan": datetime.now(),
             "tanggal_diperbarui": datetime.now(),
         }
+
+        # 4. Coba simpan ke database
         try:
             koleksi_faqs.insert_one(dokumen_faq_baru)
-            # Menggunakan parameter URL untuk SweetAlert
+            # Jika berhasil, arahkan ke halaman daftar FAQ dengan pesan sukses
             return redirect(url_for(
                 "admin_faq",
                 _sa_status='success',
@@ -3105,24 +3155,29 @@ def admin_faq_tambah():
             ))
         except Exception as e:
             logging.error(f"Error saving new FAQ: {e}", exc_info=True)
-            # Menggunakan parameter URL untuk SweetAlert
+            # Jika gagal simpan, arahkan kembali dengan pesan error
             return redirect(url_for(
                 "admin_faq_tambah",
                 _sa_status='error',
-                _sa_message="Terjadi kesalahan saat menambahkan FAQ.",
+                _sa_message="Terjadi kesalahan internal saat menyimpan ke database.",
                 # Teruskan kembali input
                 pertanyaan_input=pertanyaan,
                 jawaban_input=jawaban
             ))
 
-    # Untuk GET request, ambil data input dari URL jika ada (setelah redirect error)
-    pertanyaan_input = request.args.get('pertanyaan_input', '')
-    jawaban_input = request.args.get('jawaban_input', '')
+    # --- Bagian untuk GET Request ---
+    # Ini akan dieksekusi saat halaman dimuat pertama kali atau saat redirect dari error.
+    
+    # Ambil input dari parameter URL (jika ada) dan bungkus dalam dictionary
+    # agar sesuai dengan template: {{ data_input.pertanyaan }}
+    data_input = {
+        'pertanyaan': request.args.get('pertanyaan_input', ''),
+        'jawaban': request.args.get('jawaban_input', '')
+    }
     
     return render_template(
         "admin/faq_tambah.html",
-        pertanyaan_input=pertanyaan_input,
-        jawaban_input=jawaban_input
+        data_input=data_input  # Kirim dictionary 'data_input' ke template
     )
 
 
@@ -3209,28 +3264,34 @@ def admin_faq_ubah(id_faq):
 
 @app.route("/admin_faq_toggle_status/<id_faq>", methods=["POST"])
 def admin_faq_toggle_status(id_faq):
-    """Mengubah status aktif/nonaktif FAQ."""
+    """Mengubah status aktif/nonaktif (is_active) FAQ tanpa mengubah status editorialnya."""
     try:
         faq = koleksi_faqs.find_one({"_id": ObjectId(id_faq)})
         if not faq:
             return jsonify({"success": False, "message": "FAQ tidak ditemukan."}), 404
 
-        new_is_active = not faq.get("is_active", False) # Ambil status aktif saat ini
-        new_status_text = "published" if new_is_active else "pending" # Sesuaikan status FAQ
+        # Ambil nilai is_active saat ini dan balikkan
+        new_is_active = not faq.get("is_active", False)
 
+        # Lakukan update HANYA pada field is_active dan tanggal_diperbarui
         koleksi_faqs.update_one(
             {"_id": ObjectId(id_faq)},
-            {"$set": {
-                "is_active": new_is_active,
-                "status": new_status_text, # Update status juga jika perlu
-                "tanggal_diperbarui": datetime.now()
-            }},
+            {
+                "$set": {
+                    "is_active": new_is_active,  # <-- Hanya ubah ini
+                    "tanggal_diperbarui": datetime.now()
+                    # Field 'status' tidak disentuh sama sekali
+                }
+            },
         )
+        
+        message = "FAQ berhasil dinonaktifkan." if not new_is_active else "FAQ berhasil diaktifkan."
+        
         return jsonify(
             {
                 "success": True,
                 "new_is_active": new_is_active,
-                "message": "Status berhasil diperbarui.",
+                "message": message,
             }
         )
     except Exception as e:
@@ -4412,7 +4473,59 @@ def pemilik_pesanan_detail():
 @app.route('/pemilik_pendapatan')
 @role_required(['pemilik'])
 def pemilik_pendapatan():
-    return render_template('pemilik/pendapatan.html')
+    all_pesanan_list = []
+    try:
+        # Ambil semua pesanan dari database
+        pesanan_cursor = db.pesanan.find().sort("created_at", -1) # Urutkan dari yang terbaru
+
+        # Buat map nama layanan dan paket berdasarkan _id
+        layanan_map = {str(l["_id"]): l["nama"] for l in db.layanan.find({}, {"nama": 1})}
+        paket_map = {str(p["_id"]): p["nama"] for p in db.paket.find({}, {"nama": 1})}
+
+        for pesanan in pesanan_cursor:
+            # Konversi ObjectId pesanan ke string
+            pesanan["_id"] = str(pesanan["_id"])
+
+            # Layanan
+            layanan_id = str(pesanan.get("layanan_id", ""))
+            pesanan["layanan"] = layanan_map.get(layanan_id, "Tidak ditemukan")
+
+            # Paket
+            paket_id = str(pesanan.get("paket_id", ""))
+            pesanan["paket"] = paket_map.get(paket_id, "Tidak ditemukan")
+
+            # Format tanggal pembayaran deposit
+            if isinstance(pesanan.get("tanggal_pembayaran_deposit"), datetime):
+                pesanan["tanggal_pembayaran_deposit_formatted"] = tanggal_id(
+                    pesanan["tanggal_pembayaran_deposit"]
+                )
+            else:
+                pesanan["tanggal_pembayaran_deposit_formatted"] = "Belum Bayar"
+
+             # Format tanggal pembayaran pelunasan
+            if isinstance(pesanan.get("tanggal_pembayaran_pelunasan"), datetime):
+                pesanan["tanggal_pembayaran_pelunasan_formatted"] = tanggal_id(
+                    pesanan["tanggal_pembayaran_pelunasan"]
+                )
+            else:
+                pesanan["tanggal_pembayaran_pelunasan_formatted"] = "Belum Bayar"
+
+            # Hitung status lunas berdasarkan sisa_bayar
+            pesanan["lunas_status"] = "Sudah" if pesanan.get('sisa_bayar', 0) <= 0 else "Belum"
+             
+            all_pesanan_list.append(pesanan)
+
+        return render_template(
+            "pemilik/pendapatan.html", pesanan=all_pesanan_list, current_route=request.path
+        )
+
+    except Exception as e:
+        flash(f"Terjadi kesalahan saat mengambil data pendapatan: {e}", "danger")
+        app.logger.error(f"Error in pemilik_pendapatan: {e}", exc_info=True)
+        return redirect(url_for("pemilik_dashboard"))
+
+
+
 
 @app.route('/pemilik_pengguna')
 @role_required(['pemilik']) # Pastikan route ini dilindungi

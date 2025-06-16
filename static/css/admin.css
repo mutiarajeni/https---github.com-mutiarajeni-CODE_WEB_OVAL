@@ -260,3 +260,11 @@ select.form-control:disabled {
   opacity: 0.85 !important;
   cursor: not-allowed;
 }
+
+#filterBtn {
+  text-transform: none;
+  font-size: 1.05rem;
+  color: #fff !important;
+  background-color: #000 !important;
+  border-color: #000 !important;
+}

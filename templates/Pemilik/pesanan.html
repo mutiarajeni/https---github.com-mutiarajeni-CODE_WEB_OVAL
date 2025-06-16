@@ -9,6 +9,29 @@
             <div class="col-6 d-flex align-items-center">
               <h5 class="text-white text-capitalize ps-3">Pesanan</h5>
             </div>
+            <div class="col-6 text-end">
+              <div
+                class="d-flex flex-wrap justify-content-end align-items-center gap-2 gap-md-3 me-4 text-end"
+              >
+                <div class="position-relative w-100 w-sm-auto mb-2 mb-sm-0">
+                  <i
+                    class="bi bi-search position-absolute start-0 ms-3"
+                    style="
+                      top: 50%;
+                      transform: translateY(-50%);
+                      color: #6c757d;
+                    "
+                  ></i>
+                  <input
+                    type="text"
+                    class="form-control ps-5 fs-6"
+                    placeholder="Cari di sini"
+                    id="searchInput"
+                    style="background-color: white; font-size: 12px"
+                  />
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -28,7 +51,7 @@
                 <th class="text-center text-dark fs-7 fw-bold">Aksi</th>
               </tr>
             </thead>
-            <tbody>
+            <tbody id="tableBody">
               {% for pesanan in pesanan %}
               <tr>
                 <td class="text-center align-middle">{{ loop.index }}.</td>
@@ -56,7 +79,6 @@
                 </td>
                 <td class="text-center align-middle">
                   <div class="d-flex justify-content-center gap-4">
-                    <!-- Tombol Detail -->
                     <a
                       href="/pemilik_pesanan_detail?pesanan_id={{ pesanan._id }}"
                       class="text-decoration-none d-flex align-items-center"
@@ -76,4 +98,98 @@
     </div>
   </div>
 </div>
+
+<script>
+  (() => {
+    // Data diambil langsung dari Jinja
+    const initialData = [
+      {% for pesanan in pesanan %}
+      {
+        no: {{ loop.index }},
+        nama_klien: "{{ pesanan.nama_klien }}",
+        layanan: "{{ pesanan.layanan }}",
+        waktu_acara: "{{ pesanan.jam_acara }} WIB, {{pesanan.tanggal_mulai_acara_formatted}}-{{pesanan.tanggal_selesai_acara_formatted}}",
+        status: "{{ pesanan.status_pesanan }}",
+        // Anda bisa menambahkan data lain yang mungkin perlu untuk filter/tampilan di masa depan
+      },
+      {% endfor %}
+    ];
+
+    const tableBody = document.getElementById("tableBody");
+    const searchInput = document.getElementById("searchInput");
+
+    // Fungsi untuk merender ulang tabel
+    function renderTable(dataToRender) {
+      tableBody.innerHTML = ""; // Bersihkan isi tabel
+      if (dataToRender.length === 0) {
+        tableBody.innerHTML = `
+          <tr>
+            <td colspan="6" class="text-center py-4 text-muted">
+              Tidak ada data pesanan yang ditemukan.
+            </td>
+          </tr>
+        `;
+        return;
+      }
+
+      dataToRender.forEach((item, index) => {
+        const row = document.createElement("tr");
+        row.innerHTML = `
+          <td class="text-center align-middle">${index + 1}.</td>
+          <td class="text-center align-middle">
+            <span class="mb-0" style="font-weight: normal">${item.nama_klien}</span>
+          </td>
+          <td class="text-center align-middle">
+            <span class="mb-0" style="font-weight: normal">${item.layanan}</span>
+          </td>
+          <td class="text-center align-middle">
+            <span class="mb-0" style="font-weight: normal">${item.waktu_acara}</span>
+          </td>
+          <td class="text-center align-middle">
+            <span class="mb-0" style="font-weight: normal">${item.status}</span>
+          </td>
+          <td class="text-center align-middle">
+            <div class="d-flex justify-content-center gap-4">
+              <a
+                href="/pemilik_pesanan_detail?pesanan_id={{ pesanan._id }}"
+                class="text-decoration-none d-flex align-items-center"
+                style="color: #1a73e8"
+              >
+                <i class="material-icons me-1">visibility</i>
+                <span style="font-weight: normal">Detail</span>
+              </a>
+            </div>
+          </td>
+        `;
+        tableBody.appendChild(row);
+      });
+    }
+
+    // Fungsi untuk memfilter data
+    function filterData() {
+      const searchTerm = searchInput.value.toLowerCase().trim();
+
+      const filteredData = initialData.filter(item => {
+        // Cek Nama Klien
+        const matchesNamaKlien = item.nama_klien.toLowerCase().includes(searchTerm);
+        // Cek Layanan
+        const matchesLayanan = item.layanan.toLowerCase().includes(searchTerm);
+        // Cek Waktu Acara (termasuk jam dan tanggal)
+        const matchesWaktuAcara = item.waktu_acara.toLowerCase().includes(searchTerm);
+        // Cek Status
+        const matchesStatus = item.status.toLowerCase().includes(searchTerm);
+
+        return matchesNamaKlien || matchesLayanan || matchesWaktuAcara || matchesStatus;
+      });
+
+      renderTable(filteredData);
+    }
+
+    // Event listener untuk input pencarian
+    searchInput.addEventListener("keyup", filterData);
+
+    // Render tabel saat halaman pertama kali dimuat
+    renderTable(initialData);
+  })();
+</script>
 {% endblock %}
