@@ -1,6 +1,5 @@
 :root {
   --color: #86ade8;
-  --bg: #010101;
 }
 
 * {
@@ -84,11 +83,7 @@ body {
 }
 
 .bg-admin {
-  background: linear-gradient(
-    90deg,
-    rgba(0, 0, 0, 0.7) 0%,
-    rgba(0, 0, 0, 0.7) 100%
-  );
+  background: black;
 }
 
 /* Button styles */
@@ -267,4 +262,33 @@ select.form-control:disabled {
   color: #fff !important;
   background-color: #000 !important;
   border-color: #000 !important;
+}
+
+/* Gaya untuk item sidebar yang sedang aktif */
+.sidenav .nav-item .nav-link.active {
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Pastikan ikon pada sidebar berwarna hitam secara default */
+.sidenav .nav-item .nav-link .material-icons {
+  color: black !important;
+}
+
+/* Pastikan ikon dan teks di dalam nav-link yang aktif juga berwarna putih */
+.sidenav .nav-item .nav-link.active .material-icons,
+.sidenav .nav-item .nav-link.active .nav-link-text {
+  color: white !important;
+}
+
+/* Hover effect for sidebar navigation links (pertahankan ini jika ingin hover juga hitam-putih) */
+.sidenav .nav-item .nav-link:hover {
+  background-color: black !important;
+  color: white !important;
+}
+
+/* Ensure icons and text inside the nav-link also change color on hover */
+.sidenav .nav-item .nav-link:hover .material-icons,
+.sidenav .nav-item .nav-link:hover .nav-link-text {
+  color: white !important;
 }
